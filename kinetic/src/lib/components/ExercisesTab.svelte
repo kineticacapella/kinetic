@@ -1,35 +1,39 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { initFlowbite, Modal } from 'flowbite';
-	import { exerciseTypes, equipmentTypes } from '$lib/stores';
+	import { exerciseTypes, equipmentTypes, user } from '$lib/stores';
+	import { getExercises, addExercise, updateExercise, deleteExercise } from '$lib/supabase';
+	import type { Exercise } from '$lib/supabase';
 
-	type Exercise = {
-		id: number;
-		name: string;
-		primaryMuscles: string[];
-		secondaryMuscles: string[];
-		type: string;
-		equipment: string;
-	};
+	// ...existing code...
 
 	let exercises: Exercise[] = $state([]);
-	let editingExerciseId: number | null = $state(null);
+	let editingExerciseId: string | null = $state(null);
+	let exerciseError = $state('');
+	let exerciseSuccess = $state('');
 	let modal: Modal;
+
+	async function loadExercises() {
+		if (!$user) return;
+		try {
+			const data = await getExercises($user);
+			exercises = data || [];
+		} catch (error) {
+			if (error instanceof Error) {
+				console.error('Error fetching exercises:', error.message);
+			} else {
+				console.error('Unknown error fetching exercises:', error);
+			}
+		}
+	}
 
 	onMount(() => {
 		initFlowbite();
-		const storedExercises = localStorage.getItem('exercises');
-		if (storedExercises) {
-			exercises = JSON.parse(storedExercises);
-		}
+		loadExercises();
 		const modalElement = document.getElementById('add-exercise-modal');
 		if (modalElement) {
 			modal = new Modal(modalElement);
 		}
-	});
-
-	$effect(() => {
-		localStorage.setItem('exercises', JSON.stringify(exercises));
 	});
 
 	// Form state
@@ -50,55 +54,83 @@
 	}
 
 	function startEdit(exercise: Exercise) {
-		editingExerciseId = exercise.id;
+		editingExerciseId = exercise.id || null;
 		name = exercise.name;
-		primaryMusclesStr = exercise.primaryMuscles.join(', ');
-		secondaryMusclesStr = exercise.secondaryMuscles.join(', ');
+		primaryMusclesStr = exercise.primarymuscles.join(', ');
+		secondaryMusclesStr = exercise.secondarymuscles.join(', ');
 		type = exercise.type;
 		equipment = exercise.equipment;
 		modal.show();
 	}
 
-	function saveExercise(event: Event) {
-        event.preventDefault();
+	async function saveExercise() {
+		exerciseError = '';
+		exerciseSuccess = '';
 		if (!name.trim() || !primaryMusclesStr.trim()) {
+			exerciseError = 'Name and primary muscles are required.';
 			return;
 		}
-
+		if (!$user) {
+			exerciseError = 'You must be logged in to add exercises.';
+			return;
+		}
 		const exerciseData = {
 			name: name.trim(),
-			primaryMuscles: primaryMusclesStr.split(',').map((s) => s.trim()).filter(Boolean),
-			secondaryMuscles: secondaryMusclesStr.split(',').map((s) => s.trim()).filter(Boolean),
+			primarymuscles: primaryMusclesStr.split(',').map((s) => s.trim()).filter(Boolean),
+			secondarymuscles: secondaryMusclesStr.split(',').map((s) => s.trim()).filter(Boolean),
 			type,
 			equipment
 		};
-
-		if (editingExerciseId !== null) {
-			const index = exercises.findIndex((ex) => ex.id === editingExerciseId);
-			if (index !== -1) {
-				exercises[index] = { ...exercises[index], ...exerciseData };
+		console.log('Adding exercise payload:', {
+			...exerciseData,
+			user_id: $user.id
+		});
+		console.log('User object:', $user);
+		try {
+			if (editingExerciseId) {
+				// Directly call supabase to get error response
+				const { data, error } = await import('$lib/supabase').then(m => m.supabase.from('exercises').update(exerciseData).eq('id', editingExerciseId).select());
+				if (error) {
+					exerciseError = error.message || JSON.stringify(error);
+					console.error('Supabase error:', error);
+					return;
+				}
+				exerciseSuccess = 'Exercise updated.';
+			} else {
+				// Directly call supabase to get error response
+				const { data, error } = await import('$lib/supabase').then(m => m.supabase.from('exercises').insert([{ ...exerciseData, user_id: $user.id }]).select());
+				if (error) {
+					exerciseError = error.message || JSON.stringify(error);
+					console.error('Supabase error:', error);
+					return;
+				}
+				exerciseSuccess = 'Exercise added.';
 			}
-		} else {
-			const newExercise: Exercise = {
-				id: exercises.length > 0 ? Math.max(...exercises.map((e) => e.id)) + 1 : 1,
-				...exerciseData
-			};
-			exercises.push(newExercise);
+			await loadExercises();
+			modal.hide();
+			editingExerciseId = null;
+			name = '';
+			primaryMusclesStr = '';
+			secondaryMusclesStr = '';
+			type = 'Strength';
+			equipment = 'Barbell';
+		} catch (error) {
+			exerciseError = error instanceof Error ? error.message : JSON.stringify(error);
+			console.error('Error saving exercise:', error);
 		}
-
-		modal.hide();
-		editingExerciseId = null;
-		name = '';
-		primaryMusclesStr = '';
-		secondaryMusclesStr = '';
-		type = 'Strength';
-		equipment = 'Barbell';
 	}
 
-	function deleteExercise(id: number) {
-		const index = exercises.findIndex((ex) => ex.id === id);
-		if (index !== -1) {
-			exercises.splice(index, 1);
+	async function handleDeleteExercise(id: string | undefined) {
+		if (!id) return;
+		try {
+			await deleteExercise(id);
+			await loadExercises();
+		} catch (error) {
+			if (error instanceof Error) {
+				console.error('Error deleting exercise:', error.message);
+			} else {
+				console.error('Unknown error deleting exercise:', error);
+			}
 		}
 	}
 </script>
@@ -112,7 +144,7 @@
             </p>
         </div>
         <button
-            onclick={startAdd}
+			onclick={startAdd}
             class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800 transition-colors"
             type="button"
         >
@@ -133,15 +165,15 @@
                         <h5 class="mb-3 text-xl font-bold tracking-tight text-gray-900 dark:text-white">{exercise.name}</h5>
                         <div class="space-y-3 text-sm">
                             <div>
-                                <span class="font-semibold text-gray-600 dark:text-gray-300">Primary Muscles:</span>
-                                <span class="text-gray-500 dark:text-gray-400"> {exercise.primaryMuscles.join(', ')}</span>
+								<span class="font-semibold text-gray-600 dark:text-gray-300">Primary Muscles:</span>
+								<span class="text-gray-500 dark:text-gray-400"> {exercise.primarymuscles.join(', ')}</span>
                             </div>
-                            {#if exercise.secondaryMuscles.length > 0}
-                                <div>
-                                    <span class="font-semibold text-gray-600 dark:text-gray-300">Secondary Muscles:</span>
-                                    <span class="text-gray-500 dark:text-gray-400"> {exercise.secondaryMuscles.join(', ')}</span>
-                                </div>
-                            {/if}
+							{#if exercise.secondarymuscles.length > 0}
+								<div>
+									<span class="font-semibold text-gray-600 dark:text-gray-300">Secondary Muscles:</span>
+									<span class="text-gray-500 dark:text-gray-400"> {exercise.secondarymuscles.join(', ')}</span>
+								</div>
+							{/if}
                             <div class="pt-2">
                                 <span class="inline-flex items-center bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300">
                                     {exercise.type}
@@ -153,8 +185,8 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 flex justify-end space-x-3">
-                        <button onclick={() => startEdit(exercise)} class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">Edit</button>
-                        <button onclick={() => deleteExercise(exercise.id)} class="text-sm font-medium text-red-600 dark:text-red-400 hover:underline">Delete</button>
+						<button onclick={() => startEdit(exercise)} class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">Edit</button>
+						<button onclick={() => handleDeleteExercise(exercise.id)} class="text-sm font-medium text-red-600 dark:text-red-400 hover:underline">Delete</button>
                     </div>
                 </div>
 			{/each}
@@ -188,6 +220,12 @@
 			</div>
 			<!-- Modal body -->
 			<form class="p-4 md:p-5" onsubmit={saveExercise}>
+				{#if exerciseError}
+					<p class="text-red-600 text-sm mb-2">{exerciseError}</p>
+				{/if}
+				{#if exerciseSuccess}
+					<p class="text-green-600 text-sm mb-2">{exerciseSuccess}</p>
+				{/if}
 				<div class="grid gap-6 mb-6 grid-cols-1 md:grid-cols-2">
 					<div class="md:col-span-2">
 						<label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>

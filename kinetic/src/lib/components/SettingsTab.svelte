@@ -1,10 +1,24 @@
 <script lang="ts">
-	import { exerciseTypes, equipmentTypes } from '$lib/stores';
+	import { onMount } from 'svelte';
+	import { exerciseTypes, equipmentTypes, user, session } from '$lib/stores';
+	import { supabase } from '$lib/supabase';
 
 	let newExerciseType = '';
 	let newEquipmentType = '';
+	let email = '';
+	let password = '';
+	let isSignUp = false;
+	let authError = '';
 
-	function addExerciseType() {
+	onMount(() => {
+		const { data } = supabase.auth.onAuthStateChange((event, newSession) => {
+			session.set(newSession);
+			user.set(newSession?.user ?? null);
+		});
+	});
+
+	function addExerciseType(event?: Event) {
+		event?.preventDefault();
 		if (newExerciseType.trim()) {
 			$exerciseTypes = [...$exerciseTypes, newExerciseType.trim()];
 			newExerciseType = '';
@@ -12,10 +26,11 @@
 	}
 
 	function removeExerciseType(typeToRemove: string) {
-		$exerciseTypes = $exerciseTypes.filter((t) => t !== typeToRemove);
+		$exerciseTypes = $exerciseTypes.filter((t: string) => t !== typeToRemove);
 	}
 
-	function addEquipmentType() {
+	function addEquipmentType(event?: Event) {
+		event?.preventDefault();
 		if (newEquipmentType.trim()) {
 			$equipmentTypes = [...$equipmentTypes, newEquipmentType.trim()];
 			newEquipmentType = '';
@@ -23,7 +38,44 @@
 	}
 
 	function removeEquipmentType(typeToRemove: string) {
-		$equipmentTypes = $equipmentTypes.filter((t) => t !== typeToRemove);
+		$equipmentTypes = $equipmentTypes.filter((t: string) => t !== typeToRemove);
+	}
+
+
+	async function signIn(event?: Event) {
+		event?.preventDefault();
+		authError = '';
+		const { error } = await supabase.auth.signInWithPassword({
+			email,
+			password
+		});
+		if (error) {
+			authError = error.message;
+			console.error('Error signing in:', error.message);
+		}
+	}
+
+	async function signUp(event?: Event) {
+		event?.preventDefault();
+		authError = '';
+		const { error } = await supabase.auth.signUp({
+			email,
+			password
+		});
+		if (error) {
+			authError = error.message;
+			console.error('Error signing up:', error.message);
+		} else {
+			isSignUp = false;
+			// Optionally, auto-login or show a message
+		}
+	}
+
+	async function signOut() {
+		const { error } = await supabase.auth.signOut();
+		if (error) {
+			console.error('Error signing out:', error.message);
+		}
 	}
 </script>
 
@@ -37,6 +89,87 @@
 
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+			<h2 class="text-2xl font-semibold mb-6 text-gray-700 dark:text-gray-300">Account</h2>
+			{#if $user}
+				<div class="flex items-center justify-between">
+					<p class="text-gray-800 dark:text-gray-200">Logged in as {$user?.email}</p>
+					<button
+						onclick={signOut}
+						class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800 transition-colors"
+						>Sign Out</button
+					>
+				</div>
+			{:else}
+				{#if isSignUp}
+					<form onsubmit={signUp} class="space-y-4">
+						<div>
+							<label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+							<input
+								type="email"
+								id="email"
+								bind:value={email}
+								class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+								placeholder="your@email.com"
+								required
+							/>
+						</div>
+						<div>
+							<label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+							<input
+								type="password"
+								id="password"
+								bind:value={password}
+								class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+								placeholder="••••••••"
+								required
+							/>
+						</div>
+						{#if authError}
+							<p class="text-red-600 text-sm">{authError}</p>
+						{/if}
+						<button
+							type="submit"
+							class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800 transition-colors"
+							>Sign Up</button>
+						<button type="button" class="ml-2 text-blue-600 underline" onclick={() => { isSignUp = false; authError = ''; }}>Already have an account? Sign In</button>
+					</form>
+				{:else}
+					<form onsubmit={signIn} class="space-y-4">
+						<div>
+							<label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+							<input
+								type="email"
+								id="email"
+								bind:value={email}
+								class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+								placeholder="your@email.com"
+								required
+							/>
+						</div>
+						<div>
+							<label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+							<input
+								type="password"
+								id="password"
+								bind:value={password}
+								class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+								placeholder="••••••••"
+								required
+							/>
+						</div>
+						{#if authError}
+							<p class="text-red-600 text-sm">{authError}</p>
+						{/if}
+						<button
+							type="submit"
+							class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800 transition-colors"
+							>Sign In</button>
+						<button type="button" class="ml-2 text-green-600 underline" onclick={() => { isSignUp = true; authError = ''; }}>Need an account? Sign Up</button>
+					</form>
+				{/if}
+			{/if}
+		</div>
+		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
 			<h2 class="text-2xl font-semibold mb-6 text-gray-700 dark:text-gray-300">
 				Exercise Types
 			</h2>
@@ -47,14 +180,14 @@
 					>
 						<span class="text-gray-800 dark:text-gray-200">{type}</span>
 						<button
-							on:click={() => removeExerciseType(type)}
+							onclick={() => removeExerciseType(type)}
 							class="text-sm font-medium text-red-600 dark:text-red-400 hover:underline"
 							>Remove</button
 						>
 					</li>
 				{/each}
 			</ul>
-			<form on:submit|preventDefault={addExerciseType} class="flex items-center gap-3">
+			<form onsubmit={addExerciseType} class="flex items-center gap-3">
 				<input
 					bind:value={newExerciseType}
 					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -68,7 +201,7 @@
 			</form>
 		</div>
 
-		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-.6">
 			<h2 class="text-2xl font-semibold mb-6 text-gray-700 dark:text-gray-300">Equipment</h2>
 			<ul class="space-y-3 mb-6">
 				{#each $equipmentTypes as type}
@@ -77,14 +210,14 @@
 					>
 						<span class="text-gray-800 dark:text-gray-200">{type}</span>
 						<button
-							on:click={() => removeEquipmentType(type)}
+							onclick={() => removeEquipmentType(type)}
 							class="text-sm font-medium text-red-600 dark:text-red-400 hover:underline"
 							>Remove</button
 						>
 					</li>
 				{/each}
 			</ul>
-			<form on:submit|preventDefault={addEquipmentType} class="flex items-center gap-3">
+			<form onsubmit={addEquipmentType} class="flex items-center gap-3">
 				<input
 					bind:value={newEquipmentType}
 					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"

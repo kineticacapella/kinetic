@@ -31,4 +31,5 @@
 			</div>
 		</div>
 	</main>
+	<slot />
 </div>

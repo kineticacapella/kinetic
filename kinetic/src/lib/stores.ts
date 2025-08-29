@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store';
+import type { Session, User } from '@supabase/supabase-js';
 
-function createPersistentStore(key, startValue) {
+function createPersistentStore<T>(key: string, startValue: T) {
     const { subscribe, set, update } = writable(startValue);
 
     if (typeof window !== 'undefined') {
@@ -28,3 +29,6 @@ export const exerciseTypes = createPersistentStore('exerciseTypes', [
 export const equipmentTypes = createPersistentStore('equipmentTypes', [
     'Barbell', 'Dumbbell', 'Kettlebell', 'Machine', 'Cable', 'Bodyweight', 'Bands', 'Medicine Ball', 'Other'
 ]);
+
+export const user = writable<User | null>(null);
+export const session = writable<Session | null>(null);

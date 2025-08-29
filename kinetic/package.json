@@ -29,5 +29,9 @@
 		"onlyBuiltDependencies": [
 			"esbuild"
 		]
+	},
+	"dependencies": {
+		"@supabase/supabase-js": "^2.56.0",
+		"firebase": "^12.2.1"
 	}
 }
