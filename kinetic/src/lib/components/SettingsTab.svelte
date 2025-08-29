@@ -3,8 +3,8 @@
 	import { user, session } from '$lib/stores';
 	import { supabase, getUserSettings, upsertUserSettings } from '$lib/supabase';
 
-	let newExerciseType = '';
-	let newEquipmentType = '';
+	let newExerciseType = $state('');
+	let newEquipmentType = $state('');
 	let exerciseTypes: string[] = $state([
 		'Strength', 'Cardio', 'Stretching', 'Plyometrics', 'Powerlifting', 'Strongman', 'Olympic Weightlifting'
 	]);
@@ -12,10 +12,10 @@
 		'Barbell', 'Dumbbell', 'Kettlebell', 'Machine', 'Cable', 'Bodyweight', 'Bands', 'Medicine Ball', 'Other'
 	]);
 	let settingsError = $state('');
-	let email = '';
-	let password = '';
-	let isSignUp = false;
-	let authError = '';
+	let email = $state('');
+	let password = $state('');
+	let isSignUp = $state(false);
+	let authError = $state('');
 
 
 	async function loadUserSettings() {
