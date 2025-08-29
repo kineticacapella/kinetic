@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { initFlowbite, Modal } from 'flowbite';
-	import { exerciseTypes, equipmentTypes } from '$lib/stores.ts';
+	import { exerciseTypes, equipmentTypes } from '$lib/stores';
 
 	type Exercise = {
 		id: number;
@@ -59,7 +59,8 @@
 		modal.show();
 	}
 
-	function saveExercise() {
+	function saveExercise(event: Event) {
+        event.preventDefault();
 		if (!name.trim() || !primaryMusclesStr.trim()) {
 			return;
 		}
@@ -111,7 +112,7 @@
             </p>
         </div>
         <button
-            on:click={startAdd}
+            onclick={startAdd}
             class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800 transition-colors"
             type="button"
         >
@@ -152,8 +153,8 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 flex justify-end space-x-3">
-                        <button on:click={() => startEdit(exercise)} class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">Edit</button>
-                        <button on:click={() => deleteExercise(exercise.id)} class="text-sm font-medium text-red-600 dark:text-red-400 hover:underline">Delete</button>
+                        <button onclick={() => startEdit(exercise)} class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">Edit</button>
+                        <button onclick={() => deleteExercise(exercise.id)} class="text-sm font-medium text-red-600 dark:text-red-400 hover:underline">Delete</button>
                     </div>
                 </div>
 			{/each}
@@ -186,7 +187,7 @@
 				</button>
 			</div>
 			<!-- Modal body -->
-			<form class="p-4 md:p-5" on:submit|preventDefault={saveExercise}>
+			<form class="p-4 md:p-5" onsubmit={saveExercise}>
 				<div class="grid gap-6 mb-6 grid-cols-1 md:grid-cols-2">
 					<div class="md:col-span-2">
 						<label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
