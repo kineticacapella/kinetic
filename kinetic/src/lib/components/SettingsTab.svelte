@@ -1,44 +1,97 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { exerciseTypes, equipmentTypes, user, session } from '$lib/stores';
-	import { supabase } from '$lib/supabase';
+	import { user, session } from '$lib/stores';
+	import { supabase, getUserSettings, upsertUserSettings } from '$lib/supabase';
 
 	let newExerciseType = '';
 	let newEquipmentType = '';
+	let exerciseTypes: string[] = $state([
+		'Strength', 'Cardio', 'Stretching', 'Plyometrics', 'Powerlifting', 'Strongman', 'Olympic Weightlifting'
+	]);
+	let equipmentTypes: string[] = $state([
+		'Barbell', 'Dumbbell', 'Kettlebell', 'Machine', 'Cable', 'Bodyweight', 'Bands', 'Medicine Ball', 'Other'
+	]);
+	let settingsError = $state('');
 	let email = '';
 	let password = '';
 	let isSignUp = false;
 	let authError = '';
+
+
+	async function loadUserSettings() {
+		if ($user) {
+			try {
+				const settings = await getUserSettings($user);
+				if (settings) {
+					exerciseTypes = settings.exercise_types;
+					equipmentTypes = settings.equipment_types;
+				}
+			} catch (err) {
+				settingsError = 'Could not load settings.';
+			}
+		}
+	}
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((event, newSession) => {
 			session.set(newSession);
 			user.set(newSession?.user ?? null);
 		});
+		loadUserSettings();
 	});
 
-	function addExerciseType(event?: Event) {
+	$effect(() => {
+		loadUserSettings();
+	});
+
+	async function addExerciseType(event?: Event) {
 		event?.preventDefault();
-		if (newExerciseType.trim()) {
-			$exerciseTypes = [...$exerciseTypes, newExerciseType.trim()];
-			newExerciseType = '';
+		if (!newExerciseType.trim() || !$user) return;
+		exerciseTypes = [...exerciseTypes, newExerciseType.trim()];
+		newExerciseType = '';
+		try {
+			await upsertUserSettings($user, exerciseTypes, equipmentTypes);
+			await loadUserSettings();
+		} catch (err) {
+			settingsError = 'Could not save exercise types.';
 		}
 	}
 
-	function removeExerciseType(typeToRemove: string) {
-		$exerciseTypes = $exerciseTypes.filter((t: string) => t !== typeToRemove);
-	}
-
-	function addEquipmentType(event?: Event) {
-		event?.preventDefault();
-		if (newEquipmentType.trim()) {
-			$equipmentTypes = [...$equipmentTypes, newEquipmentType.trim()];
-			newEquipmentType = '';
+	async function removeExerciseType(typeToRemove: string) {
+		exerciseTypes = exerciseTypes.filter((t: string) => t !== typeToRemove);
+		if ($user) {
+			try {
+				await upsertUserSettings($user, exerciseTypes, equipmentTypes);
+				await loadUserSettings();
+			} catch (err) {
+				settingsError = 'Could not save exercise types.';
+			}
 		}
 	}
 
-	function removeEquipmentType(typeToRemove: string) {
-		$equipmentTypes = $equipmentTypes.filter((t: string) => t !== typeToRemove);
+	async function addEquipmentType(event?: Event) {
+		event?.preventDefault();
+		if (!newEquipmentType.trim() || !$user) return;
+		equipmentTypes = [...equipmentTypes, newEquipmentType.trim()];
+		newEquipmentType = '';
+		try {
+			await upsertUserSettings($user, exerciseTypes, equipmentTypes);
+			await loadUserSettings();
+		} catch (err) {
+			settingsError = 'Could not save equipment types.';
+		}
+	}
+
+	async function removeEquipmentType(typeToRemove: string) {
+		equipmentTypes = equipmentTypes.filter((t: string) => t !== typeToRemove);
+		if ($user) {
+			try {
+				await upsertUserSettings($user, exerciseTypes, equipmentTypes);
+				await loadUserSettings();
+			} catch (err) {
+				settingsError = 'Could not save equipment types.';
+			}
+		}
 	}
 
 
@@ -173,8 +226,11 @@
 			<h2 class="text-2xl font-semibold mb-6 text-gray-700 dark:text-gray-300">
 				Exercise Types
 			</h2>
+			{#if settingsError}
+				<p class="text-red-600 text-sm mb-2">{settingsError}</p>
+			{/if}
 			<ul class="space-y-3 mb-6">
-				{#each $exerciseTypes as type}
+				{#each exerciseTypes as type}
 					<li
 						class="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded-lg"
 					>
@@ -204,7 +260,7 @@
 		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-.6">
 			<h2 class="text-2xl font-semibold mb-6 text-gray-700 dark:text-gray-300">Equipment</h2>
 			<ul class="space-y-3 mb-6">
-				{#each $equipmentTypes as type}
+				{#each equipmentTypes as type}
 					<li
 						class="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded-lg"
 					>

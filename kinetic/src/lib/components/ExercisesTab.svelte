@@ -1,11 +1,18 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { initFlowbite, Modal } from 'flowbite';
-	import { exerciseTypes, equipmentTypes, user } from '$lib/stores';
+	import { user } from '$lib/stores';
 	import { getExercises, addExercise, updateExercise, deleteExercise } from '$lib/supabase';
-	import type { Exercise } from '$lib/supabase';
 
-	// ...existing code...
+	type Exercise = {
+		id: string;
+		name: string;
+		primarymuscles: string[];
+		secondarymuscles: string[];
+		type: string;
+		equipment: string;
+		user_id: string;
+	};
 
 	let exercises: Exercise[] = $state([]);
 	let editingExerciseId: string | null = $state(null);
@@ -27,6 +34,7 @@
 		}
 	}
 
+
 	onMount(() => {
 		initFlowbite();
 		loadExercises();
@@ -36,12 +44,39 @@
 		}
 	});
 
+	$effect(() => {
+		if ($user) loadExercises();
+	});
+
 	// Form state
 	let name = $state('');
 	let primaryMusclesStr = $state('');
 	let secondaryMusclesStr = $state('');
 	let type = $state('Strength');
 	let equipment = $state('Barbell');
+
+	// Shared options from user_settings
+	import { getUserSettings } from '$lib/supabase';
+	let exerciseTypes: string[] = $state([
+		'Strength', 'Cardio', 'Stretching', 'Plyometrics', 'Powerlifting', 'Strongman', 'Olympic Weightlifting'
+	]);
+	let equipmentTypes: string[] = $state([
+		'Barbell', 'Dumbbell', 'Kettlebell', 'Machine', 'Cable', 'Bodyweight', 'Bands', 'Medicine Ball', 'Other'
+	]);
+
+	$effect(async () => {
+		if ($user) {
+			try {
+				const settings = await getUserSettings($user);
+				if (settings) {
+					exerciseTypes = settings.exercise_types;
+					equipmentTypes = settings.equipment_types;
+				}
+			} catch (err) {
+				// Optionally handle error
+			}
+		}
+	});
 
 	function startAdd() {
 		editingExerciseId = null;
@@ -269,7 +304,7 @@
 							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 							bind:value={type}
 						>
-							{#each $exerciseTypes as exerciseType}
+							{#each exerciseTypes as exerciseType}
 								<option value={exerciseType}>{exerciseType}</option>
 							{/each}
 						</select>
@@ -281,7 +316,7 @@
 							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 							bind:value={equipment}
 						>
-							{#each $equipmentTypes as equipmentType}
+							{#each equipmentTypes as equipmentType}
 								<option value={equipmentType}>{equipmentType}</option>
 							{/each}
 						</select>

@@ -1,3 +1,33 @@
+// User settings CRUD functions
+export interface UserSettings {
+	user_id: string;
+	exercise_types: string[];
+	equipment_types: string[];
+}
+
+export async function getUserSettings(user: User): Promise<UserSettings | null> {
+	const { data, error } = await supabase
+		.from('user_settings')
+		.select('*')
+		.eq('user_id', user.id)
+		.single();
+	if (error) {
+		if (error.code === 'PGRST116') return null; // Not found
+		throw error;
+	}
+	return data as UserSettings;
+}
+
+export async function upsertUserSettings(user: User, exercise_types: string[], equipment_types: string[]) {
+	const { error } = await supabase
+		.from('user_settings')
+		.upsert({
+			user_id: user.id,
+			exercise_types,
+			equipment_types
+		});
+	if (error) throw error;
+}
 // Exercise CRUD functions
 import type { User } from '@supabase/supabase-js';
 
