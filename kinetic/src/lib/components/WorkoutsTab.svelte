@@ -1,32 +1,18 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { initFlowbite, Modal } from 'flowbite';
-	import { user } from '$lib/stores';
-	import { getWorkouts, addWorkout, updateWorkout, deleteWorkout, getExercises, addExerciseToWorkout, removeExerciseFromWorkout, updateExerciseInWorkout } from '$lib/supabase';
+	import { workouts } from '$lib/stores';
+	import { getExercises } from '$lib/supabase';
 	import type { Workout, Exercise, WorkoutExercise } from '$lib/supabase';
 	import { PlusOutline } from 'flowbite-svelte-icons';
+    import { user } from '$lib/stores';
 
-	let workouts: Workout[] = $state([]);
 	let exercises: Exercise[] = $state([]);
 	let editingWorkout: Workout | null = $state(null);
 	let workoutError = $state('');
 	let workoutSuccess = $state('');
 	let addWorkoutModal: Modal;
 	let viewWorkoutModal: Modal;
-
-	async function loadWorkouts() {
-		if (!$user) return;
-		try {
-			const data = await getWorkouts($user);
-			workouts = data || [];
-		} catch (error) {
-			if (error instanceof Error) {
-				console.error('Error fetching workouts:', error.message);
-			} else {
-				console.error('Unknown error fetching workouts:', error);
-			}
-		}
-	}
 
 	async function loadExercises() {
 		if (!$user) return;
@@ -56,7 +42,6 @@
 
 	$effect(() => {
 		if ($user) {
-			void loadWorkouts();
 			void loadExercises();
 		}
 	});
@@ -81,50 +66,36 @@
 		viewWorkoutModal.show();
 	}
 
-	async function saveWorkout() {
+	function saveWorkout() {
 		workoutError = '';
 		workoutSuccess = '';
 		if (!name.trim()) {
 			workoutError = 'Name is required.';
 			return;
 		}
-		if (!$user) {
-			workoutError = 'You must be logged in to add workouts.';
-			return;
-		}
+
 		const workoutData = {
+			id: editingWorkout?.id || crypto.randomUUID(),
 			name: name.trim(),
+			exercises: editingWorkout?.exercises || []
 		};
-		try {
-			if (editingWorkout && editingWorkout.id) {
-				await updateWorkout(editingWorkout.id, workoutData);
-				workoutSuccess = 'Workout updated.';
-			} else {
-				await addWorkout(workoutData, $user);
-				workoutSuccess = 'Workout added.';
-			}
-			await loadWorkouts();
-			addWorkoutModal.hide();
-			editingWorkout = null;
-			name = '';
-		} catch (error) {
-			workoutError = error instanceof Error ? error.message : JSON.stringify(error);
-			console.error('Error saving workout:', error);
+
+		if (editingWorkout) {
+			workouts.update(items => items.map(item => item.id === editingWorkout!.id ? workoutData : item));
+			workoutSuccess = 'Workout updated.';
+		} else {
+			workouts.update(items => [...items, workoutData]);
+			workoutSuccess = 'Workout added.';
 		}
+
+		addWorkoutModal.hide();
+		editingWorkout = null;
+		name = '';
 	}
 
-	async function handleDeleteWorkout(id: string | undefined) {
+	function handleDeleteWorkout(id: string | undefined) {
 		if (!id) return;
-		try {
-			await deleteWorkout(id);
-			await loadWorkouts();
-		} catch (error) {
-			if (error instanceof Error) {
-				console.error('Error deleting workout:', error.message);
-			} else {
-				console.error('Unknown error deleting workout:', error);
-			}
-		}
+		workouts.update(items => items.filter(item => item.id !== id));
 	}
 
 	// Workout Exercise Management
@@ -133,42 +104,36 @@
 	let reps = $state(10);
 	let weight = $state(100);
 
-	async function handleAddExerciseToWorkout() {
+	function handleAddExerciseToWorkout(event: Event) {
+		event.preventDefault();
 		if (!editingWorkout || !editingWorkout.id || !selectedExerciseId) return;
 
-		const workoutExercise: WorkoutExercise = {
+		const exercise = exercises.find(e => e.id === selectedExerciseId);
+		if (!exercise) return;
+
+		const workoutExercise: any = {
+			id: crypto.randomUUID(),
 			workout_id: editingWorkout.id,
 			exercise_id: selectedExerciseId,
 			sets,
 			reps,
-			weight
+			weight,
+			exercises: exercise // Nest the full exercise object
 		};
 
-		try {
-			await addExerciseToWorkout(workoutExercise);
-			await loadWorkouts(); // Reload to show the new exercise
-			// Need to update the editingWorkout object to reflect the change
-			const updatedWorkout = workouts.find(w => w.id === editingWorkout?.id)
-			if(updatedWorkout) editingWorkout = updatedWorkout;
-			selectedExerciseId = '';
-			sets = 3;
-			reps = 10;
-			weight = 100;
-		} catch (error) {
-			console.error('Error adding exercise to workout:', error);
-		}
+		editingWorkout.exercises = [...(editingWorkout.exercises || []), workoutExercise];
+		workouts.update(items => items.map(item => item.id === editingWorkout!.id ? editingWorkout : item));
+
+		selectedExerciseId = '';
+		sets = 3;
+		reps = 10;
+		weight = 100;
 	}
 
-	async function handleRemoveExerciseFromWorkout(workoutExerciseId: string) {
+	function handleRemoveExerciseFromWorkout(workoutExerciseId: string) {
 		if (!editingWorkout) return;
-		try {
-			await removeExerciseFromWorkout(workoutExerciseId);
-			await loadWorkouts();
-			const updatedWorkout = workouts.find(w => w.id === editingWorkout?.id)
-			if(updatedWorkout) editingWorkout = updatedWorkout;
-		} catch (error) {
-			console.error('Error removing exercise from workout:', error);
-		}
+		editingWorkout.exercises = (editingWorkout.exercises || []).filter(we => we.id !== workoutExerciseId);
+		workouts.update(items => items.map(item => item.id === editingWorkout!.id ? editingWorkout : item));
 	}
 
 </script>
@@ -187,14 +152,14 @@
         </button>
     </div>
 
-	{#if workouts.length === 0}
+	{#if $workouts.length === 0}
 		<div class="text-center p-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
 			<h3 class="text-xl font-semibold text-gray-800 dark:text-white">No workouts yet!</h3>
 			<p class="text-gray-500 dark:text-gray-400 mt-2">Click "Add Workout" to get started.</p>
 		</div>
 	{:else}
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-			{#each workouts as workout (workout.id)}
+			{#each $workouts as workout (workout.id)}
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg">
                     <div class="p-6">
                         <h5 class="mb-3 text-xl font-bold tracking-tight text-gray-900 dark:text-white">{workout.name}</h5>
