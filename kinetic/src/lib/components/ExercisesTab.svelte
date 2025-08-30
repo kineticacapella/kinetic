@@ -3,6 +3,7 @@
 	import { initFlowbite, Modal } from 'flowbite';
 	import { user } from '$lib/stores';
 	import { getExercises, addExercise, updateExercise, deleteExercise } from '$lib/supabase';
+	import { PlusOutline } from 'flowbite-svelte-icons';
 
 	type Exercise = {
 		id: string;
@@ -37,7 +38,6 @@
 
 	onMount(() => {
 		initFlowbite();
-		loadExercises();
 		const modalElement = document.getElementById('add-exercise-modal');
 		if (modalElement) {
 			modal = new Modal(modalElement);
@@ -45,7 +45,7 @@
 	});
 
 	$effect(() => {
-		if ($user) loadExercises();
+		if ($user) void loadExercises();
 	});
 
 	// Form state
@@ -64,17 +64,19 @@
 		'Barbell', 'Dumbbell', 'Kettlebell', 'Machine', 'Cable', 'Bodyweight', 'Bands', 'Medicine Ball', 'Other'
 	]);
 
-	$effect(async () => {
+	$effect(() => {
 		if ($user) {
-			try {
-				const settings = await getUserSettings($user);
-				if (settings) {
-					exerciseTypes = settings.exercise_types;
-					equipmentTypes = settings.equipment_types;
+			(async () => {
+				try {
+					const settings = await getUserSettings($user);
+					if (settings) {
+						exerciseTypes = settings.exercise_types;
+						equipmentTypes = settings.equipment_types;
+					}
+				} catch (err) {
+					// Optionally handle error
 				}
-			} catch (err) {
-				// Optionally handle error
-			}
+			})();
 		}
 	});
 
@@ -178,12 +180,9 @@
                 A list of exercises you can add to your workout routines.
             </p>
         </div>
-        <button
-			onclick={startAdd}
-            class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800 transition-colors"
-            type="button"
-        >
-            Add Exercise
+        <button onclick={startAdd} type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            <PlusOutline class="w-6 h-6" />
+            <span class="sr-only">Add Exercise</span>
         </button>
     </div>
 
