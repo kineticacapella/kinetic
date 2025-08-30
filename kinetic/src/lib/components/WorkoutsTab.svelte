@@ -109,13 +109,14 @@
 	function handleAddExerciseToWorkout(event: Event) {
 		event.preventDefault();
 		if (!editingWorkout || !editingWorkout.id || !selectedExerciseId) return;
+		const currentWorkout = editingWorkout;
 
 		const exercise = exercises.find(e => e.id === selectedExerciseId);
 		if (!exercise) return;
 
 		const workoutExercise: any = {
 			id: crypto.randomUUID(),
-			workout_id: editingWorkout.id,
+			workout_id: currentWorkout.id,
 			exercise_id: selectedExerciseId,
 			sets,
 			reps,
@@ -123,8 +124,8 @@
 			exercises: exercise // Nest the full exercise object
 		};
 
-		editingWorkout.exercises = [...(editingWorkout.exercises || []), workoutExercise];
-		workouts.update(items => items.map(item => item.id === editingWorkout!.id ? editingWorkout : item));
+		currentWorkout.exercises = [...(currentWorkout.exercises || []), workoutExercise];
+		workouts.update(items => items.map(item => item.id === currentWorkout.id ? currentWorkout : item));
 
 		selectedExerciseId = '';
 		sets = 3;
@@ -134,8 +135,9 @@
 
 	function handleRemoveExerciseFromWorkout(workoutExerciseId: string) {
 		if (!editingWorkout) return;
-		editingWorkout.exercises = (editingWorkout.exercises || []).filter(we => we.id !== workoutExerciseId);
-		workouts.update(items => items.map(item => item.id === editingWorkout!.id ? editingWorkout : item));
+		const currentWorkout = editingWorkout;
+		currentWorkout.exercises = (currentWorkout.exercises || []).filter(we => we.id !== workoutExerciseId);
+		workouts.update(items => items.map(item => item.id === currentWorkout.id ? currentWorkout : item));
 	}
 
 </script>
@@ -253,10 +255,10 @@
                         {#each editingWorkout?.exercises || [] as woExercise}
                             <li class="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
                                 <div>
-									<span class="font-bold text-gray-800 dark:text-gray-200">{woExercise.exercises.name}</span>
+									<span class="font-bold text-gray-800 dark:text-gray-200">{(woExercise as any).exercises.name}</span>
 									<span class="text-sm text-gray-500 dark:text-gray-400 ml-2">{woExercise.sets} sets x {woExercise.reps} reps @ {woExercise.weight}kg</span>
 								</div>
-                                <button onclick={() => handleRemoveExerciseFromWorkout(woExercise.id)} class="text-sm font-medium text-red-600 dark:text-red-400 hover:underline">Remove</button>
+                                <button onclick={() => woExercise.id && handleRemoveExerciseFromWorkout(woExercise.id)} class="text-sm font-medium text-red-600 dark:text-red-400 hover:underline">Remove</button>
                             </li>
                         {/each}
                     </ul>
