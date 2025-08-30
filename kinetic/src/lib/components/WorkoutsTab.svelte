@@ -83,14 +83,16 @@
 		if (editingWorkout) {
 			workouts.update(items => items.map(item => item.id === editingWorkout!.id ? workoutData : item));
 			workoutSuccess = 'Workout updated.';
+			addWorkoutModal.hide();
+			editingWorkout = null;
+			name = '';
 		} else {
 			workouts.update(items => [...items, workoutData]);
 			workoutSuccess = 'Workout added.';
+			addWorkoutModal.hide();
+			name = '';
+			viewWorkout(workoutData);
 		}
-
-		addWorkoutModal.hide();
-		editingWorkout = null;
-		name = '';
 	}
 
 	function handleDeleteWorkout(id: string | undefined) {
