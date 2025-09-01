@@ -62,10 +62,6 @@
 		newWorkoutSets = [...newWorkoutSets, { id: crypto.randomUUID(), weight: 0, reps: 0 }];
 	}
 
-	function removeSet(id: string) {
-		newWorkoutSets = newWorkoutSets.filter((set) => set.id !== id);
-	}
-
 	function handleAddWorkout(event: Event) {
 		event.preventDefault();
 		if (!newWorkoutName.trim() || !$user || !newWorkoutExerciseId || newWorkoutSets.length === 0)
@@ -221,7 +217,7 @@
 	aria-hidden="true"
 	class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
 >
-	<div class="relative p-4 w-full max-w-2xl max-h-full">
+	<div class="relative p-4 w-full max-w-4xl max-h-full">
 		<div class="relative bg-white rounded-lg shadow-xl dark:bg-gray-800">
 			<div
 				class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
@@ -255,14 +251,14 @@
 					<div>
 						<label
 							for="workout-name"
-							class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+							class="block mb-2 text-base font-medium text-gray-900 dark:text-white"
 							>Workout Name</label
 						>
 						<input
 							type="text"
 							id="workout-name"
 							bind:value={newWorkoutName}
-							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+							class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
 							placeholder="e.g. Push Day"
 							required
 						/>
@@ -270,13 +266,13 @@
 					<div>
 						<label
 							for="workout-exercise"
-							class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+							class="block mb-2 text-base font-medium text-gray-900 dark:text-white"
 							>Exercise</label
 						>
 						<select
 							id="workout-exercise"
 							bind:value={newWorkoutExerciseId}
-							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+							class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
 							required
 						>
 							<option value="" disabled>Select an exercise</option>
@@ -293,32 +289,32 @@
 						<button
 							type="button"
 							onclick={addSet}
-							class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+							class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 						>
 							Add Set
 						</button>
 					</div>
-					<div class="flex flex-col gap-2">
+					<div class="flex flex-col gap-3">
 						{#if newWorkoutSets.length > 0}
 							<div
-								class="grid grid-cols-4 gap-2 items-center font-medium text-gray-500 dark:text-gray-400"
+								class="grid grid-cols-4 gap-4 items-center font-medium text-gray-500 dark:text-gray-400"
 							>
-								<div>Set</div>
-								<div>Weight</div>
-								<div>Reps</div>
-								<div></div>
+								<div class="text-base">Set</div>
+								<div class="text-base">Weight</div>
+								<div class="text-base">Reps</div>
+								<div class="text-base text-center">Completed</div>
 							</div>
 						{/if}
 						{#each newWorkoutSets as set, i (set.id)}
-							<div class="grid grid-cols-4 gap-2 items-center">
-								<div class="text-sm font-medium text-gray-900 dark:text-white">{i + 1}</div>
+							<div class="grid grid-cols-4 gap-4 items-center">
+								<div class="text-base font-medium text-gray-900 dark:text-white">{i + 1}</div>
 								<div>
 									<label for="weight-{set.id}" class="sr-only">Weight</label>
 									<input
 										type="number"
 										id="weight-{set.id}"
 										bind:value={set.weight}
-										class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600"
+										class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600"
 										placeholder="Weight"
 									/>
 								</div>
@@ -328,16 +324,16 @@
 										type="number"
 										id="reps-{set.id}"
 										bind:value={set.reps}
-										class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600"
+										class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600"
 										placeholder="Reps"
 									/>
 								</div>
-								<button
-									type="button"
-									onclick={() => removeSet(set.id)}
-									class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500"
-									>Remove</button
-								>
+								<div class="flex justify-center">
+									<input
+										type="checkbox"
+										class="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+									/>
+								</div>
 							</div>
 						{/each}
 					</div>
@@ -345,7 +341,7 @@
 
 				<button
 					type="submit"
-					class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+					class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-base px-5 py-3 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 				>
 					Add workout
 				</button>
