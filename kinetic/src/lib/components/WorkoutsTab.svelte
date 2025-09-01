@@ -4,7 +4,7 @@
 	import { workouts } from '$lib/stores';
 	import { getExercises } from '$lib/supabase';
 	import type { Workout, Exercise, WorkoutExercise } from '$lib/supabase';
-	import { PlusOutline } from 'flowbite-svelte-icons';
+	import { PlusOutline, DotsVerticalOutline } from 'flowbite-svelte-icons';
 	import { user } from '$lib/stores';
 
 	let exercises: Exercise[] = $state([]);
@@ -297,8 +297,9 @@
 					<div class="flex flex-col gap-4">
 						{#if newWorkoutSets.length > 0}
 							<div
-								class="grid grid-cols-4 gap-4 items-center font-medium text-gray-500 dark:text-gray-400 text-center"
+								class="grid grid-cols-5 gap-4 items-center font-medium text-gray-500 dark:text-gray-400 text-center"
 							>
+								<div></div>
 								<div class="text-base">Set</div>
 								<div class="text-base">Weight</div>
 								<div class="text-base">Reps</div>
@@ -307,8 +308,11 @@
 						{/if}
 						{#each newWorkoutSets as set, i (set.id)}
 							<div
-								class="grid grid-cols-4 gap-4 items-center border border-gray-200 dark:border-gray-700 rounded-lg p-3"
+								class="grid grid-cols-5 gap-4 items-center border border-gray-200 dark:border-gray-700 rounded-lg p-3"
 							>
+								<div class="flex justify-center">
+									<DotsVerticalOutline class="w-5 h-5 text-gray-500" />
+								</div>
 								<div class="text-base font-medium text-gray-900 dark:text-white text-center">
 									{i + 1}
 								</div>
