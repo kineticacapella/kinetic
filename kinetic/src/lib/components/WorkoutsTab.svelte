@@ -17,7 +17,32 @@
 	// Add workout state
 	let newWorkoutName = $state('');
 	let newWorkoutExerciseId = $state('');
-	let newWorkoutSets = $state<{ id: string; weight: number; reps: number }[]>([]);
+	let newWorkoutSets = $state<
+		{ id: string; exerciseId: string; exerciseName: string; weight: number; reps: number }[]
+	>([]);
+
+	let groupedSets = $derived(
+		newWorkoutSets.reduce(
+			(acc, set) => {
+				let group = acc.find((g) => g.exerciseId === set.exerciseId);
+				if (!group) {
+					group = {
+						exerciseId: set.exerciseId,
+						exerciseName: set.exerciseName,
+						sets: []
+					};
+					acc.push(group);
+				}
+				group.sets.push(set);
+				return acc;
+			},
+			[] as {
+				exerciseId: string;
+				exerciseName: string;
+				sets: typeof newWorkoutSets;
+			}[]
+		)
+	);
 
 	async function loadExercises() {
 		if (!$user) return;
@@ -59,7 +84,25 @@
 	}
 
 	async function addSet() {
-		newWorkoutSets = [...newWorkoutSets, { id: crypto.randomUUID(), weight: 0, reps: 0 }];
+		if (!newWorkoutExerciseId) {
+			// TODO: show error to user
+			return;
+		}
+		const exercise = exercises.find((e) => e.id === newWorkoutExerciseId);
+		if (!exercise) {
+			// TODO: show error to user
+			return;
+		}
+		newWorkoutSets = [
+			...newWorkoutSets,
+			{
+				id: crypto.randomUUID(),
+				exerciseId: newWorkoutExerciseId,
+				exerciseName: exercise.name,
+				weight: 0,
+				reps: 0
+			}
+		];
 		await tick();
 		initFlowbite();
 	}
@@ -70,23 +113,22 @@
 
 	function handleAddWorkout(event: Event) {
 		event.preventDefault();
-		if (!newWorkoutName.trim() || !$user || !newWorkoutExerciseId || newWorkoutSets.length === 0)
-			return;
-
-		const exercise = exercises.find((e) => e.id === newWorkoutExerciseId);
-		if (!exercise) return;
+		if (!newWorkoutName.trim() || !$user || newWorkoutSets.length === 0) return;
 
 		const newWorkoutId = crypto.randomUUID();
 
-		const workoutExercises: any[] = newWorkoutSets.map((set) => ({
-			id: crypto.randomUUID(),
-			workout_id: newWorkoutId,
-			exercise_id: newWorkoutExerciseId,
-			sets: 1, // Each row is 1 set
-			reps: set.reps,
-			weight: set.weight,
-			exercises: exercise
-		}));
+		const workoutExercises: any[] = newWorkoutSets.map((set) => {
+			const exercise = exercises.find((e) => e.id === set.exerciseId);
+			return {
+				id: crypto.randomUUID(),
+				workout_id: newWorkoutId,
+				exercise_id: set.exerciseId,
+				sets: 1, // Each row is 1 set
+				reps: set.reps,
+				weight: set.weight,
+				exercises: exercise
+			};
+		});
 
 		const newWorkout: Workout = {
 			id: newWorkoutId,
@@ -301,78 +343,85 @@
 						</button>
 					</div>
 					<div class="flex flex-col gap-4">
-						{#if newWorkoutSets.length > 0}
-							<div
-								class="grid grid-cols-5 gap-4 items-center font-medium text-gray-500 dark:text-gray-400"
-							>
-								<div class="text-left"></div>
-								<div class="text-base text-left">Set</div>
-								<div class="text-base text-left">Weight</div>
-								<div class="text-base text-left">Reps</div>
-								<div class="text-base text-left">Log</div>
-							</div>
-						{/if}
-						{#each newWorkoutSets as set, i (set.id)}
-							<div
-								class="grid grid-cols-5 gap-4 items-center border border-gray-200 dark:border-gray-700 rounded-lg p-3"
-							>
-								<div class="flex justify-start">
-									<button
-										id="dropdownMenuIconButton-{set.id}"
-										data-dropdown-toggle="dropdownDots-{set.id}"
-										class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-										type="button"
-									>
-										<DotsVerticalOutline class="w-5 h-5 text-gray-500" />
-									</button>
+						{#each groupedSets as group (group.exerciseId)}
+							<div class="flex flex-col gap-4 mt-4">
+								<h5 class="text-lg font-semibold text-gray-800 dark:text-white">
+									{group.exerciseName}
+								</h5>
+								{#if group.sets.length > 0}
 									<div
-										id="dropdownDots-{set.id}"
-										class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600"
+										class="grid grid-cols-5 gap-4 items-center font-medium text-gray-500 dark:text-gray-400"
 									>
-										<ul
-											class="py-2 text-sm text-gray-700 dark:text-gray-200"
-											aria-labelledby="dropdownMenuIconButton-{set.id}"
-										>
-											<li>
-												<button
-													type="button"
-													onclick={() => removeSet(set.id)}
-													class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-													>Remove</button
-												>
-											</li>
-										</ul>
+										<div class="text-left"></div>
+										<div class="text-base text-left">Set</div>
+										<div class="text-base text-left">Weight</div>
+										<div class="text-base text-left">Reps</div>
+										<div class="text-base text-left">Log</div>
 									</div>
-								</div>
-								<div class="text-base font-medium text-gray-900 dark:text-white text-left">
-									{i + 1}
-								</div>
-								<div class="flex justify-start">
-									<label for="weight-{set.id}" class="sr-only">Weight</label>
-									<input
-										type="number"
-										id="weight-{set.id}"
-										bind:value={set.weight}
-										class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-24 p-3 dark:bg-gray-700 dark:border-gray-600"
-										placeholder="Weight"
-									/>
-								</div>
-								<div class="flex justify-start">
-									<label for="reps-{set.id}" class="sr-only">Reps</label>
-									<input
-										type="number"
-										id="reps-{set.id}"
-										bind:value={set.reps}
-										class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-24 p-3 dark:bg-gray-700 dark:border-gray-600"
-										placeholder="Reps"
-									/>
-								</div>
-								<div class="flex justify-start">
-									<input
-										type="checkbox"
-										class="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-									/>
-								</div>
+								{/if}
+								{#each group.sets as set, i (set.id)}
+									<div
+										class="grid grid-cols-5 gap-4 items-center border border-gray-200 dark:border-gray-700 rounded-lg p-3"
+									>
+										<div class="flex justify-start">
+											<button
+												id="dropdownMenuIconButton-{set.id}"
+												data-dropdown-toggle="dropdownDots-{set.id}"
+												class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+												type="button"
+											>
+												<DotsVerticalOutline class="w-5 h-5 text-gray-500" />
+											</button>
+											<div
+												id="dropdownDots-{set.id}"
+												class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600"
+											>
+												<ul
+													class="py-2 text-sm text-gray-700 dark:text-gray-200"
+													aria-labelledby="dropdownMenuIconButton-{set.id}"
+												>
+													<li>
+														<button
+															type="button"
+															onclick={() => removeSet(set.id)}
+															class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+															>Remove</button
+														>
+													</li>
+												</ul>
+											</div>
+										</div>
+										<div class="text-base font-medium text-gray-900 dark:text-white text-left">
+											{i + 1}
+										</div>
+										<div class="flex justify-start">
+											<label for="weight-{set.id}" class="sr-only">Weight</label>
+											<input
+												type="number"
+												id="weight-{set.id}"
+												bind:value={set.weight}
+												class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-24 p-3 dark:bg-gray-700 dark:border-gray-600"
+												placeholder="Weight"
+											/>
+										</div>
+										<div class="flex justify-start">
+											<label for="reps-{set.id}" class="sr-only">Reps</label>
+											<input
+												type="number"
+												id="reps-{set.id}"
+												bind:value={set.reps}
+												class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-24 p-3 dark:bg-gray-700 dark:border-gray-600"
+												placeholder="Reps"
+											/>
+										</div>
+										<div class="flex justify-start">
+											<input
+												type="checkbox"
+												class="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+											/>
+										</div>
+									</div>
+								{/each}
 							</div>
 						{/each}
 					</div>
