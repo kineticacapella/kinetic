@@ -13,7 +13,11 @@
 	let workoutSuccess = $state('');
 	let viewWorkoutModal: Modal;
 	let addWorkoutModal: Modal;
+
+	// Add workout state
 	let newWorkoutName = $state('');
+	let newWorkoutExerciseId = $state('');
+	let newWorkoutSets = $state<{ id: string; weight: number; reps: number }[]>([]);
 
 	async function loadExercises() {
 		if (!$user) return;
@@ -49,23 +53,48 @@
 
 	function startAdd() {
 		newWorkoutName = '';
+		newWorkoutExerciseId = '';
+		newWorkoutSets = [{ id: crypto.randomUUID(), weight: 0, reps: 0 }];
 		addWorkoutModal.show();
+	}
+
+	function addSet() {
+		newWorkoutSets = [...newWorkoutSets, { id: crypto.randomUUID(), weight: 0, reps: 0 }];
+	}
+
+	function removeSet(id: string) {
+		newWorkoutSets = newWorkoutSets.filter((set) => set.id !== id);
 	}
 
 	function handleAddWorkout(event: Event) {
 		event.preventDefault();
-		if (!newWorkoutName.trim() || !$user) return;
+		if (!newWorkoutName.trim() || !$user || !newWorkoutExerciseId || newWorkoutSets.length === 0)
+			return;
+
+		const exercise = exercises.find((e) => e.id === newWorkoutExerciseId);
+		if (!exercise) return;
+
+		const newWorkoutId = crypto.randomUUID();
+
+		const workoutExercises: any[] = newWorkoutSets.map((set) => ({
+			id: crypto.randomUUID(),
+			workout_id: newWorkoutId,
+			exercise_id: newWorkoutExerciseId,
+			sets: 1, // Each row is 1 set
+			reps: set.reps,
+			weight: set.weight,
+			exercises: exercise
+		}));
 
 		const newWorkout: Workout = {
-			id: crypto.randomUUID(),
+			id: newWorkoutId,
 			user_id: $user.id,
 			name: newWorkoutName,
-			exercises: []
+			exercises: workoutExercises
 		};
 
 		workouts.update((items) => [...items, newWorkout]);
 		addWorkoutModal.hide();
-		newWorkoutName = '';
 	}
 
 	function startEdit(workout: Workout) {
@@ -82,7 +111,7 @@
 		workouts.update((items) => items.filter((item) => item.id !== id));
 	}
 
-	// Workout Exercise Management
+	// Workout Exercise Management (in view modal)
 	let selectedExerciseId = $state('');
 	let sets = $state(3);
 	let reps = $state(10);
@@ -192,7 +221,7 @@
 	aria-hidden="true"
 	class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
 >
-	<div class="relative p-4 w-full max-w-md max-h-full">
+	<div class="relative p-4 w-full max-w-2xl max-h-full">
 		<div class="relative bg-white rounded-lg shadow-xl dark:bg-gray-800">
 			<div
 				class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
@@ -238,7 +267,82 @@
 							required
 						/>
 					</div>
+					<div>
+						<label
+							for="workout-exercise"
+							class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+							>Exercise</label
+						>
+						<select
+							id="workout-exercise"
+							bind:value={newWorkoutExerciseId}
+							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+							required
+						>
+							<option value="" disabled>Select an exercise</option>
+							{#each exercises as exercise}
+								<option value={exercise.id}>{exercise.name}</option>
+							{/each}
+						</select>
+					</div>
 				</div>
+
+				<div class="mb-4">
+					<div class="flex justify-between items-center mb-2">
+						<h4 class="text-lg font-semibold text-gray-800 dark:text-white">Sets</h4>
+						<button
+							type="button"
+							onclick={addSet}
+							class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+						>
+							Add Set
+						</button>
+					</div>
+					<div class="flex flex-col gap-2">
+						{#if newWorkoutSets.length > 0}
+							<div
+								class="grid grid-cols-4 gap-2 items-center font-medium text-gray-500 dark:text-gray-400"
+							>
+								<div>Set</div>
+								<div>Weight</div>
+								<div>Reps</div>
+								<div></div>
+							</div>
+						{/if}
+						{#each newWorkoutSets as set, i (set.id)}
+							<div class="grid grid-cols-4 gap-2 items-center">
+								<div class="text-sm font-medium text-gray-900 dark:text-white">{i + 1}</div>
+								<div>
+									<label for="weight-{set.id}" class="sr-only">Weight</label>
+									<input
+										type="number"
+										id="weight-{set.id}"
+										bind:value={set.weight}
+										class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600"
+										placeholder="Weight"
+									/>
+								</div>
+								<div>
+									<label for="reps-{set.id}" class="sr-only">Reps</label>
+									<input
+										type="number"
+										id="reps-{set.id}"
+										bind:value={set.reps}
+										class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600"
+										placeholder="Reps"
+									/>
+								</div>
+								<button
+									type="button"
+									onclick={() => removeSet(set.id)}
+									class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500"
+									>Remove</button
+								>
+							</div>
+						{/each}
+					</div>
+				</div>
+
 				<button
 					type="submit"
 					class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
