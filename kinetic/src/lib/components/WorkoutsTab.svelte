@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { initFlowbite, Modal } from 'flowbite';
+	import { initFlowbite, Modal, Dropdown } from 'flowbite';
 	import { workouts } from '$lib/stores';
 	import { getExercises } from '$lib/supabase';
 	import type { Workout, Exercise, WorkoutExercise } from '$lib/supabase';
@@ -60,6 +60,10 @@
 
 	function addSet() {
 		newWorkoutSets = [...newWorkoutSets, { id: crypto.randomUUID(), weight: 0, reps: 0 }];
+	}
+
+	function removeSet(id: string) {
+		newWorkoutSets = newWorkoutSets.filter((set) => set.id !== id);
 	}
 
 	function handleAddWorkout(event: Event) {
@@ -299,7 +303,7 @@
 							<div
 								class="grid grid-cols-5 gap-4 items-center font-medium text-gray-500 dark:text-gray-400 text-center"
 							>
-								<div></div>
+								<div class="text-left"></div>
 								<div class="text-base">Set</div>
 								<div class="text-base">Weight</div>
 								<div class="text-base">Reps</div>
@@ -310,8 +314,33 @@
 							<div
 								class="grid grid-cols-5 gap-4 items-center border border-gray-200 dark:border-gray-700 rounded-lg p-3"
 							>
-								<div class="flex justify-center">
-									<DotsVerticalOutline class="w-5 h-5 text-gray-500" />
+								<div class="flex justify-start">
+									<button
+										id="dropdownMenuIconButton-{set.id}"
+										data-dropdown-toggle="dropdownDots-{set.id}"
+										class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+										type="button"
+									>
+										<DotsVerticalOutline class="w-5 h-5 text-gray-500" />
+									</button>
+									<div
+										id="dropdownDots-{set.id}"
+										class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600"
+									>
+										<ul
+											class="py-2 text-sm text-gray-700 dark:text-gray-200"
+											aria-labelledby="dropdownMenuIconButton-{set.id}"
+										>
+											<li>
+												<a
+													href="#"
+													onclick={() => removeSet(set.id)}
+													class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+													>Remove</a
+												>
+											</li>
+										</ul>
+									</div>
 								</div>
 								<div class="text-base font-medium text-gray-900 dark:text-white text-center">
 									{i + 1}
