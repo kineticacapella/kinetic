@@ -332,8 +332,7 @@
 				</div>
 
 				<div class="mb-6">
-					<div class="flex justify-between items-center mb-4">
-						<h4 class="text-lg font-semibold text-gray-800 dark:text-white">Sets</h4>
+					<div class="flex justify-end items-center mb-4">
 						<button
 							type="button"
 							onclick={addSet}
