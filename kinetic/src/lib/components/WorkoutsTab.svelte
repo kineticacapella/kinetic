@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { initFlowbite, Modal, Dropdown } from 'flowbite';
 	import { workouts } from '$lib/stores';
 	import { getExercises } from '$lib/supabase';
@@ -58,8 +58,10 @@
 		addWorkoutModal.show();
 	}
 
-	function addSet() {
+	async function addSet() {
 		newWorkoutSets = [...newWorkoutSets, { id: crypto.randomUUID(), weight: 0, reps: 0 }];
+		await tick();
+		initFlowbite();
 	}
 
 	function removeSet(id: string) {
