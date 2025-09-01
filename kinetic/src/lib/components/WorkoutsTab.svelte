@@ -66,7 +66,14 @@
 		}
 		const addModalElement = document.getElementById('add-workout-modal');
 		if (addModalElement) {
-			addWorkoutModal = new Modal(addModalElement);
+			addWorkoutModal = new Modal(addModalElement, {
+				onHide: () => {
+					editingWorkout = null;
+					newWorkoutName = '';
+					newWorkoutSets = [];
+					newWorkoutExerciseId = '';
+				}
+			});
 		}
 	});
 
@@ -77,6 +84,7 @@
 	});
 
 	function startAdd() {
+		editingWorkout = null;
 		newWorkoutName = '';
 		newWorkoutExerciseId = '';
 		newWorkoutSets = [];
@@ -115,34 +123,68 @@
 		event.preventDefault();
 		if (!newWorkoutName.trim() || !$user || newWorkoutSets.length === 0) return;
 
-		const newWorkoutId = crypto.randomUUID();
-
-		const workoutExercises: any[] = newWorkoutSets.map((set) => {
-			const exercise = exercises.find((e) => e.id === set.exerciseId);
-			return {
-				id: crypto.randomUUID(),
-				workout_id: newWorkoutId,
-				exercise_id: set.exerciseId,
-				sets: 1, // Each row is 1 set
-				reps: set.reps,
-				weight: set.weight,
-				exercises: exercise
+		if (editingWorkout) {
+			// Update existing workout
+			const updatedWorkout: Workout = {
+				...editingWorkout,
+				name: newWorkoutName,
+				exercises: newWorkoutSets.map((set) => {
+					const exercise = exercises.find((e) => e.id === set.exerciseId);
+					return {
+						id: set.id, // Preserving original ID for existing sets
+						workout_id: editingWorkout.id,
+						exercise_id: set.exerciseId,
+						sets: 1,
+						reps: set.reps,
+						weight: set.weight,
+						exercises: exercise
+					};
+				})
 			};
-		});
 
-		const newWorkout: Workout = {
-			id: newWorkoutId,
-			user_id: $user.id,
-			name: newWorkoutName,
-			exercises: workoutExercises
-		};
+			workouts.update((items) =>
+				items.map((w) => (w.id === editingWorkout!.id ? updatedWorkout : w))
+			);
+		} else {
+			// Add new workout
+			const newWorkoutId = crypto.randomUUID();
 
-		workouts.update((items) => [...items, newWorkout]);
+			const workoutExercises: any[] = newWorkoutSets.map((set) => {
+				const exercise = exercises.find((e) => e.id === set.exerciseId);
+				return {
+					id: crypto.randomUUID(),
+					workout_id: newWorkoutId,
+					exercise_id: set.exerciseId,
+					sets: 1, // Each row is 1 set
+					reps: set.reps,
+					weight: set.weight,
+					exercises: exercise
+				};
+			});
+
+			const newWorkout: Workout = {
+				id: newWorkoutId,
+				user_id: $user.id,
+				name: newWorkoutName,
+				exercises: workoutExercises
+			};
+
+			workouts.update((items) => [...items, newWorkout]);
+		}
 		addWorkoutModal.hide();
 	}
 
 	function startEdit(workout: Workout) {
-		// TODO: Implement edit workout
+		editingWorkout = workout;
+		newWorkoutName = workout.name;
+		newWorkoutSets = (workout.exercises || []).map((we: any) => ({
+			id: we.id,
+			exerciseId: we.exercise_id,
+			exerciseName: we.exercises.name,
+			weight: we.weight,
+			reps: we.reps
+		}));
+		addWorkoutModal.show();
 	}
 
 	function viewWorkout(workout: Workout) {
@@ -270,7 +312,9 @@
 			<div
 				class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
 			>
-				<h3 class="text-xl font-semibold text-gray-900 dark:text-white">Add New Workout</h3>
+				<h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+					{editingWorkout ? 'Edit Workout' : 'Add New Workout'}
+				</h3>
 				<button
 					type="button"
 					class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-700 dark:hover:text-white"
@@ -430,7 +474,7 @@
 					type="submit"
 					class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-base px-5 py-3 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 				>
-					Add workout
+					{editingWorkout ? 'Save Changes' : 'Add workout'}
 				</button>
 			</form>
 		</div>
