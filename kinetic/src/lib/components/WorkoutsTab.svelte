@@ -247,7 +247,7 @@
 				</button>
 			</div>
 			<form onsubmit={handleAddWorkout} class="p-4 md:p-5">
-				<div class="grid gap-4 mb-4 grid-cols-1">
+				<div class="grid gap-6 mb-6 grid-cols-1">
 					<div>
 						<label
 							for="workout-name"
@@ -283,8 +283,8 @@
 					</div>
 				</div>
 
-				<div class="mb-4">
-					<div class="flex justify-between items-center mb-2">
+				<div class="mb-6">
+					<div class="flex justify-between items-center mb-4">
 						<h4 class="text-lg font-semibold text-gray-800 dark:text-white">Sets</h4>
 						<button
 							type="button"
@@ -294,7 +294,7 @@
 							Add Set
 						</button>
 					</div>
-					<div class="flex flex-col gap-3">
+					<div class="flex flex-col gap-4">
 						{#if newWorkoutSets.length > 0}
 							<div
 								class="grid grid-cols-4 gap-4 items-center font-medium text-gray-500 dark:text-gray-400"
@@ -306,7 +306,9 @@
 							</div>
 						{/if}
 						{#each newWorkoutSets as set, i (set.id)}
-							<div class="grid grid-cols-4 gap-4 items-center">
+							<div
+								class="grid grid-cols-4 gap-4 items-center border border-gray-200 dark:border-gray-700 rounded-lg p-3"
+							>
 								<div class="text-base font-medium text-gray-900 dark:text-white">{i + 1}</div>
 								<div>
 									<label for="weight-{set.id}" class="sr-only">Weight</label>
@@ -314,7 +316,7 @@
 										type="number"
 										id="weight-{set.id}"
 										bind:value={set.weight}
-										class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600"
+										class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-32 p-3 dark:bg-gray-700 dark:border-gray-600"
 										placeholder="Weight"
 									/>
 								</div>
@@ -324,7 +326,7 @@
 										type="number"
 										id="reps-{set.id}"
 										bind:value={set.reps}
-										class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600"
+										class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-32 p-3 dark:bg-gray-700 dark:border-gray-600"
 										placeholder="Reps"
 									/>
 								</div>
