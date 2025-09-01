@@ -297,40 +297,42 @@
 					<div class="flex flex-col gap-4">
 						{#if newWorkoutSets.length > 0}
 							<div
-								class="grid grid-cols-4 gap-4 items-center font-medium text-gray-500 dark:text-gray-400"
+								class="grid grid-cols-12 gap-4 items-center font-medium text-gray-500 dark:text-gray-400"
 							>
-								<div class="text-base">Set</div>
-								<div class="text-base">Weight</div>
-								<div class="text-base">Reps</div>
-								<div class="text-base text-center">Completed</div>
+								<div class="col-span-1 text-base">Set</div>
+								<div class="col-span-5 text-base">Weight</div>
+								<div class="col-span-5 text-base">Reps</div>
+								<div class="col-span-1 text-base text-center">Log</div>
 							</div>
 						{/if}
 						{#each newWorkoutSets as set, i (set.id)}
 							<div
-								class="grid grid-cols-4 gap-4 items-center border border-gray-200 dark:border-gray-700 rounded-lg p-3"
+								class="grid grid-cols-12 gap-4 items-center border border-gray-200 dark:border-gray-700 rounded-lg p-3"
 							>
-								<div class="text-base font-medium text-gray-900 dark:text-white">{i + 1}</div>
-								<div>
+								<div class="col-span-1 text-base font-medium text-gray-900 dark:text-white">
+									{i + 1}
+								</div>
+								<div class="col-span-5">
 									<label for="weight-{set.id}" class="sr-only">Weight</label>
 									<input
 										type="number"
 										id="weight-{set.id}"
 										bind:value={set.weight}
-										class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-32 p-3 dark:bg-gray-700 dark:border-gray-600"
+										class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600"
 										placeholder="Weight"
 									/>
 								</div>
-								<div>
+								<div class="col-span-5">
 									<label for="reps-{set.id}" class="sr-only">Reps</label>
 									<input
 										type="number"
 										id="reps-{set.id}"
 										bind:value={set.reps}
-										class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-32 p-3 dark:bg-gray-700 dark:border-gray-600"
+										class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600"
 										placeholder="Reps"
 									/>
 								</div>
-								<div class="flex justify-center">
+								<div class="col-span-1 flex justify-center">
 									<input
 										type="checkbox"
 										class="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
