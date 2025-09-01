@@ -54,7 +54,7 @@
 	function startAdd() {
 		newWorkoutName = '';
 		newWorkoutExerciseId = '';
-		newWorkoutSets = [{ id: crypto.randomUUID(), weight: 0, reps: 0 }];
+		newWorkoutSets = [];
 		addWorkoutModal.show();
 	}
 
@@ -334,11 +334,11 @@
 											aria-labelledby="dropdownMenuIconButton-{set.id}"
 										>
 											<li>
-												<a
-													href="#"
+												<button
+													type="button"
 													onclick={() => removeSet(set.id)}
-													class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-													>Remove</a
+													class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+													>Remove</button
 												>
 											</li>
 										</ul>
