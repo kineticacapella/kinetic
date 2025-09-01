@@ -169,8 +169,7 @@ export async function updateExerciseInWorkout(id: string, workoutExercise: Parti
 
 import { createClient } from '@supabase/supabase-js'
 
-// TODO: Replace with your project's URL and anon key
-const supabaseUrl = 'https://sxdmlypuekifpeogmjca.supabase.co'
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN4ZG1seXB1ZWtpZnBlb2dtamNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0Njg4MDQsImV4cCI6MjA3MjA0NDgwNH0.chsBAJsbH7Hxi-ITVtNh2K36diMhwE8lZE0I5Ne-8p0'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
