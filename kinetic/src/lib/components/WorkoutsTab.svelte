@@ -446,7 +446,7 @@
 									<div
 										class="grid grid-cols-5 gap-4 items-center border border-gray-200 dark:border-gray-700 rounded-lg p-3"
 									>
-										<div class="flex justify-start">
+										<div class="flex justify-start items-center">
 											<button
 												id="dropdownMenuIconButton-{set.id}"
 												data-dropdown-toggle="dropdownDots-{set.id}"
@@ -481,11 +481,13 @@
 													</li>
 												</ul>
 											</div>
+											<div class="w-5 h-5 ml-2">
+												{#if set.isDropSet}
+													<ArrowDownOutline class="w-5 h-5 text-blue-500" />
+												{/if}
+											</div>
 										</div>
 										<div class="text-base font-medium text-gray-900 dark:text-white text-left">
-											{#if set.isDropSet}
-												<ArrowDownOutline class="w-5 h-5 inline-block text-blue-500" />
-											{/if}
 											{i + 1}
 										</div>
 										<div class="flex justify-start">
