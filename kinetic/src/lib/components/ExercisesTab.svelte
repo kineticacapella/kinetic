@@ -237,7 +237,7 @@
 >
 	<div class="relative p-4 w-full max-w-lg max-h-full">
 		<!-- Modal content -->
-		<div class="relative bg-white rounded-lg shadow-xl dark:bg-gray-800">
+		<div class="relative bg-white rounded-lg shadow-xl dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
 			<!-- Modal header -->
 			<div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
 				<h3 class="text-xl font-semibold text-gray-900 dark:text-white">{editingExerciseId ? 'Edit Exercise' : 'Create New Exercise'}</h3>
