@@ -174,7 +174,7 @@
 		addWorkoutModal.hide();
 	}
 
-	function startEdit(workout: Workout) {
+	async function startEdit(workout: Workout) {
 		editingWorkout = workout;
 		newWorkoutName = workout.name;
 		newWorkoutSets = (workout.exercises || []).map((we: any) => ({
@@ -185,6 +185,8 @@
 			reps: we.reps
 		}));
 		addWorkoutModal.show();
+		await tick();
+		initFlowbite();
 	}
 
 	function viewWorkout(workout: Workout) {
