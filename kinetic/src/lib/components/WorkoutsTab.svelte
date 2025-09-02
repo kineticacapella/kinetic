@@ -453,7 +453,7 @@
 							<div>
 								<span class="font-semibold text-gray-600 dark:text-gray-300">Exercises:</span>
 								<span class="text-gray-500 dark:text-gray-400">
-									{(workout.exercises || []).map((e: any) => e.exercises.name).join(', ')}</span
+									{Array.from(new Set((workout.exercises || []).map((e: any) => e.exercises.name))).join(', ')}</span
 								>
 							</div>
 							<div class="pt-2">
