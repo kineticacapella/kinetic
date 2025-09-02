@@ -4,7 +4,14 @@
 	import { workouts } from '$lib/stores';
 	import { getExercises } from '$lib/supabase';
 	import type { Workout, Exercise, WorkoutExercise } from '$lib/supabase';
-	import { PlusOutline, DotsVerticalOutline, TrashBinOutline, EyeOutline, PencilOutline } from 'flowbite-svelte-icons';
+	import {
+		PlusOutline,
+		DotsVerticalOutline,
+		TrashBinOutline,
+		EyeOutline,
+		PencilOutline,
+		ArrowDownOutline
+	} from 'flowbite-svelte-icons';
 	import { user } from '$lib/stores';
 
 	let exercises: Exercise[] = $state([]);
@@ -18,7 +25,14 @@
 	let newWorkoutName = $state('');
 	let newWorkoutExerciseId = $state('');
 	let newWorkoutSets = $state<
-		{ id: string; exerciseId: string; exerciseName: string; weight: number; reps: number }[]
+		{
+			id: string;
+			exerciseId: string;
+			exerciseName: string;
+			weight: number;
+			reps: number;
+			isDropSet?: boolean;
+		}[]
 	>([]);
 
 	let groupedSets = $derived(
@@ -108,7 +122,8 @@
 				exerciseId: newWorkoutExerciseId,
 				exerciseName: exercise.name,
 				weight: 0,
-				reps: 0
+				reps: 0,
+				isDropSet: false
 			}
 		];
 		await tick();
@@ -117,6 +132,15 @@
 
 	function removeSet(id: string) {
 		newWorkoutSets = newWorkoutSets.filter((set) => set.id !== id);
+	}
+
+	function toggleDropSet(id: string) {
+		newWorkoutSets = newWorkoutSets.map((set) => {
+			if (set.id === id) {
+				return { ...set, isDropSet: !set.isDropSet };
+			}
+			return set;
+		});
 	}
 
 	function handleAddWorkout(event: Event) {
@@ -137,6 +161,7 @@
 						sets: 1,
 						reps: set.reps,
 						weight: set.weight,
+						isDropSet: set.isDropSet,
 						exercises: exercise
 					};
 				})
@@ -158,6 +183,7 @@
 					sets: 1, // Each row is 1 set
 					reps: set.reps,
 					weight: set.weight,
+					isDropSet: set.isDropSet,
 					exercises: exercise
 				};
 			});
@@ -182,7 +208,8 @@
 			exerciseId: we.exercise_id,
 			exerciseName: we.exercises.name,
 			weight: we.weight,
-			reps: we.reps
+			reps: we.reps,
+			isDropSet: we.isDropSet || false
 		}));
 		addWorkoutModal.show();
 		await tick();
@@ -281,12 +308,14 @@
 						<h5 class="mb-3 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
 							{workout.name}
 						</h5>
-                        <div class="space-y-3 text-sm">
-                            <div>
+						<div class="space-y-3 text-sm">
+							<div>
 								<span class="font-semibold text-gray-600 dark:text-gray-300">Exercises:</span>
-								<span class="text-gray-500 dark:text-gray-400"> {workout.exercises.map(e => e.exercises.name).join(', ')}</span>
-                            </div>
-                        </div>
+								<span class="text-gray-500 dark:text-gray-400">
+									{workout.exercises.map((e) => e.exercises.name).join(', ')}</span
+								>
+							</div>
+						</div>
 					</div>
 					<div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 flex justify-end space-x-3">
 						<button
@@ -370,25 +399,25 @@
 							>Exercise</label
 						>
 						<div class="flex items-center gap-2">
-						<select
-							id="workout-exercise"
-							bind:value={newWorkoutExerciseId}
-							class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-							required
-						>
-							<option value="" disabled>Select an exercise</option>
-							{#each exercises as exercise}
-								<option value={exercise.id}>{exercise.name}</option>
-							{/each}
-						</select>
-						<button
-							type="button"
-							onclick={addSet}
-							class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-						>
-							<PlusOutline class="w-6 h-6" />
-							<span class="sr-only">Add Set</span>
-						</button>
+							<select
+								id="workout-exercise"
+								bind:value={newWorkoutExerciseId}
+								class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+								required
+							>
+								<option value="" disabled>Select an exercise</option>
+								{#each exercises as exercise}
+									<option value={exercise.id}>{exercise.name}</option>
+								{/each}
+							</select>
+							<button
+								type="button"
+								onclick={addSet}
+								class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+							>
+								<PlusOutline class="w-6 h-6" />
+								<span class="sr-only">Add Set</span>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -396,7 +425,9 @@
 				<div class="mb-6">
 					<div class="flex flex-col gap-4">
 						{#each groupedSets as group (group.exerciseId)}
-							<div class="flex flex-col gap-4 mt-4 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+							<div
+								class="flex flex-col gap-4 mt-4 p-4 rounded-lg border border-gray-200 dark:border-gray-700"
+							>
 								<h5 class="text-lg font-semibold text-gray-800 dark:text-white">
 									{group.exerciseName}
 								</h5>
@@ -440,10 +471,21 @@
 															>Remove</button
 														>
 													</li>
+													<li>
+														<button
+															type="button"
+															onclick={() => toggleDropSet(set.id)}
+															class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+															>Drop set</button
+														>
+													</li>
 												</ul>
 											</div>
 										</div>
 										<div class="text-base font-medium text-gray-900 dark:text-white text-left">
+											{#if set.isDropSet}
+												<ArrowDownOutline class="w-5 h-5 inline-block text-blue-500" />
+											{/if}
 											{i + 1}
 										</div>
 										<div class="flex justify-start">
@@ -536,23 +578,23 @@
 							class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Exercise</label
 						>
 						<div class="flex items-center gap-2">
-						<select
-							id="exercise"
-							bind:value={selectedExerciseId}
-							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-						>
-							<option value="" disabled>Select an exercise</option>
-							{#each exercises as exercise}
-								<option value={exercise.id}>{exercise.name}</option>
-							{/each}
-						</select>
-						<button
-							type="submit"
-							class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-						>
-							<PlusOutline class="w-6 h-6" />
-							<span class="sr-only">Add Exercise</span>
-						</button>
+							<select
+								id="exercise"
+								bind:value={selectedExerciseId}
+								class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+							>
+								<option value="" disabled>Select an exercise</option>
+								{#each exercises as exercise}
+									<option value={exercise.id}>{exercise.name}</option>
+								{/each}
+							</select>
+							<button
+								type="submit"
+								class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+							>
+								<PlusOutline class="w-6 h-6" />
+								<span class="sr-only">Add Exercise</span>
+							</button>
 						</div>
 					</div>
 					<div>
