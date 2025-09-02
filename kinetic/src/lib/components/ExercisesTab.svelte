@@ -194,7 +194,7 @@
 	{:else}
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 			{#each exercises as exercise (exercise.id)}
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600">
                     <div class="p-6">
                         <h5 class="mb-3 text-xl font-bold tracking-tight text-gray-900 dark:text-white">{exercise.name}</h5>
                         <div class="space-y-3 text-sm">
