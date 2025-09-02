@@ -442,7 +442,7 @@
 				{@const hasDropSet = (workout.exercises || []).some((ex: any) => ex.isDropSet)}
 				{@const hasMyoRep = (workout.exercises || []).some((ex: any) => ex.myoRep)}
 				<div
-					class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg"
+					class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600"
 				>
 					<div class="p-6">
 						<h5 class="mb-3 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
