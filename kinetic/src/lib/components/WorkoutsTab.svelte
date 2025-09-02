@@ -142,14 +142,19 @@
 		const config = exerciseDropSetInfo[newWorkoutExerciseId];
 		if (lastSet && config?.auto && lastSet.isDropSet) {
 			isDrop = true;
+			let calculatedWeight = 0;
 			if (config.reduction.type === 'percent') {
 				const reductionFactor = 1 - (config.reduction.value || 0) / 100;
-				weight = Math.round(lastSet.weight * reductionFactor);
+				calculatedWeight = Math.round(lastSet.weight * reductionFactor);
 			} else {
 				// type is 'weight'
-				weight = lastSet.weight - (config.reduction.value || 0);
+				calculatedWeight = lastSet.weight - (config.reduction.value || 0);
 			}
-			if (weight < 0) weight = 0; // prevent negative weight
+
+			if (calculatedWeight <= 0) {
+				return; // Do not add set if weight is 0 or less
+			}
+			weight = calculatedWeight;
 			reps = lastSet.reps;
 		}
 
