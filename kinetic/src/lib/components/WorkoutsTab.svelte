@@ -33,6 +33,7 @@
 			weight: number;
 			reps: number;
 			isDropSet?: boolean;
+			myoRep?: 'start' | 'match' | null;
 		}[]
 	>([]);
 
@@ -138,24 +139,33 @@
 		let isDrop = false;
 		let weight = 0;
 		let reps = 0;
+		let myoRep: 'start' | 'match' | null = null;
 
-		const config = exerciseDropSetInfo[newWorkoutExerciseId];
-		if (lastSet && config?.auto && lastSet.isDropSet) {
-			isDrop = true;
-			let calculatedWeight = 0;
-			if (config.reduction.type === 'percent') {
-				const reductionFactor = 1 - (config.reduction.value || 0) / 100;
-				calculatedWeight = Math.round(lastSet.weight * reductionFactor);
-			} else {
-				// type is 'weight'
-				calculatedWeight = lastSet.weight - (config.reduction.value || 0);
-			}
+		const myoStartSet = setsForExercise.find((s) => s.myoRep === 'start');
 
-			if (calculatedWeight <= 0) {
-				return; // Do not add set if weight is 0 or less
+		if (myoStartSet) {
+			myoRep = 'match';
+			reps = myoStartSet.reps;
+			weight = myoStartSet.weight;
+		} else {
+			const config = exerciseDropSetInfo[newWorkoutExerciseId];
+			if (lastSet && config?.auto && lastSet.isDropSet) {
+				isDrop = true;
+				let calculatedWeight = 0;
+				if (config.reduction.type === 'percent') {
+					const reductionFactor = 1 - (config.reduction.value || 0) / 100;
+					calculatedWeight = Math.round(lastSet.weight * reductionFactor);
+				} else {
+					// type is 'weight'
+					calculatedWeight = lastSet.weight - (config.reduction.value || 0);
+				}
+
+				if (calculatedWeight <= 0) {
+					return; // Do not add set if weight is 0 or less
+				}
+				weight = calculatedWeight;
+				reps = lastSet.reps;
 			}
-			weight = calculatedWeight;
-			reps = lastSet.reps;
 		}
 
 		newWorkoutSets = [
@@ -166,7 +176,8 @@
 				exerciseName: exercise.name,
 				weight: weight,
 				reps: reps,
-				isDropSet: isDrop
+				isDropSet: isDrop,
+				myoRep: myoRep
 			}
 		];
 		await tick();
@@ -175,6 +186,34 @@
 
 	function removeSet(id: string) {
 		newWorkoutSets = newWorkoutSets.filter((set) => set.id !== id);
+	}
+
+	function toggleMyoRep(setId: string) {
+		const setIndex = newWorkoutSets.findIndex((s) => s.id === setId);
+		if (setIndex === -1) return;
+
+		const exerciseId = newWorkoutSets[setIndex].exerciseId;
+		const isCurrentlyStart = newWorkoutSets[setIndex].myoRep === 'start';
+
+		// Reset all myo-reps for this exercise first
+		newWorkoutSets = newWorkoutSets.map((s) => {
+			if (s.exerciseId === exerciseId) {
+				return { ...s, myoRep: null };
+			}
+			return s;
+		});
+
+		// If it wasn't the start, make it the start.
+		if (!isCurrentlyStart) {
+			newWorkoutSets[setIndex].myoRep = 'start';
+			// Disable drop sets for this exercise
+			delete exerciseDropSetInfo[exerciseId];
+			newWorkoutSets = newWorkoutSets.map((s) =>
+				s.exerciseId === exerciseId ? { ...s, isDropSet: false } : s
+			);
+		}
+
+		newWorkoutSets = [...newWorkoutSets];
 	}
 
 	function handleDropSetClick(setId: string, exerciseId: string) {
@@ -224,6 +263,14 @@
 			delete exerciseDropSetInfo[exerciseId];
 		}
 
+		// Disable myo-reps for this exercise
+		newWorkoutSets = newWorkoutSets.map((s) => {
+			if (s.exerciseId === exerciseId) {
+				return { ...s, myoRep: null };
+			}
+			return s;
+		});
+
 		newWorkoutSets = [...newWorkoutSets];
 
 		dropSetModal.hide();
@@ -249,6 +296,7 @@
 						reps: set.reps,
 						weight: set.weight,
 						isDropSet: set.isDropSet,
+						myoRep: set.myoRep,
 						exercises: exercise
 					};
 				})
@@ -271,6 +319,7 @@
 					reps: set.reps,
 					weight: set.weight,
 					isDropSet: set.isDropSet,
+					myoRep: set.myoRep,
 					exercises: exercise
 				};
 			});
@@ -296,7 +345,8 @@
 			exerciseName: we.exercises.name,
 			weight: we.weight,
 			reps: we.reps,
-			isDropSet: we.isDropSet || false
+			isDropSet: we.isDropSet || false,
+			myoRep: we.myoRep || null
 		}));
 		addWorkoutModal.show();
 		await tick();
@@ -566,11 +616,26 @@
 															>Drop set</button
 														>
 													</li>
+													<li>
+														<button
+															type="button"
+															onclick={() => toggleMyoRep(set.id)}
+															class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+															>Myo-reps</button
+														>
+													</li>
 												</ul>
 											</div>
 											<div class="w-5 h-5 ml-2">
 												{#if set.isDropSet}
 													<ArrowDownOutline class="w-5 h-5 text-blue-500" />
+												{/if}
+											</div>
+											<div class="w-5 h-5 ml-1">
+												{#if set.myoRep === 'start'}
+													<span class="text-lg font-bold text-blue-500">m</span>
+												{:else if set.myoRep === 'match'}
+													<span class="text-lg font-bold text-blue-500">mm</span>
 												{/if}
 											</div>
 										</div>
