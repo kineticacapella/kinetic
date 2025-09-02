@@ -406,7 +406,7 @@
 										<div class="text-base text-left">Set</div>
 										<div class="text-base text-left">Weight</div>
 										<div class="text-base text-left">Reps</div>
-										<div class="text-base text-left">Log</div>
+										<div class="text-base text-center">Log</div>
 									</div>
 								{/if}
 								{#each group.sets as set, i (set.id)}
@@ -464,7 +464,7 @@
 												placeholder="Reps"
 											/>
 										</div>
-										<div class="flex justify-start">
+										<div class="flex justify-center">
 											<input
 												type="checkbox"
 												class="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
