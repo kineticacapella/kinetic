@@ -279,22 +279,25 @@
 						<h5 class="mb-3 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
 							{workout.name}
 						</h5>
+                        <div class="space-y-3 text-sm">
+                            <div>
+								<span class="font-semibold text-gray-600 dark:text-gray-300">Exercises:</span>
+								<span class="text-gray-500 dark:text-gray-400"> {workout.exercises.map(e => e.exercises.name).join(', ')}</span>
+                            </div>
+                        </div>
 					</div>
 					<div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 flex justify-end space-x-3">
 						<button
 							onclick={() => viewWorkout(workout)}
-							class="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-800"
-							>View</button
+							class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">View</button
 						>
 						<button
 							onclick={() => startEdit(workout)}
-							class="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-800"
-							>Edit</button
+							class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">Edit</button
 						>
 						<button
 							onclick={() => handleDeleteWorkout(workout.id)}
-							class="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
-							>Delete</button
+							class="text-sm font-medium text-red-600 dark:text-red-400 hover:underline">Delete</button
 						>
 					</div>
 				</div>
