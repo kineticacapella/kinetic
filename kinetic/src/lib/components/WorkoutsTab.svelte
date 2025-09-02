@@ -282,7 +282,7 @@
 		if (!newWorkoutName.trim() || !$user || newWorkoutSets.length === 0) return;
 
 		const currentWorkout = editingWorkout;
-		if (currentWorkout) {
+		if (currentWorkout && currentWorkout.id) {
 			// Update existing workout
 			const updatedWorkout: Workout = {
 				...currentWorkout,
@@ -300,7 +300,7 @@
 						myoRep: set.myoRep,
 						exercises: exercise
 					};
-				})
+				}) as any
 			};
 
 			workouts.update((items) =>
