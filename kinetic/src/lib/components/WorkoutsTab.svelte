@@ -9,7 +9,7 @@
 		DotsVerticalOutline,
 		TrashBinOutline,
 		EyeOutline,
-		PencilOutline,
+		PenOutline,
 		ArrowDownOutline
 	} from 'flowbite-svelte-icons';
 	import { user } from '$lib/stores';
@@ -281,16 +281,17 @@
 		event.preventDefault();
 		if (!newWorkoutName.trim() || !$user || newWorkoutSets.length === 0) return;
 
-		if (editingWorkout) {
+		const currentWorkout = editingWorkout;
+		if (currentWorkout) {
 			// Update existing workout
 			const updatedWorkout: Workout = {
-				...editingWorkout,
+				...currentWorkout,
 				name: newWorkoutName,
 				exercises: newWorkoutSets.map((set) => {
 					const exercise = exercises.find((e) => e.id === set.exerciseId);
 					return {
 						id: set.id, // Preserving original ID for existing sets
-						workout_id: editingWorkout.id,
+						workout_id: currentWorkout.id,
 						exercise_id: set.exerciseId,
 						sets: 1,
 						reps: set.reps,
@@ -303,7 +304,7 @@
 			};
 
 			workouts.update((items) =>
-				items.map((w) => (w.id === editingWorkout!.id ? updatedWorkout : w))
+				items.map((w) => (w.id === currentWorkout.id ? updatedWorkout : w))
 			);
 		} else {
 			// Add new workout
@@ -371,8 +372,8 @@
 
 	function handleAddExerciseToWorkout(event: Event) {
 		event.preventDefault();
-		if (!editingWorkout || !editingWorkout.id || !selectedExerciseId) return;
 		const currentWorkout = editingWorkout;
+		if (!currentWorkout || !currentWorkout.id || !selectedExerciseId) return;
 
 		const exercise = exercises.find((e) => e.id === selectedExerciseId);
 		if (!exercise) return;
@@ -438,6 +439,8 @@
 	{:else}
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 			{#each $workouts as workout (workout.id)}
+				{@const hasDropSet = (workout.exercises || []).some((ex: any) => ex.isDropSet)}
+				{@const hasMyoRep = (workout.exercises || []).some((ex: any) => ex.myoRep)}
 				<div
 					class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg"
 				>
@@ -447,8 +450,6 @@
 								{workout.name}
 							</h5>
 							<div class="flex flex-col gap-2 items-end">
-								{@const hasDropSet = workout.exercises.some((ex) => ex.isDropSet)}
-								{@const hasMyoRep = workout.exercises.some((ex) => ex.myoRep)}
 								{#if hasDropSet}
 									<span
 										class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300"
@@ -468,7 +469,7 @@
 							<div>
 								<span class="font-semibold text-gray-600 dark:text-gray-300">Exercises:</span>
 								<span class="text-gray-500 dark:text-gray-400">
-									{workout.exercises.map((e) => e.exercises.name).join(', ')}</span
+									{(workout.exercises || []).map((e: any) => e.exercises.name).join(', ')}</span
 								>
 							</div>
 						</div>
@@ -736,8 +737,8 @@
 					<label for="drop-each-set-checkbox" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Drop each subsequent set</label>
 				</div>
 				{#if dropEachSubsequentSet}
-				<div class="mt-4">
-					<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Reduction Type</label>
+				<fieldset class="mt-4">
+					<legend class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Reduction Type</legend>
 					<div class="flex gap-4">
 						<div class="flex items-center">
 							<input bind:group={reductionType} type="radio" id="percent-reduction" value="percent" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
@@ -748,7 +749,7 @@
 							<label for="weight-reduction" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Fixed Weight</label>
 						</div>
 					</div>
-				</div>
+				</fieldset>
 
 				{#if reductionType === 'percent'}
 				<div class="mt-4">
