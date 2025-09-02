@@ -345,7 +345,7 @@
 				</button>
 			</div>
 			<form onsubmit={handleAddWorkout} class="p-4 md:p-5">
-				<div class="grid gap-6 mb-6 grid-cols-1">
+				<div class="grid gap-6 mb-6 grid-cols-2">
 					<div>
 						<label
 							for="workout-name"
@@ -367,6 +367,7 @@
 							class="block mb-2 text-base font-medium text-gray-900 dark:text-white"
 							>Exercise</label
 						>
+						<div class="flex items-center gap-2">
 						<select
 							id="workout-exercise"
 							bind:value={newWorkoutExerciseId}
@@ -378,19 +379,19 @@
 								<option value={exercise.id}>{exercise.name}</option>
 							{/each}
 						</select>
+						<button
+							type="button"
+							onclick={addSet}
+							class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+						>
+							<PlusOutline class="w-6 h-6" />
+							<span class="sr-only">Add Set</span>
+						</button>
+						</div>
 					</div>
 				</div>
 
 				<div class="mb-6">
-					<div class="flex justify-end items-center mb-4">
-						<button
-							type="button"
-							onclick={addSet}
-							class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-						>
-							Add Set
-						</button>
-					</div>
 					<div class="flex flex-col gap-4">
 						{#each groupedSets as group (group.exerciseId)}
 							<div class="flex flex-col gap-4 mt-4 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
