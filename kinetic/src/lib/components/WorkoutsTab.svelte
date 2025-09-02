@@ -141,6 +141,12 @@
 		let reps = 0;
 		let myoRep: 'start' | 'match' | null = null;
 
+		// Inherit weight and reps from the last set if it exists
+		if (lastSet) {
+			weight = lastSet.weight;
+			reps = lastSet.reps;
+		}
+
 		const myoStartSet = setsForExercise.find((s) => s.myoRep === 'start');
 
 		if (myoStartSet) {
