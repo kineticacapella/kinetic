@@ -3,6 +3,7 @@
 	import ExercisesTab from '$lib/components/ExercisesTab.svelte';
 	import SettingsTab from '$lib/components/SettingsTab.svelte';
 	import WorkoutsTab from '$lib/components/WorkoutsTab.svelte';
+	import HistoryTab from '$lib/components/HistoryTab.svelte';
 	import { onMount } from 'svelte';
 	import { initFlowbite } from 'flowbite';
 
@@ -24,6 +25,9 @@
 				<li class="mr-2" role="presentation">
 					<button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="settings-tab" data-tabs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">Settings</button>
 				</li>
+				<li class="mr-2" role="presentation">
+					<button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="history-tab" data-tabs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">History</button>
+				</li>
 			</ul>
 		</div>
 		<div id="myTabContent">
@@ -35,6 +39,9 @@
 			</div>
 			<div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="settings" role="tabpanel" aria-labelledby="settings-tab">
 				<SettingsTab />
+			</div>
+			<div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="history" role="tabpanel" aria-labelledby="history-tab">
+				<HistoryTab />
 			</div>
 		</div>
 	</main>
