@@ -4,7 +4,7 @@
 	import { workouts } from '$lib/stores';
 	import { getExercises } from '$lib/supabase';
 	import type { Workout, Exercise, WorkoutExercise } from '$lib/supabase';
-	import { PlusOutline, DotsVerticalOutline } from 'flowbite-svelte-icons';
+	import { PlusOutline, DotsVerticalOutline, TrashBinOutline, EyeOutline, PencilOutline } from 'flowbite-svelte-icons';
 	import { user } from '$lib/stores';
 
 	let exercises: Exercise[] = $state([]);
@@ -283,15 +283,18 @@
 					<div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 flex justify-end space-x-3">
 						<button
 							onclick={() => viewWorkout(workout)}
-							class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">View</button
+							class="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-800"
+							>View</button
 						>
 						<button
 							onclick={() => startEdit(workout)}
-							class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">Edit</button
+							class="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-600 dark:focus:ring-blue-800"
+							>Edit</button
 						>
 						<button
 							onclick={() => handleDeleteWorkout(workout.id)}
-							class="text-sm font-medium text-red-600 dark:text-red-400 hover:underline">Delete</button
+							class="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
+							>Delete</button
 						>
 					</div>
 				</div>
@@ -520,12 +523,13 @@
 				</button>
 			</div>
 			<div class="p-4 md:p-5 space-y-4">
-				<form onsubmit={handleAddExerciseToWorkout} class="grid grid-cols-5 gap-4 items-end">
+				<form onsubmit={handleAddExerciseToWorkout} class="grid grid-cols-4 gap-4 items-end">
 					<div class="col-span-2">
 						<label
 							for="exercise"
 							class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Exercise</label
 						>
+						<div class="flex items-center gap-2">
 						<select
 							id="exercise"
 							bind:value={selectedExerciseId}
@@ -536,6 +540,14 @@
 								<option value={exercise.id}>{exercise.name}</option>
 							{/each}
 						</select>
+						<button
+							type="submit"
+							class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+						>
+							<PlusOutline class="w-6 h-6" />
+							<span class="sr-only">Add Exercise</span>
+						</button>
+						</div>
 					</div>
 					<div>
 						<label for="sets" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -571,11 +583,6 @@
 							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600"
 						/>
 					</div>
-					<button
-						type="submit"
-						class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800"
-						>Add</button
-					>
 				</form>
 
 				<div class="mt-4">
@@ -585,7 +592,7 @@
 					<ul class="space-y-2">
 						{#each editingWorkout?.exercises || [] as woExercise}
 							<li
-								class="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded-lg"
+								class="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600"
 							>
 								<div>
 									<span class="font-bold text-gray-800 dark:text-gray-200"
@@ -597,9 +604,11 @@
 								</div>
 								<button
 									onclick={() => woExercise.id && handleRemoveExerciseFromWorkout(woExercise.id)}
-									class="text-sm font-medium text-red-600 dark:text-red-400 hover:underline"
-									>Remove</button
+									class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
 								>
+									<TrashBinOutline class="w-6 h-6" />
+									<span class="sr-only">Remove Exercise</span>
+								</button>
 							</li>
 						{/each}
 					</ul>
