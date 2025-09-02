@@ -39,8 +39,11 @@
 	// New state for drop set feature
 	let activeSetForDropSet: { id: string; exerciseId: string } | null = $state(null);
 	let dropEachSubsequentSet = $state(false);
+	let reductionType = $state<'percent' | 'weight'>('percent');
 	let weightReductionPercentage = $state(10);
-	let exerciseDropSetInfo: { [exerciseId: string]: { auto: boolean; reduction: number } } = $state(
+	let weightReductionAmount = $state(5);
+	type DropSetReduction = { type: 'percent'; value: number } | { type: 'weight'; value: number };
+	let exerciseDropSetInfo: { [exerciseId: string]: { auto: boolean; reduction: DropSetReduction } } = $state(
 		{}
 	);
 
@@ -136,10 +139,17 @@
 		let weight = 0;
 		let reps = 0;
 
-		if (lastSet && exerciseDropSetInfo[newWorkoutExerciseId]?.auto && lastSet.isDropSet) {
+		const config = exerciseDropSetInfo[newWorkoutExerciseId];
+		if (lastSet && config?.auto && lastSet.isDropSet) {
 			isDrop = true;
-			const reduction = 1 - (exerciseDropSetInfo[newWorkoutExerciseId].reduction || 0) / 100;
-			weight = Math.round(lastSet.weight * reduction);
+			if (config.reduction.type === 'percent') {
+				const reductionFactor = 1 - (config.reduction.value || 0) / 100;
+				weight = Math.round(lastSet.weight * reductionFactor);
+			} else {
+				// type is 'weight'
+				weight = lastSet.weight - (config.reduction.value || 0);
+			}
+			if (weight < 0) weight = 0; // prevent negative weight
 			reps = lastSet.reps;
 		}
 
@@ -166,11 +176,22 @@
 		activeSetForDropSet = { id: setId, exerciseId: exerciseId };
 
 		if (exerciseDropSetInfo[exerciseId]) {
-			dropEachSubsequentSet = exerciseDropSetInfo[exerciseId].auto;
-			weightReductionPercentage = exerciseDropSetInfo[exerciseId].reduction;
+			const config = exerciseDropSetInfo[exerciseId];
+			dropEachSubsequentSet = config.auto;
+			reductionType = config.reduction.type;
+			if (config.reduction.type === 'percent') {
+				weightReductionPercentage = config.reduction.value;
+				weightReductionAmount = 5; // reset other
+			} else {
+				weightReductionAmount = config.reduction.value;
+				weightReductionPercentage = 10; // reset other
+			}
 		} else {
+			// Reset to defaults
 			dropEachSubsequentSet = false;
+			reductionType = 'percent';
 			weightReductionPercentage = 10;
+			weightReductionAmount = 5;
 		}
 
 		dropSetModal.show();
@@ -189,7 +210,10 @@
 		if (dropEachSubsequentSet) {
 			exerciseDropSetInfo[exerciseId] = {
 				auto: true,
-				reduction: weightReductionPercentage
+				reduction: {
+					type: reductionType,
+					value: reductionType === 'percent' ? weightReductionPercentage : weightReductionAmount
+				}
 			};
 		} else {
 			delete exerciseDropSetInfo[exerciseId];
@@ -624,9 +648,30 @@
 				</div>
 				{#if dropEachSubsequentSet}
 				<div class="mt-4">
-					<label for="drop-set-weight-reduction" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Weight reduction (%)</label>
-					<input bind:value={weightReductionPercentage} type="number" id="drop-set-weight-reduction" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="e.g. 10" />
+					<label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Reduction Type</label>
+					<div class="flex gap-4">
+						<div class="flex items-center">
+							<input bind:group={reductionType} type="radio" id="percent-reduction" value="percent" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+							<label for="percent-reduction" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Percentage</label>
+						</div>
+						<div class="flex items-center">
+							<input bind:group={reductionType} type="radio" id="weight-reduction" value="weight" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+							<label for="weight-reduction" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Fixed Weight</label>
+						</div>
+					</div>
 				</div>
+
+				{#if reductionType === 'percent'}
+				<div class="mt-4">
+					<label for="drop-set-weight-reduction-percent" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Weight reduction (%)</label>
+					<input bind:value={weightReductionPercentage} type="number" id="drop-set-weight-reduction-percent" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="e.g. 10" />
+				</div>
+				{:else}
+				<div class="mt-4">
+					<label for="drop-set-weight-reduction-amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Weight reduction (amount)</label>
+					<input bind:value={weightReductionAmount} type="number" id="drop-set-weight-reduction-amount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="e.g. 5" />
+				</div>
+				{/if}
 				{/if}
 			</div>
 			<div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
