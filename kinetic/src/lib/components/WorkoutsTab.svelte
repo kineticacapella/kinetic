@@ -4,7 +4,7 @@
 	import { workouts } from '$lib/stores';
 	import { getExercises } from '$lib/supabase';
 	import type { Workout, Exercise, WorkoutExercise } from '$lib/supabase';
-	import { PlusOutline, DotsVerticalOutline } from 'flowbite-svelte-icons';
+	import { PlusOutline, DotsVerticalOutline, TrashBinOutline } from 'flowbite-svelte-icons';
 	import { user } from '$lib/stores';
 
 	let exercises: Exercise[] = $state([]);
@@ -388,53 +388,24 @@
 				<div class="mb-6">
 					<div class="flex flex-col gap-4">
 						{#each groupedSets as group (group.exerciseId)}
-							<div class="flex flex-col gap-4 mt-4">
+							<div class="flex flex-col gap-4 mt-4 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
 								<h5 class="text-lg font-semibold text-gray-800 dark:text-white">
 									{group.exerciseName}
 								</h5>
 								{#if group.sets.length > 0}
 									<div
-										class="grid grid-cols-5 gap-4 items-center font-medium text-gray-500 dark:text-gray-400"
+										class="grid grid-cols-4 gap-4 items-center font-medium text-gray-500 dark:text-gray-400"
 									>
-										<div class="text-left"></div>
 										<div class="text-base text-left">Set</div>
 										<div class="text-base text-left">Weight</div>
 										<div class="text-base text-left">Reps</div>
-										<div class="text-base text-left">Log</div>
+										<div class="text-base text-left"></div>
 									</div>
 								{/if}
 								{#each group.sets as set, i (set.id)}
 									<div
-										class="grid grid-cols-5 gap-4 items-center border border-gray-200 dark:border-gray-700 rounded-lg p-3"
+										class="grid grid-cols-4 gap-4 items-center border-t border-gray-200 dark:border-gray-700 pt-4"
 									>
-										<div class="flex justify-start">
-											<button
-												id="dropdownMenuIconButton-{set.id}"
-												data-dropdown-toggle="dropdownDots-{set.id}"
-												class="inline-flex items-center p-2 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-												type="button"
-											>
-												<DotsVerticalOutline class="w-5 h-5 text-gray-500" />
-											</button>
-											<div
-												id="dropdownDots-{set.id}"
-												class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600"
-											>
-												<ul
-													class="py-2 text-sm text-gray-700 dark:text-gray-200"
-													aria-labelledby="dropdownMenuIconButton-{set.id}"
-												>
-													<li>
-														<button
-															type="button"
-															onclick={() => removeSet(set.id)}
-															class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-															>Remove</button
-														>
-													</li>
-												</ul>
-											</div>
-										</div>
 										<div class="text-base font-medium text-gray-900 dark:text-white text-left">
 											{i + 1}
 										</div>
@@ -458,11 +429,15 @@
 												placeholder="Reps"
 											/>
 										</div>
-										<div class="flex justify-start">
-											<input
-												type="checkbox"
-												class="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-											/>
+										<div class="flex justify-end">
+											<button
+												type="button"
+												onclick={() => removeSet(set.id)}
+												class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+											>
+												<TrashBinOutline class="w-6 h-6" />
+												<span class="sr-only">Remove Set</span>
+											</button>
 										</div>
 									</div>
 								{/each}
