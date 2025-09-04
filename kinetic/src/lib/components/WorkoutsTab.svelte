@@ -2,7 +2,17 @@
 	import { onMount, tick } from 'svelte';
 	import { initFlowbite, Modal, Dropdown } from 'flowbite';
 	import { workouts } from '$lib/stores';
-	import { getExercises } from '$lib/supabase';
+	import {
+		getExercises,
+		getWorkouts,
+		getWorkout,
+		addWorkout,
+		updateWorkout,
+		deleteWorkout,
+		addExerciseToWorkout,
+		removeExerciseFromWorkout,
+		updateExerciseInWorkout
+	} from '$lib/supabase';
 	import type { Workout, Exercise, WorkoutExercise } from '$lib/supabase';
 	import {
 		PlusOutline,
@@ -85,6 +95,20 @@
 		}
 	}
 
+	async function loadWorkouts() {
+		if (!$user) return;
+		try {
+			const data = await getWorkouts($user);
+			workouts.set(data || []);
+		} catch (error) {
+			if (error instanceof Error) {
+				console.error('Error fetching workouts:', error.message);
+			} else {
+				console.error('Unknown error fetching workouts:', error);
+			}
+		}
+	}
+
 	onMount(() => {
 		initFlowbite();
 		const viewModalElement = document.getElementById('view-workout-modal');
@@ -111,6 +135,7 @@
 	$effect(() => {
 		if ($user) {
 			void loadExercises();
+			void loadWorkouts();
 		}
 	});
 
@@ -283,64 +308,58 @@
 		activeSetForDropSet = null;
 	}
 
-	function handleAddWorkout(event: Event) {
+	async function handleAddWorkout(event: Event) {
 		event.preventDefault();
 		if (!newWorkoutName.trim() || !$user || newWorkoutSets.length === 0) return;
 
 		const currentWorkout = editingWorkout;
-		if (currentWorkout && currentWorkout.id) {
-			// Update existing workout
-			const updatedWorkout: Workout = {
-				...currentWorkout,
-				name: newWorkoutName,
-				exercises: newWorkoutSets.map((set) => {
-					const exercise = exercises.find((e) => e.id === set.exerciseId);
-					return {
-						id: set.id, // Preserving original ID for existing sets
+		try {
+			if (currentWorkout && currentWorkout.id) {
+				// Update existing workout
+				await updateWorkout(currentWorkout.id, { name: newWorkoutName });
+
+				// Simple update: delete all exercises and re-add them
+				await Promise.all(
+					(currentWorkout.exercises || []).map(we => removeExerciseFromWorkout(we.id))
+				);
+				await Promise.all(
+					newWorkoutSets.map(set => addExerciseToWorkout({
 						workout_id: currentWorkout.id,
 						exercise_id: set.exerciseId,
-						sets: 1,
+						sets: 1, // Each row is 1 set
 						reps: set.reps,
 						weight: set.weight,
-						isDropSet: set.isDropSet,
-						myoRep: set.myoRep,
-						exercises: exercise
-					};
-				}) as any
-			};
-
-			workouts.update((items) =>
-				items.map((w) => (w.id === currentWorkout.id ? updatedWorkout : w))
-			);
-		} else {
-			// Add new workout
-			const newWorkoutId = crypto.randomUUID();
-
-			const workoutExercises: any[] = newWorkoutSets.map((set) => {
-				const exercise = exercises.find((e) => e.id === set.exerciseId);
-				return {
-					id: crypto.randomUUID(),
-					workout_id: newWorkoutId,
-					exercise_id: set.exerciseId,
-					sets: 1, // Each row is 1 set
-					reps: set.reps,
-					weight: set.weight,
-					isDropSet: set.isDropSet,
-					myoRep: set.myoRep,
-					exercises: exercise
-				};
-			});
-
-			const newWorkout: Workout = {
-				id: newWorkoutId,
-				user_id: $user.id,
-				name: newWorkoutName,
-				exercises: workoutExercises
-			};
-
-			workouts.update((items) => [...items, newWorkout]);
+						// isDropSet: set.isDropSet,
+						// myoRep: set.myoRep
+					}))
+				);
+			} else {
+				// Add new workout
+				const newWorkout = await addWorkout({ name: newWorkoutName }, $user);
+				if (newWorkout && newWorkout.id) {
+					await Promise.all(
+						newWorkoutSets.map(set => addExerciseToWorkout({
+							workout_id: newWorkout.id,
+							exercise_id: set.exerciseId,
+							sets: 1, // Each row is 1 set
+							reps: set.reps,
+							weight: set.weight,
+							// isDropSet: set.isDropSet,
+							// myoRep: set.myoRep
+						}))
+					);
+				}
+			}
+			await loadWorkouts();
+			addWorkoutModal.hide();
+		} catch (error) {
+			if (error instanceof Error) {
+				workoutError = error.message;
+			} else {
+				workoutError = 'An unknown error occurred.';
+			}
+			console.error('Error saving workout:', error);
 		}
-		addWorkoutModal.hide();
 	}
 
 	async function startEdit(workout: Workout) {
@@ -365,9 +384,18 @@
 		viewWorkoutModal.show();
 	}
 
-	function handleDeleteWorkout(id: string | undefined) {
+	async function handleDeleteWorkout(id: string | undefined) {
 		if (!id) return;
-		workouts.update((items) => items.filter((item) => item.id !== id));
+		try {
+			await deleteWorkout(id);
+			await loadWorkouts();
+		} catch (error) {
+			if (error instanceof Error) {
+				console.error('Error deleting workout:', error.message);
+			} else {
+				console.error('Unknown error deleting workout:', error);
+			}
+		}
 	}
 
 	// Workout Exercise Management (in view modal)
@@ -376,7 +404,7 @@
 	let reps = $state(10);
 	let weight = $state(100);
 
-	function handleAddExerciseToWorkout(event: Event) {
+	async function handleAddExerciseToWorkout(event: Event) {
 		event.preventDefault();
 		const currentWorkout = editingWorkout;
 		if (!currentWorkout || !currentWorkout.id || !selectedExerciseId) return;
@@ -384,20 +412,24 @@
 		const exercise = exercises.find((e) => e.id === selectedExerciseId);
 		if (!exercise) return;
 
-		const workoutExercise: any = {
-			id: crypto.randomUUID(),
-			workout_id: currentWorkout.id,
-			exercise_id: selectedExerciseId,
-			sets,
-			reps,
-			weight,
-			exercises: exercise // Nest the full exercise object
-		};
+		try {
+			await addExerciseToWorkout({
+				workout_id: currentWorkout.id,
+				exercise_id: selectedExerciseId,
+				sets,
+				reps,
+				weight
+			});
+			await loadWorkouts(); // Refresh workouts to show the new exercise
+			// Also update the editingWorkout object to reflect the change immediately in the modal
+			const updatedWorkout = await getWorkout(currentWorkout.id); // Assuming getWorkout fetches a single workout
+			if (updatedWorkout) {
+				editingWorkout = updatedWorkout;
+			}
+		} catch (error) {
+			console.error('Error adding exercise to workout:', error);
+		}
 
-		currentWorkout.exercises = [...(currentWorkout.exercises || []), workoutExercise];
-		workouts.update((items) =>
-			items.map((item) => (item.id === currentWorkout.id ? currentWorkout : item))
-		);
 
 		selectedExerciseId = '';
 		sets = 3;
@@ -405,15 +437,22 @@
 		weight = 100;
 	}
 
-	function handleRemoveExerciseFromWorkout(workoutExerciseId: string) {
+	async function handleRemoveExerciseFromWorkout(workoutExerciseId: string) {
 		if (!editingWorkout) return;
-		const currentWorkout = editingWorkout;
-		currentWorkout.exercises = (currentWorkout.exercises || []).filter(
-			(we) => we.id !== workoutExerciseId
-		);
-		workouts.update((items) =>
-			items.map((item) => (item.id === currentWorkout.id ? currentWorkout : item))
-		);
+		try {
+			await removeExerciseFromWorkout(workoutExerciseId);
+			await loadWorkouts(); // Refresh workouts
+			// Also update the editingWorkout object
+			const updatedWorkout = await getWorkout(editingWorkout.id);
+			if (updatedWorkout) {
+				editingWorkout = updatedWorkout;
+			} else {
+				// If the workout is gone, close the modal
+				viewWorkoutModal.hide();
+			}
+		} catch (error) {
+			console.error('Error removing exercise from workout:', error);
+		}
 	}
 </script>
 
