@@ -320,7 +320,11 @@
 
 				// Simple update: delete all exercises and re-add them
 				await Promise.all(
-					(currentWorkout.exercises || []).map(we => removeExerciseFromWorkout(we.id))
+					(currentWorkout.workout_exercises || []).map((we: WorkoutExercise) => {
+						if (we.id) {
+							return removeExerciseFromWorkout(we.id);
+						}
+					})
 				);
 				await Promise.all(
 					newWorkoutSets.map(set => addExerciseToWorkout({
@@ -365,8 +369,8 @@
 	async function startEdit(workout: Workout) {
 		editingWorkout = workout;
 		newWorkoutName = workout.name;
-		newWorkoutSets = (workout.exercises || []).map((we: any) => ({
-			id: we.id,
+		newWorkoutSets = (workout.workout_exercises || []).map((we: WorkoutExercise) => ({
+			id: we.id || '',
 			exerciseId: we.exercise_id,
 			exerciseName: we.exercises.name,
 			weight: we.weight,
@@ -437,8 +441,8 @@
 		weight = 100;
 	}
 
-	async function handleRemoveExerciseFromWorkout(workoutExerciseId: string) {
-		if (!editingWorkout) return;
+	async function handleRemoveExerciseFromWorkout(workoutExerciseId: string | undefined) {
+		if (!workoutExerciseId || !editingWorkout || !editingWorkout.id) return;
 		try {
 			await removeExerciseFromWorkout(workoutExerciseId);
 			await loadWorkouts(); // Refresh workouts
@@ -484,8 +488,8 @@
 	{:else}
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 			{#each $workouts as workout (workout.id)}
-				{@const hasDropSet = (workout.exercises || []).some((ex: any) => ex.isDropSet)}
-				{@const hasMyoRep = (workout.exercises || []).some((ex: any) => ex.myoRep)}
+				{@const hasDropSet = (workout.workout_exercises || []).some((ex: WorkoutExercise) => ex.isDropSet)}
+				{@const hasMyoRep = (workout.workout_exercises || []).some((ex: WorkoutExercise) => ex.myoRep)}
 				<div
 					class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600"
 				>
@@ -498,7 +502,7 @@
 							<div>
 								<span class="font-semibold text-gray-600 dark:text-gray-300">Exercises:</span>
 								<span class="text-gray-500 dark:text-gray-400">
-									{Array.from(new Set((workout.exercises || []).map((e: any) => e.exercises.name))).join(', ')}</span
+									{Array.from(new Set((workout.workout_exercises || []).map((e: WorkoutExercise) => e.exercises.name))).join(', ')}</span
 								>
 							</div>
 							<div class="pt-2">
@@ -921,220 +925,20 @@
 						Exercises in this workout:
 					</h4>
 					<ul class="space-y-2">
-						{#each editingWorkout?.exercises || [] as woExercise}
+						{#each editingWorkout?.workout_exercises || [] as woExercise}
 							<li
 								class="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600"
 							>
 								<div>
 									<span class="font-bold text-gray-800 dark:text-gray-200"
-										>{(woExercise as any).exercises.name}</span
+										>{woExercise.exercises.name}</span
 									>
 									<span class="text-sm text-gray-500 dark:text-gray-400 ml-2"
 										>{woExercise.sets} sets x {woExercise.reps} reps @ {woExercise.weight}kg</span
 									>
 								</div>
 								<button
-									onclick={() => woExercise.id && handleRemoveExerciseFromWorkout(woExercise.id)}
-									class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
-								>
-									<TrashBinOutline class="w-6 h-6" />
-									<span class="sr-only">Remove Exercise</span>
-								</button>
-							</li>
-						{/each}
-					</ul>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-
-<!-- Drop Set Modal -->
-<div
-	id="drop-set-modal"
-	tabindex="-1"
-	aria-hidden="true"
-	class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
->
-	<div class="relative p-4 w-full max-w-md max-h-full">
-		<div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-			<div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-				<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-					Drop Set Options
-				</h3>
-				<button
-					type="button"
-					class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-					data-modal-hide="drop-set-modal"
-				>
-					<svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-					</svg>
-					<span class="sr-only">Close modal</span>
-				</button>
-			</div>
-			<div class="p-4 md:p-5">
-				<p class="text-gray-500 dark:text-gray-400 mb-4">Configure the drop set behavior:</p>
-				<div class="flex items-center ps-4 border border-gray-200 rounded dark:border-gray-700">
-					<input bind:checked={dropEachSubsequentSet} id="drop-each-set-checkbox" type="checkbox" value="" name="bordered-checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-					<label for="drop-each-set-checkbox" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Drop each subsequent set</label>
-				</div>
-				{#if dropEachSubsequentSet}
-				<fieldset class="mt-4">
-					<legend class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Reduction Type</legend>
-					<div class="flex gap-4">
-						<div class="flex items-center">
-							<input bind:group={reductionType} type="radio" id="percent-reduction" value="percent" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-							<label for="percent-reduction" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Percentage</label>
-						</div>
-						<div class="flex items-center">
-							<input bind:group={reductionType} type="radio" id="weight-reduction" value="weight" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-							<label for="weight-reduction" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Fixed Weight</label>
-						</div>
-					</div>
-				</fieldset>
-
-				{#if reductionType === 'percent'}
-				<div class="mt-4">
-					<label for="drop-set-weight-reduction-percent" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Weight reduction (%)</label>
-					<input bind:value={weightReductionPercentage} type="number" id="drop-set-weight-reduction-percent" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="e.g. 10" />
-				</div>
-				{:else}
-				<div class="mt-4">
-					<label for="drop-set-weight-reduction-amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Weight reduction (amount)</label>
-					<input bind:value={weightReductionAmount} type="number" id="drop-set-weight-reduction-amount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="e.g. 5" />
-				</div>
-				{/if}
-				{/if}
-			</div>
-			<div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
-				<button onclick={confirmDropSet} type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Save</button>
-				<button data-modal-hide="drop-set-modal" type="button" class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Cancel</button>
-			</div>
-		</div>
-	</div>
-</div>
-
-<!-- View Workout Modal -->
-<div
-	id="view-workout-modal"
-	tabindex="-1"
-	aria-hidden="true"
-	class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
->
-	<div class="relative p-4 w-full max-w-2xl max-h-full">
-		<div class="relative bg-white rounded-lg shadow-xl dark:bg-gray-800 border-2 border-blue-700 dark:border-blue-600">
-			<div
-				class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
-			>
-				<h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-					{editingWorkout?.name}
-				</h3>
-				<button
-					type="button"
-					class="text-red-500 bg-transparent hover:bg-red-100 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:text-red-400 dark:hover:bg-red-900"
-					data-modal-hide="view-workout-modal"
-				>
-					<svg
-						class="w-3 h-3"
-						aria-hidden="true"
-						xmlns="http://www.w3.org/2000/svg"
-						fill="none"
-						viewBox="0 0 14 14"
-					>
-						<path
-							stroke="currentColor"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-						/>
-					</svg>
-					<span class="sr-only">Close modal</span>
-				</button>
-			</div>
-			<div class="p-4 md:p-5 space-y-4">
-				<form onsubmit={handleAddExerciseToWorkout} class="grid grid-cols-4 gap-4 items-end">
-					<div class="col-span-2">
-						<label
-							for="exercise"
-							class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Exercise</label
-						>
-						<div class="flex items-center gap-2">
-							<select
-								id="exercise"
-								bind:value={selectedExerciseId}
-								class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-							>
-								<option value="" disabled>Select an exercise</option>
-								{#each exercises as exercise}
-									<option value={exercise.id}>{exercise.name}</option>
-								{/each}
-							</select>
-							<button
-								type="submit"
-								class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-							>
-								<PlusOutline class="w-6 h-6" />
-								<span class="sr-only">Add Exercise</span>
-							</button>
-						</div>
-					</div>
-					<div>
-						<label for="sets" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-							>Sets</label
-						>
-						<input
-							type="number"
-							id="sets"
-							bind:value={sets}
-							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600"
-						/>
-					</div>
-					<div>
-						<label for="reps" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-							>Reps</label
-						>
-						<input
-							type="number"
-							id="reps"
-							bind:value={reps}
-							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600"
-						/>
-					</div>
-					<div>
-						<label
-							for="weight"
-							class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Weight</label
-						>
-						<input
-							type="number"
-							id="weight"
-							bind:value={weight}
-							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600"
-						/>
-					</div>
-				</form>
-
-				<div class="mt-4">
-					<h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">
-						Exercises in this workout:
-					</h4>
-					<ul class="space-y-2">
-						{#each editingWorkout?.exercises || [] as woExercise}
-							<li
-								class="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600"
-							>
-								<div>
-									<span class="font-bold text-gray-800 dark:text-gray-200"
-										>{(woExercise as any).exercises.name}</span
-									>
-									<span class="text-sm text-gray-500 dark:text-gray-400 ml-2"
-										>{woExercise.sets} sets x {woExercise.reps} reps @ {woExercise.weight}kg</span
-									>
-								</div>
-								<button
-									onclick={() => woExercise.id && handleRemoveExerciseFromWorkout(woExercise.id)}
+									onclick={() => handleRemoveExerciseFromWorkout(woExercise.id)}
 									class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
 								>
 									<TrashBinOutline class="w-6 h-6" />

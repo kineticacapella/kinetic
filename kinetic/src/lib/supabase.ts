@@ -82,7 +82,7 @@ export interface Workout {
 	id?: string;
 	name: string;
 	user_id?: string;
-	exercises?: WorkoutExercise[]; // This will be populated by a join
+	workout_exercises?: WorkoutExercise[]; // This will be populated by a join
 }
 
 export interface WorkoutExercise {
@@ -92,6 +92,9 @@ export interface WorkoutExercise {
 	sets: number;
 	reps: number;
 	weight: number;
+	isDropSet?: boolean;
+	myoRep?: 'start' | 'match' | null;
+	exercises: Exercise; // Added nested exercise
 }
 
 export async function getWorkouts(user: User) {
