@@ -333,8 +333,8 @@
 						sets: 1, // Each row is 1 set
 						reps: set.reps,
 						weight: set.weight,
-						// isDropSet: set.isDropSet,
-						// myoRep: set.myoRep
+						isDropSet: set.isDropSet,
+						myoRep: set.myoRep
 					}))
 				);
 			} else {
@@ -348,8 +348,8 @@
 							sets: 1, // Each row is 1 set
 							reps: set.reps,
 							weight: set.weight,
-							// isDropSet: set.isDropSet,
-							// myoRep: set.myoRep
+							isDropSet: set.isDropSet,
+							myoRep: set.myoRep
 						}))
 					);
 				}
@@ -372,7 +372,7 @@
 		newWorkoutSets = (workout.workout_exercises || []).map((we: WorkoutExercise) => ({
 			id: we.id || '',
 			exerciseId: we.exercise_id,
-			exerciseName: we.exercises.name,
+			exerciseName: we.exercises?.name || '',
 			weight: we.weight,
 			reps: we.reps,
 			isDropSet: we.isDropSet || false,
@@ -502,7 +502,7 @@
 							<div>
 								<span class="font-semibold text-gray-600 dark:text-gray-300">Exercises:</span>
 								<span class="text-gray-500 dark:text-gray-400">
-									{Array.from(new Set((workout.workout_exercises || []).map((e: WorkoutExercise) => e.exercises.name))).join(', ')}</span
+									{Array.from(new Set((workout.workout_exercises || []).map((e: WorkoutExercise) => e.exercises?.name))).join(', ')}</span
 								>
 							</div>
 							<div class="pt-2">
@@ -931,7 +931,7 @@
 							>
 								<div>
 									<span class="font-bold text-gray-800 dark:text-gray-200"
-										>{woExercise.exercises.name}</span
+										>{woExercise.exercises?.name}</span
 									>
 									<span class="text-sm text-gray-500 dark:text-gray-400 ml-2"
 										>{woExercise.sets} sets x {woExercise.reps} reps @ {woExercise.weight}kg</span

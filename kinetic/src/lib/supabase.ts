@@ -94,7 +94,7 @@ export interface WorkoutExercise {
 	weight: number;
 	isDropSet?: boolean;
 	myoRep?: 'start' | 'match' | null;
-	exercises: Exercise; // Added nested exercise
+	exercises?: Exercise; // Make nested exercise optional
 }
 
 export async function getWorkouts(user: User) {
@@ -143,7 +143,7 @@ export async function deleteWorkout(id: string) {
 	if (error) throw error;
 }
 
-export async function addExerciseToWorkout(workoutExercise: WorkoutExercise) {
+export async function addExerciseToWorkout(workoutExercise: Partial<WorkoutExercise>) {
 	const { data, error } = await supabase
 		.from('workout_exercises')
 		.insert([workoutExercise])
@@ -152,7 +152,8 @@ export async function addExerciseToWorkout(workoutExercise: WorkoutExercise) {
 	return data?.[0];
 }
 
-export async function removeExerciseFromWorkout(id: string) {
+export async function removeExerciseFromWorkout(id: string | undefined) {
+	if (!id) return;
 	const { error } = await supabase
 		.from('workout_exercises')
 		.delete()
