@@ -333,8 +333,8 @@
 						sets: 1, // Each row is 1 set
 						reps: set.reps,
 						weight: set.weight,
-						isDropSet: set.isDropSet,
-						myoRep: set.myoRep
+						is_drop_set: set.isDropSet,
+						myo_rep: set.myoRep
 					}))
 				);
 			} else {
@@ -348,8 +348,8 @@
 							sets: 1, // Each row is 1 set
 							reps: set.reps,
 							weight: set.weight,
-							isDropSet: set.isDropSet,
-							myoRep: set.myoRep
+							is_drop_set: set.isDropSet,
+							myo_rep: set.myoRep
 						}))
 					);
 				}
@@ -375,8 +375,8 @@
 			exerciseName: we.exercises?.name || '',
 			weight: we.weight,
 			reps: we.reps,
-			isDropSet: we.isDropSet || false,
-			myoRep: we.myoRep || null
+			isDropSet: we.is_drop_set || false,
+			myoRep: we.myo_rep || null
 		}));
 		addWorkoutModal.show();
 		await tick();
@@ -488,8 +488,8 @@
 	{:else}
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 			{#each $workouts as workout (workout.id)}
-				{@const hasDropSet = (workout.workout_exercises || []).some((ex: WorkoutExercise) => ex.isDropSet)}
-				{@const hasMyoRep = (workout.workout_exercises || []).some((ex: WorkoutExercise) => ex.myoRep)}
+				{@const hasDropSet = (workout.workout_exercises || []).some((ex: WorkoutExercise) => ex.is_drop_set)}
+				{@const hasMyoRep = (workout.workout_exercises || []).some((ex: WorkoutExercise) => ex.myo_rep)}
 				<div
 					class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600"
 				>

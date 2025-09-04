@@ -92,8 +92,8 @@ export interface WorkoutExercise {
 	sets: number;
 	reps: number;
 	weight: number;
-	isDropSet?: boolean;
-	myoRep?: 'start' | 'match' | null;
+	is_drop_set?: boolean;
+	myo_rep?: 'start' | 'match' | null;
 	exercises?: Exercise; // Make nested exercise optional
 }
 
