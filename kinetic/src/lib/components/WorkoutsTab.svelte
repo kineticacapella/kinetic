@@ -319,15 +319,12 @@
 				await updateWorkout(currentWorkout.id, { name: newWorkoutName });
 
 				// Simple update: delete all exercises and re-add them
-				await Promise.all(
-					(currentWorkout.workout_exercises || []).map((we: WorkoutExercise) => {
-						if (we.id) {
-							return removeExerciseFromWorkout(we.id);
-						}
-					})
-				);
-				await Promise.all(
-					newWorkoutSets.map(set => addExerciseToWorkout({
+				for (const we of currentWorkout.workout_exercises || []) {
+					await removeExerciseFromWorkout(we.id);
+				}
+
+				for (const set of newWorkoutSets) {
+					await addExerciseToWorkout({
 						workout_id: currentWorkout.id,
 						exercise_id: set.exerciseId,
 						sets: 1, // Each row is 1 set
@@ -335,14 +332,14 @@
 						weight: set.weight,
 						is_drop_set: set.isDropSet,
 						myo_rep: set.myoRep
-					}))
-				);
+					});
+				}
 			} else {
 				// Add new workout
 				const newWorkout = await addWorkout({ name: newWorkoutName }, $user);
 				if (newWorkout && newWorkout.id) {
-					await Promise.all(
-						newWorkoutSets.map(set => addExerciseToWorkout({
+					for (const set of newWorkoutSets) {
+						await addExerciseToWorkout({
 							workout_id: newWorkout.id,
 							exercise_id: set.exerciseId,
 							sets: 1, // Each row is 1 set
@@ -350,8 +347,8 @@
 							weight: set.weight,
 							is_drop_set: set.isDropSet,
 							myo_rep: set.myoRep
-						}))
-					);
+						});
+					}
 				}
 			}
 			await loadWorkouts();
