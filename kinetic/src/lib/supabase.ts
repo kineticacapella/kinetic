@@ -100,8 +100,9 @@ export interface WorkoutExercise {
 export async function getWorkouts(user: User) {
 	const { data, error } = await supabase
 		.from('workouts')
-		.select('*, workout_exercises(*, exercises(*)) ')
-		.eq('user_id', user.id);
+		.select('*, workout_exercises(*, exercises(*))')
+		.eq('user_id', user.id)
+		.order('created_at', { foreignTable: 'workout_exercises', ascending: true });
 	if (error) throw error;
 	return data;
 }
@@ -109,8 +110,9 @@ export async function getWorkouts(user: User) {
 export async function getWorkout(id: string) {
 	const { data, error } = await supabase
 		.from('workouts')
-		.select('*, workout_exercises(*, exercises(*)) ')
+		.select('*, workout_exercises(*, exercises(*))')
 		.eq('id', id)
+		.order('created_at', { foreignTable: 'workout_exercises', ascending: true })
 		.single();
 	if (error) throw error;
 	return data;
