@@ -33,6 +33,7 @@
 	let addWorkoutModal: Modal;
 	let dropSetModal: Modal;
 	let workoutMode: 'edit' | 'play' = $state('edit');
+	let activeWorkoutId: string | null = $state(null);
 
 	// Add workout state
 	let newWorkoutName = $state('');
@@ -153,12 +154,15 @@
 		if (addModalElement) {
 			addWorkoutModal = new Modal(addModalElement, {
 				onHide: () => {
-					editingWorkout = null;
-					newWorkoutName = '';
-					newWorkoutSets = [];
-					newWorkoutExerciseId = '';
-					workoutMode = 'edit';
-					resetTimer();
+					if (workoutMode !== 'play') {
+						editingWorkout = null;
+						newWorkoutName = '';
+						newWorkoutSets = [];
+						newWorkoutExerciseId = '';
+						workoutMode = 'edit';
+						resetTimer();
+						activeWorkoutId = null;
+					}
 				}
 			});
 		}
@@ -347,6 +351,15 @@
 
 	async function handleAddWorkout(event: Event) {
 		event.preventDefault();
+
+		if (workoutMode === 'play') {
+			stopTimer();
+			resetTimer();
+			activeWorkoutId = null;
+			addWorkoutModal.hide();
+			return;
+		}
+
 		if (!newWorkoutName.trim() || !$user || newWorkoutSets.length === 0) return;
 
 		const currentWorkout = editingWorkout;
@@ -431,6 +444,9 @@
 			myoRep: we.myo_rep || null
 		}));
 		workoutMode = 'play';
+		if (workout.id) {
+			activeWorkoutId = workout.id;
+		}
 		addWorkoutModal.show();
 		startTimer();
 		await tick();
@@ -548,12 +564,16 @@
 					class="relative bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600"
 				>
 					<div class="p-6">
-						<button
-							onclick={() => startWorkout(workout)}
-							class="absolute top-4 right-4 text-sm font-medium text-green-600 dark:text-green-400 hover:underline"
-						>
-							<PlayOutline class="w-6 h-6" />
-						</button>
+						{#if activeWorkoutId === workout.id}
+							<span class="absolute top-4 right-4 text-sm font-medium text-green-600 dark:text-green-400">Active Session</span>
+						{:else}
+							<button
+								onclick={() => startWorkout(workout)}
+								class="absolute top-4 right-4 text-sm font-medium text-green-600 dark:text-green-400 hover:underline"
+							>
+								<PlayOutline class="w-6 h-6" />
+							</button>
+						{/if}
 						<h5 class="mb-3 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
 							{workout.name}
 						</h5>
@@ -813,7 +833,7 @@
 					type="submit"
 					class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 				>
-					{editingWorkout ? 'Save Changes' : 'Add workout'}
+					{workoutMode === 'play' ? 'End Session' : editingWorkout ? 'Save Changes' : 'Add workout'}
 				</button>
 			</form>
 		</div>
