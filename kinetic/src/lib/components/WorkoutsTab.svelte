@@ -21,7 +21,7 @@
 		EyeOutline,
 		PenOutline,
 		ArrowDownOutline,
-		PlayCircleOutline
+		PlayOutline
 	} from 'flowbite-svelte-icons';
 	import { user } from '$lib/stores';
 
@@ -546,7 +546,7 @@
 							onclick={() => startWorkout(workout)}
 							class="text-sm font-medium text-green-600 dark:text-green-400 hover:underline"
 						>
-							<PlayCircleOutline class="w-6 h-6" />
+							<PlayOutline class="w-6 h-6" />
 						</button>
 						<button
 							onclick={() => viewWorkout(workout)}
