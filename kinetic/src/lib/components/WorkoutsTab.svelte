@@ -351,15 +351,6 @@
 
 	async function handleAddWorkout(event: Event) {
 		event.preventDefault();
-
-		if (workoutMode === 'play') {
-			stopTimer();
-			resetTimer();
-			activeWorkoutId = null;
-			addWorkoutModal.hide();
-			return;
-		}
-
 		if (!newWorkoutName.trim() || !$user || newWorkoutSets.length === 0) return;
 
 		const currentWorkout = editingWorkout;
@@ -411,6 +402,13 @@
 			}
 			console.error('Error saving workout:', error);
 		}
+	}
+
+	function handleEndSession() {
+		stopTimer();
+		resetTimer();
+		activeWorkoutId = null;
+		addWorkoutModal.hide();
 	}
 
 	async function startEdit(workout: Workout) {
@@ -829,12 +827,22 @@
 					</div>
 				</div>
 
-				<button
-					type="submit"
-					class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-				>
-					{workoutMode === 'play' ? 'End Session' : editingWorkout ? 'Save Changes' : 'Add workout'}
-				</button>
+				{#if workoutMode === 'play'}
+					<button
+						type="button"
+						onclick={handleEndSession}
+						class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+					>
+						End Session
+					</button>
+				{:else}
+					<button
+						type="submit"
+						class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+					>
+						{editingWorkout ? 'Save Changes' : 'Add workout'}
+					</button>
+				{/if}
 			</form>
 		</div>
 	</div>
