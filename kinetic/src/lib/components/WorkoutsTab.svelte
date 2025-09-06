@@ -661,7 +661,6 @@
 							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
 							placeholder="e.g. Push Day"
 							required
-							disabled={workoutMode === 'play'}
 						/>
 					</div>
 					<div>
@@ -676,7 +675,6 @@
 								bind:value={newWorkoutExerciseId}
 								class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
 								required
-								disabled={workoutMode === 'play'}
 							>
 								<option value="" disabled>Select an exercise</option>
 								{#each exercises as exercise}
@@ -687,7 +685,6 @@
 								type="button"
 								onclick={addSet}
 								class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-								disabled={workoutMode === 'play'}
 							>
 								<PlusOutline class="w-6 h-6" />
 								<span class="sr-only">Add Set</span>
@@ -726,7 +723,6 @@
 												data-dropdown-toggle="dropdownDots-{set.id}"
 												class="inline-flex items-center p-1.5 text-sm font-medium text-center text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
 												type="button"
-												disabled={workoutMode === 'play'}
 											>
 												<DotsVerticalOutline class="w-5 h-5 text-gray-500" />
 											</button>
@@ -788,7 +784,6 @@
 												bind:value={set.weight}
 												class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-20 p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white {workoutMode === 'play' ? 'opacity-50' : ''}"
 												placeholder="Weight"
-												disabled={workoutMode === 'play'}
 											/>
 										</div>
 										<div class="flex justify-start">
@@ -799,7 +794,6 @@
 												bind:value={set.reps}
 												class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-20 p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white {workoutMode === 'play' ? 'opacity-50' : ''}"
 												placeholder="Reps"
-												disabled={workoutMode === 'play'}
 											/>
 										</div>
 										<div class="flex justify-center">
@@ -818,13 +812,8 @@
 				<button
 					type="submit"
 					class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-					disabled={workoutMode === 'play'}
 				>
-					{workoutMode === 'play'
-						? 'Start Workout'
-						: editingWorkout
-						? 'Save Changes'
-						: 'Add workout'}
+					{editingWorkout ? 'Save Changes' : 'Add workout'}
 				</button>
 			</form>
 		</div>
