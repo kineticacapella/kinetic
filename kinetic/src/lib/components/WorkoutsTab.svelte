@@ -49,6 +49,38 @@
 		}[]
 	>([]);
 
+	// Timer state
+	let timer = $state(0);
+	let timerInterval: NodeJS.Timeout | null = $state(null);
+
+	function formatTime(seconds: number) {
+		const minutes = Math.floor(seconds / 60);
+		const remainingSeconds = seconds % 60;
+		return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+	}
+
+	function startTimer() {
+		if (timerInterval) {
+			clearInterval(timerInterval);
+		}
+		timerInterval = setInterval(() => {
+			timer++;
+		}, 1000);
+	}
+
+	function stopTimer() {
+		if (timerInterval) {
+			clearInterval(timerInterval);
+			timerInterval = null;
+		}
+	}
+
+	function resetTimer() {
+		stopTimer();
+		timer = 0;
+	}
+
+
 	// New state for drop set feature
 	let activeSetForDropSet: { id: string; exerciseId: string } | null = $state(null);
 	let dropEachSubsequentSet = $state(false);
@@ -126,6 +158,7 @@
 					newWorkoutSets = [];
 					newWorkoutExerciseId = '';
 					workoutMode = 'edit';
+					resetTimer();
 				}
 			});
 		}
@@ -397,8 +430,9 @@
 			isDropSet: we.is_drop_set || false,
 			myoRep: we.myo_rep || null
 		}));
-		workoutMode = 'edit';
+		workoutMode = 'play';
 		addWorkoutModal.show();
+		startTimer();
 		await tick();
 		initFlowbite();
 	}
@@ -586,6 +620,9 @@
 						? 'Edit Workout'
 						: 'Add New Workout'}
 				</h3>
+				{#if workoutMode === 'play'}
+					<div class="text-lg font-semibold text-gray-900 dark:text-white">{formatTime(timer)}</div>
+				{/if}
 				<button
 					type="button"
 					class="text-red-500 bg-transparent hover:bg-red-100 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:text-red-400 dark:hover:bg-red-900"
@@ -749,7 +786,7 @@
 												type="number"
 												id="weight-{set.id}"
 												bind:value={set.weight}
-												class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-20 p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+												class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-20 p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white {workoutMode === 'play' ? 'opacity-50' : ''}"
 												placeholder="Weight"
 												disabled={workoutMode === 'play'}
 											/>
@@ -760,7 +797,7 @@
 												type="number"
 												id="reps-{set.id}"
 												bind:value={set.reps}
-												class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-20 p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+												class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-20 p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white {workoutMode === 'play' ? 'opacity-50' : ''}"
 												placeholder="Reps"
 												disabled={workoutMode === 'play'}
 											/>
