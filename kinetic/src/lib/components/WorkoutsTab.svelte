@@ -511,9 +511,15 @@
 				{@const hasDropSet = (workout.workout_exercises || []).some((ex: WorkoutExercise) => ex.is_drop_set)}
 				{@const hasMyoRep = (workout.workout_exercises || []).some((ex: WorkoutExercise) => ex.myo_rep)}
 				<div
-					class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600"
+					class="relative bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600"
 				>
 					<div class="p-6">
+						<button
+							onclick={() => startWorkout(workout)}
+							class="absolute top-4 right-4 text-sm font-medium text-green-600 dark:text-green-400 hover:underline"
+						>
+							<PlayOutline class="w-6 h-6" />
+						</button>
 						<h5 class="mb-3 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
 							{workout.name}
 						</h5>
@@ -542,12 +548,6 @@
 						</div>
 					</div>
 					<div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 flex justify-end space-x-3">
-						<button
-							onclick={() => startWorkout(workout)}
-							class="text-sm font-medium text-green-600 dark:text-green-400 hover:underline"
-						>
-							<PlayOutline class="w-6 h-6" />
-						</button>
 						<button
 							onclick={() => viewWorkout(workout)}
 							class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">View</button
