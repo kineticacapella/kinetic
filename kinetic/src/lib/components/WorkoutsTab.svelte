@@ -397,7 +397,7 @@
 			isDropSet: we.is_drop_set || false,
 			myoRep: we.myo_rep || null
 		}));
-		workoutMode = 'play';
+		workoutMode = 'edit';
 		addWorkoutModal.show();
 		await tick();
 		initFlowbite();
