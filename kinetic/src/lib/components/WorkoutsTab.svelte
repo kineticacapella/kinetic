@@ -661,7 +661,7 @@
 			>
 				<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
 					{workoutMode === 'play'
-						? 'Play Workout'
+						? 'Active Session'
 						: editingWorkout
 						? 'Edit Workout'
 						: 'Add New Workout'}
