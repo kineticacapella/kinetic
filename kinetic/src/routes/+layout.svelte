@@ -17,31 +17,31 @@
 		<div class="mb-4 border-b border-gray-200 dark:border-gray-700">
 			<ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="myTab" data-tabs-toggle="#myTabContent" role="tablist">
 				<li class="mr-2" role="presentation">
-					<button class="inline-block p-4 border-b-2 rounded-t-lg" id="exercises-tab" data-tabs-target="#exercises" type="button" role="tab" aria-controls="exercises" aria-selected="true">Exercises</button>
+					<button class="inline-block p-4 border-b-2 rounded-t-lg" id="workouts-tab" data-tabs-target="#workouts" type="button" role="tab" aria-controls="workouts" aria-selected="true">Workouts</button>
 				</li>
 				<li class="mr-2" role="presentation">
-					<button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="workouts-tab" data-tabs-target="#workouts" type="button" role="tab" aria-controls="workouts" aria-selected="false">Workouts</button>
-				</li>
-				<li class="mr-2" role="presentation">
-					<button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="settings-tab" data-tabs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">Settings</button>
+					<button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="exercises-tab" data-tabs-target="#exercises" type="button" role="tab" aria-controls="exercises" aria-selected="false">Exercises</button>
 				</li>
 				<li class="mr-2" role="presentation">
 					<button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="history-tab" data-tabs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">History</button>
 				</li>
+				<li class="mr-2" role="presentation">
+					<button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="settings-tab" data-tabs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">Settings</button>
+				</li>
 			</ul>
 		</div>
 		<div id="myTabContent">
-			<div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="exercises" role="tabpanel" aria-labelledby="exercises-tab">
-				<ExercisesTab />
-			</div>
 			<div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="workouts" role="tabpanel" aria-labelledby="workouts-tab">
 				<WorkoutsTab />
 			</div>
-			<div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-				<SettingsTab />
+			<div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="exercises" role="tabpanel" aria-labelledby="exercises-tab">
+				<ExercisesTab />
 			</div>
 			<div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="history" role="tabpanel" aria-labelledby="history-tab">
 				<HistoryTab />
+			</div>
+			<div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+				<SettingsTab />
 			</div>
 		</div>
 	</main>
