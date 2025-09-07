@@ -178,4 +178,23 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+export interface LoggedSet {
+    exerciseId: string;
+    exerciseName: string;
+    weight: number;
+    reps: number;
+    isDropSet: boolean;
+    myoRep: 'start' | 'match' | null;
+    timerTime: number; // Time on the timer when this set was logged (in seconds)
+    loggedAt: string; // ISO timestamp
+}
+
+export interface WorkoutLog {
+    id: string;
+    workoutName: string;
+    startedAt: string; // ISO timestamp
+    endedAt: string | null; // ISO timestamp, null if session is ongoing
+    sets: LoggedSet[];
+}

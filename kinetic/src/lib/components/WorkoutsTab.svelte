@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { initFlowbite, Modal, Dropdown } from 'flowbite';
-	import { workouts } from '$lib/stores';
+	import { workouts, saveWorkoutLog, loadWorkoutLogs, updateWorkoutLog } from '$lib/stores';
 	import {
 		getExercises,
 		getWorkouts,
@@ -13,7 +13,7 @@
 		removeExerciseFromWorkout,
 		updateExerciseInWorkout
 	} from '$lib/supabase';
-	import type { Workout, Exercise, WorkoutExercise } from '$lib/supabase';
+	import type { Workout, Exercise, WorkoutExercise, WorkoutLog, LoggedSet } from '$lib/supabase';
 	import {
 		PlusOutline,
 		DotsVerticalOutline,
@@ -34,6 +34,7 @@
 	let dropSetModal: Modal;
 	let workoutMode: 'edit' | 'play' = $state('edit');
 	let activeWorkoutId: string | null = $state(null);
+	let currentWorkoutLog: WorkoutLog | null = $state(null);
 
 	// Add workout state
 	let newWorkoutName = $state('');
@@ -81,6 +82,8 @@
 		timer = 0;
 	}
 
+
+	
 
 	// New state for drop set feature
 	let activeSetForDropSet: { id: string; exerciseId: string } | null = $state(null);
@@ -411,6 +414,13 @@
 		resetTimer();
 		activeWorkoutId = null;
 		addWorkoutModal.hide();
+
+		// New logging logic
+		if (currentWorkoutLog) {
+			currentWorkoutLog.endedAt = new Date().toISOString();
+			updateWorkoutLog(currentWorkoutLog);
+			currentWorkoutLog = null; // Clear current log
+		}
 	}
 
 	async function startEdit(workout: Workout) {
@@ -451,6 +461,16 @@
 		startTimer();
 		await tick();
 		initFlowbite();
+
+		// New logging logic
+		currentWorkoutLog = {
+			id: crypto.randomUUID(),
+			workoutName: workout.name,
+			startedAt: new Date().toISOString(),
+			endedAt: null,
+			sets: []
+		};
+		saveWorkoutLog(currentWorkoutLog);
 	}
 
 	function viewWorkout(workout: Workout) {
@@ -568,9 +588,9 @@
 						{#if activeWorkoutId === workout.id}
 							<button
 								onclick={() => startWorkout(workout)}
-								class="absolute top-4 right-4 text-sm font-medium text-green-600 dark:text-green-400 hover:underline font-bold"
+								class="absolute top-4 right-4 text-sm font-medium text-green-600 dark:text-green-400 hover:underline"
 							>
-								Active Session
+								<strong>Active Session</strong>
 							</button>
 						{:else}
 							<button
@@ -818,13 +838,30 @@
 												type="number"
 												id="reps-{set.id}"
 												bind:value={set.reps}
-												class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-20 p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white {workoutMode === 'play' ? 'opacity-50' : ''}"
+												class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
 											/>
 										</div>
 										<div class="flex justify-center">
 											<input
 												type="checkbox"
 												class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+												onchange={(e) => {
+													const target = e.target as HTMLInputElement;
+													if (target.checked && currentWorkoutLog) {
+														const loggedSet: LoggedSet = {
+															exerciseId: set.exerciseId,
+															exerciseName: set.exerciseName,
+															weight: set.weight,
+															reps: set.reps,
+															isDropSet: set.isDropSet || false,
+															myoRep: set.myoRep || null,
+															timerTime: timer,
+															loggedAt: new Date().toISOString()
+														};
+														currentWorkoutLog.sets.push(loggedSet);
+														updateWorkoutLog(currentWorkoutLog);
+													}
+												}}
 											/>
 										</div>
 									</div>
@@ -838,14 +875,14 @@
 					<button
 						type="button"
 						onclick={handleEndSession}
-						class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+						class="text-white bg-red-800 hover:bg-red-900 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-red-700 dark:hover:bg-red-800 dark:focus:ring-red-900"
 					>
 						End Session
 					</button>
 				{:else}
 					<button
 						type="submit"
-						class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+						class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 					>
 						{editingWorkout ? 'Save Changes' : 'Add workout'}
 					</button>
