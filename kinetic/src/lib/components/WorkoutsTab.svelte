@@ -660,15 +660,14 @@
 				class="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600"
 			>
 				<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-					{workoutMode === 'play'
-						? 'Active Session'
-						: editingWorkout
-						? 'Edit Workout'
-						: 'Add New Workout'}
+					{#if workoutMode === 'play'}
+						<span class="text-green-600 dark:text-green-400">Active Session {formatTime(timer)}</span>
+					{:else if editingWorkout}
+						Edit Workout
+					{:else}
+						Add New Workout
+					{/if}
 				</h3>
-				{#if workoutMode === 'play'}
-					<div class="text-lg font-semibold text-gray-900 dark:text-white">{formatTime(timer)}</div>
-				{/if}
 				<button
 					type="button"
 					class="text-red-500 bg-transparent hover:bg-red-100 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:text-red-400 dark:hover:bg-red-900"
