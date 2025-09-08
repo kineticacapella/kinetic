@@ -232,6 +232,6 @@ export interface WorkoutLog {
     user_id?: string;
     workout_name: string;
     started_at: string; 
-    endedAt: string | null; 
+    ended_at: string | null; 
     sets: LoggedSet[];
 }
