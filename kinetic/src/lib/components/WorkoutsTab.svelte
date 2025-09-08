@@ -582,9 +582,9 @@
 				{@const hasDropSet = (workout.workout_exercises || []).some((ex: WorkoutExercise) => ex.is_drop_set)}
 				{@const hasMyoRep = (workout.workout_exercises || []).some((ex: WorkoutExercise) => ex.myo_rep)}
 				<div
-					class="relative bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600"
+					class="relative flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600"
 				>
-					<div class="p-6">
+					<div class="p-6 flex-grow">
 						{#if activeWorkoutId === workout.id}
 							<button
 								onclick={() => startWorkout(workout)}
