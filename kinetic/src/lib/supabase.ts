@@ -185,22 +185,26 @@ export async function getWorkoutLogs(user: User) {
 }
 
 export async function addWorkoutLog(log: Omit<WorkoutLog, 'id' | 'user_id'>, user: User) {
+    console.log('supabase.ts: addWorkoutLog', log, user);
 	const { data, error } = await supabase
 		.from('workout_logs')
 		.insert([{ ...log, user_id: user.id }])
 		.select()
         .single();
+    console.log('supabase.ts: addWorkoutLog result', { data, error });
 	if (error) throw error;
 	return data as WorkoutLog;
 }
 
 export async function updateWorkoutLog(id: string, log: Partial<WorkoutLog>) {
+    console.log('supabase.ts: updateWorkoutLog', id, log);
 	const { data, error } = await supabase
 		.from('workout_logs')
 		.update(log)
 		.eq('id', id)
 		.select()
         .single();
+    console.log('supabase.ts: updateWorkoutLog result', { data, error });
 	if (error) throw error;
 	return data as WorkoutLog;
 }

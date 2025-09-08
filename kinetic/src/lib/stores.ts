@@ -35,15 +35,23 @@ export const myoReps = writable([]);
 export const dropSets = writable([]);
 
 export async function addWorkoutLog(log: Omit<WorkoutLog, 'id' | 'user_id'>) {
+    console.log('stores.ts: addWorkoutLog', log);
     const currentUser = get(user);
-    if (!currentUser) throw new Error("User not logged in");
+    if (!currentUser) {
+        console.error('stores.ts: User not logged in');
+        throw new Error("User not logged in");
+    }
+    console.log('stores.ts: currentUser', currentUser);
     const newLog = await dbAddWorkoutLog(log, currentUser);
+    console.log('stores.ts: newLog from db', newLog);
     workoutLogs.update(logs => [newLog, ...logs]);
     return newLog;
 }
 
 export async function updateWorkoutLog(id: string, log: Partial<WorkoutLog>) {
+    console.log('stores.ts: updateWorkoutLog', id, log);
     const updatedLog = await dbUpdateWorkoutLog(id, log);
+    console.log('stores.ts: updatedLog from db', updatedLog);
     workoutLogs.update(logs => logs.map(l => l.id === id ? updatedLog : l));
     return updatedLog;
 }
