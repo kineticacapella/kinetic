@@ -42,12 +42,12 @@
 	let newWorkoutSets = $state<
 		{
 			id: string;
-			exerciseId: string;
-			exerciseName: string;
+			exercise_id: string;
+			exercise_name: string;
 			weight: number;
 			reps: number;
-			isDropSet?: boolean;
-			myoRep?: 'start' | 'match' | null;
+			is_drop_set?: boolean;
+			myo_rep?: 'start' | 'match' | null;
 		}[]
 	>([]);
 
@@ -99,11 +99,11 @@
 	let groupedSets = $derived(
 		newWorkoutSets.reduce(
 			(acc, set) => {
-				let group = acc.find((g) => g.exerciseId === set.exerciseId);
+				let group = acc.find((g) => g.exercise_id === set.exercise_id);
 				if (!group) {
 					group = {
-						exerciseId: set.exerciseId,
-						exerciseName: set.exerciseName,
+						exercise_id: set.exercise_id,
+						exercise_name: set.exercise_name,
 						sets: []
 					};
 					acc.push(group);
@@ -112,8 +112,8 @@
 				return acc;
 			},
 			[] as {
-				exerciseId: string;
-				exerciseName: string;
+				exercise_id: string;
+				exercise_name: string;
 				sets: typeof newWorkoutSets;
 			}[]
 		)
@@ -202,7 +202,7 @@
 			return;
 		}
 
-		const setsForExercise = newWorkoutSets.filter((s) => s.exerciseId === newWorkoutExerciseId);
+		const setsForExercise = newWorkoutSets.filter((s) => s.exercise_id === newWorkoutExerciseId);
 		const lastSet = setsForExercise.length > 0 ? setsForExercise[setsForExercise.length - 1] : null;
 
 		let isDrop = false;
@@ -216,7 +216,7 @@
 			reps = lastSet.reps;
 		}
 
-		const myoStartSet = setsForExercise.find((s) => s.myoRep === 'start');
+		const myoStartSet = setsForExercise.find((s) => s.myo_rep === 'start');
 
 		if (myoStartSet) {
 			myoRep = 'match';
@@ -224,7 +224,7 @@
 			weight = myoStartSet.weight;
 		} else {
 			const config = exerciseDropSetInfo[newWorkoutExerciseId];
-			if (lastSet && config?.auto && lastSet.isDropSet) {
+			if (lastSet && config?.auto && lastSet.is_drop_set) {
 				isDrop = true;
 				let calculatedWeight = 0;
 				if (config.reduction.type === 'percent') {
@@ -247,12 +247,12 @@
 			...newWorkoutSets,
 			{
 				id: crypto.randomUUID(),
-				exerciseId: newWorkoutExerciseId,
-				exerciseName: exercise?.name || '',
+				exercise_id: newWorkoutExerciseId,
+				exercise_name: exercise?.name || '',
 				weight: weight,
 				reps: reps,
-				isDropSet: isDrop,
-				myoRep: myoRep
+				is_drop_set: isDrop,
+				myo_rep: myoRep
 			}
 		];
 		await tick();
@@ -267,24 +267,24 @@
 		const setIndex = newWorkoutSets.findIndex((s) => s.id === setId);
 		if (setIndex === -1) return;
 
-		const exerciseId = newWorkoutSets[setIndex].exerciseId;
-		const isCurrentlyStart = newWorkoutSets[setIndex].myoRep === 'start';
+		const exerciseId = newWorkoutSets[setIndex].exercise_id;
+		const isCurrentlyStart = newWorkoutSets[setIndex].myo_rep === 'start';
 
 		// Reset all myo-reps for this exercise first
 		newWorkoutSets = newWorkoutSets.map((s) => {
-			if (s.exerciseId === exerciseId) {
-				return { ...s, myoRep: null };
+			if (s.exercise_id === exerciseId) {
+				return { ...s, myo_rep: null };
 			}
 			return s;
 		});
 
 		// If it wasn't the start, make it the start.
 		if (!isCurrentlyStart) {
-			newWorkoutSets[setIndex].myoRep = 'start';
+			newWorkoutSets[setIndex].myo_rep = 'start';
 			// Disable drop sets for this exercise
 			delete exerciseDropSetInfo[exerciseId];
 			newWorkoutSets = newWorkoutSets.map((s) =>
-				s.exerciseId === exerciseId ? { ...s, isDropSet: false } : s
+				s.exercise_id === exerciseId ? { ...s, is_drop_set: false } : s
 			);
 		}
 
@@ -323,7 +323,7 @@
 
 		const setIndex = newWorkoutSets.findIndex((s) => s.id === id);
 		if (setIndex > -1) {
-			newWorkoutSets[setIndex].isDropSet = true;
+			newWorkoutSets[setIndex].is_drop_set = true;
 		}
 
 		if (dropEachSubsequentSet) {
@@ -341,8 +341,8 @@
 
 		// Disable myo-reps for this exercise
 		newWorkoutSets = newWorkoutSets.map((s) => {
-			if (s.exerciseId === exerciseId) {
-				return { ...s, myoRep: null };
+			if (s.exercise_id === exerciseId) {
+				return { ...s, myo_rep: null };
 			}
 			return s;
 		});
@@ -372,12 +372,12 @@
 				for (const set of newWorkoutSets) {
 					await addExerciseToWorkout({
 						workout_id: currentWorkout.id,
-						exercise_id: set.exerciseId,
+						exercise_id: set.exercise_id,
 						sets: 1, // Each row is 1 set
 						weight: set.weight,
 						reps: set.reps,
-						is_drop_set: set.isDropSet,
-						myo_rep: set.myoRep
+						is_drop_set: set.is_drop_set,
+						myo_rep: set.myo_rep
 					});
 				}
 			} else {
@@ -387,12 +387,12 @@
 					for (const set of newWorkoutSets) {
 						await addExerciseToWorkout({
 							workout_id: newWorkout.id,
-							exercise_id: set.exerciseId,
+							exercise_id: set.exercise_id,
 							sets: 1, // Each row is 1 set
 							reps: set.reps,
 							weight: set.weight,
-							is_drop_set: set.isDropSet,
-							myo_rep: set.myoRep
+							is_drop_set: set.is_drop_set,
+							myo_rep: set.myo_rep
 						});
 					}
 				}
@@ -431,12 +431,12 @@
 		newWorkoutName = workout.name;
 		newWorkoutSets = (workout.workout_exercises || []).map((we: WorkoutExercise) => ({
 			id: we.id || '',
-			exerciseId: we.exercise_id,
-			exerciseName: we.exercises?.name || '',
+			exercise_id: we.exercise_id,
+			exercise_name: we.exercises?.name || '',
 			weight: we.weight,
 			reps: we.reps,
-			isDropSet: we.is_drop_set || false,
-			myoRep: we.myo_rep || null
+			is_drop_set: we.is_drop_set || false,
+			myo_rep: we.myo_rep || null
 		}));
 		workoutMode = 'edit';
 		addWorkoutModal.show();
@@ -449,12 +449,12 @@
 		newWorkoutName = workout.name;
 		newWorkoutSets = (workout.workout_exercises || []).map((we: WorkoutExercise) => ({
 			id: we.id || '',
-			exerciseId: we.exercise_id,
-			exerciseName: we.exercises?.name || '',
+			exercise_id: we.exercise_id,
+			exercise_name: we.exercises?.name || '',
 			weight: we.weight,
 			reps: we.reps,
-			isDropSet: we.is_drop_set || false,
-			myoRep: we.myo_rep || null
+			is_drop_set: we.is_drop_set || false,
+			myo_rep: we.myo_rep || null
 		}));
 		workoutMode = 'play';
 		if (workout.id) {
@@ -467,8 +467,8 @@
 
 		// New logging logic
 		const newLog = await addWorkoutLog({
-			workoutName: workout.name,
-			startedAt: new Date().toISOString(),
+			workout_name: workout.name,
+			started_at: new Date().toISOString(),
 			endedAt: null,
 			sets: []
 		});
@@ -743,12 +743,12 @@
 
 				<div class="mb-4">
 					<div class="flex flex-col gap-3">
-						{#each groupedSets as group (group.exerciseId)}
+						{#each groupedSets as group (group.exercise_id)}
 							<div
 								class="flex flex-col gap-3 mt-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
 							>
 								<h5 class="text-md font-semibold text-gray-800 dark:text-white">
-									{group.exerciseName}
+									{group.exercise_name}
 								</h5>
 								{#if group.sets.length > 0}
 									<div
@@ -793,7 +793,7 @@
 													<li>
 														<button
 															type="button"
-															onclick={() => handleDropSetClick(set.id, group.exerciseId)}
+															onclick={() => handleDropSetClick(set.id, group.exercise_id)}
 															class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
 															>Drop set</button
 														>
@@ -809,14 +809,14 @@
 												</ul>
 											</div>
 											<div class="w-5 h-5 ml-2">
-												{#if set.isDropSet}
+												{#if set.is_drop_set}
 													<ArrowDownOutline class="w-5 h-5 text-blue-500" />
 												{/if}
 											</div>
 											<div class="w-5 h-5 ml-1">
-												{#if set.myoRep === 'start'}
+												{#if set.myo_rep === 'start'}
 													<span class="text-lg font-bold text-blue-500">m</span>
-												{:else if set.myoRep === 'match'}
+												{:else if set.myo_rep === 'match'}
 													<span class="text-lg font-bold text-blue-500">mm</span>
 												{/if}
 											</div>
@@ -850,14 +850,14 @@
 													const target = e.target as HTMLInputElement;
 													if (target.checked && currentWorkoutLog && currentWorkoutLog.id) {
 														const loggedSet: LoggedSet = {
-															exerciseId: set.exerciseId,
-															exerciseName: set.exerciseName,
+															exercise_id: set.exercise_id,
+															exercise_name: set.exercise_name,
 															weight: set.weight,
 															reps: set.reps,
-															isDropSet: set.isDropSet || false,
-															myoRep: set.myoRep || null,
-															timerTime: timer,
-															loggedAt: new Date().toISOString()
+															is_drop_set: set.is_drop_set || false,
+															myo_rep: set.myo_rep || null,
+															timer_time: timer,
+															logged_at: new Date().toISOString()
 														};
 														currentWorkoutLog.sets.push(loggedSet);
 														await updateWorkoutLog(currentWorkoutLog.id, { sets: currentWorkoutLog.sets });

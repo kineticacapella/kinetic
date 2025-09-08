@@ -217,21 +217,21 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export interface LoggedSet {
-    exerciseId: string;
-    exerciseName: string;
+    exercise_id: string;
+    exercise_name: string;
     weight: number;
     reps: number;
-    isDropSet: boolean;
-    myoRep: 'start' | 'match' | null;
-    timerTime: number; // Time on the timer when this set was logged (in seconds)
-    loggedAt: string; // ISO timestamp
+    is_drop_set: boolean;
+    myo_rep: 'start' | 'match' | null;
+    timer_time: number; 
+    logged_at: string; 
 }
 
 export interface WorkoutLog {
     id: string;
     user_id?: string;
-    workoutName: string;
-    startedAt: string; // ISO timestamp
-    endedAt: string | null; // ISO timestamp, null if session is ongoing
+    workout_name: string;
+    started_at: string; 
+    endedAt: string | null; 
     sets: LoggedSet[];
 }
