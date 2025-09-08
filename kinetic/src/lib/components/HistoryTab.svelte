@@ -7,7 +7,16 @@
 
     onMount(() => {
         const unsubscribe = workoutLogs.subscribe(logs => {
-            history = logs;
+            const ongoing = logs.filter(log => !log.endedAt);
+            const completed = logs.filter(log => log.endedAt);
+
+            let latestOngoing: WorkoutLog[] = [];
+            if (ongoing.length > 0) {
+                const latest = ongoing.sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())[0];
+                latestOngoing.push(latest);
+            }
+            
+            history = [...completed, ...latestOngoing].sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime());
         });
 
         return () => unsubscribe();
