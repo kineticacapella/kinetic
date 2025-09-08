@@ -12,8 +12,9 @@
 
             let latestOngoing: WorkoutLog[] = [];
             if (ongoing.length > 0) {
+                // Sort by startedAt descending to find the latest
                 const latest = ongoing.sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())[0];
-                latestOngoing.push(latest);
+                latestOngoing = [latest];
             }
             
             history = [...completed, ...latestOngoing].sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime());

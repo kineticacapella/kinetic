@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { initFlowbite, Modal, Dropdown } from 'flowbite';
-	import { workouts, saveWorkoutLog, loadWorkoutLogs, updateWorkoutLog } from '$lib/stores';
+	import { workouts, addWorkoutLog, updateWorkoutLog } from '$lib/stores';
 	import {
 		getExercises,
 		getWorkouts,
@@ -409,16 +409,16 @@
 		}
 	}
 
-	function handleEndSession() {
+	async function handleEndSession() {
 		stopTimer();
 		resetTimer();
 		activeWorkoutId = null;
 		addWorkoutModal.hide();
 
 		// New logging logic
-		if (currentWorkoutLog) {
+		if (currentWorkoutLog && currentWorkoutLog.id) {
 			currentWorkoutLog.endedAt = new Date().toISOString();
-			updateWorkoutLog(currentWorkoutLog);
+			await updateWorkoutLog(currentWorkoutLog.id, { endedAt: currentWorkoutLog.endedAt });
 			currentWorkoutLog = null; // Clear current log
 		}
 	}
@@ -463,14 +463,13 @@
 		initFlowbite();
 
 		// New logging logic
-		currentWorkoutLog = {
-			id: crypto.randomUUID(),
+		const newLog = await addWorkoutLog({
 			workoutName: workout.name,
 			startedAt: new Date().toISOString(),
 			endedAt: null,
 			sets: []
-		};
-		saveWorkoutLog(currentWorkoutLog);
+		});
+		currentWorkoutLog = newLog;
 	}
 
 	function viewWorkout(workout: Workout) {
@@ -611,7 +610,7 @@
 									{Array.from(new Set((workout.workout_exercises || []).map((e: WorkoutExercise) => e.exercises?.name))).join(', ')}</span
 								>
 							</div>
-							<div class="pt-2">
+							<div class="pt-2 min-h-[34px]">
 								{#if hasDropSet}
 									<span
 										class="inline-flex items-center bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300"
@@ -844,9 +843,9 @@
 											<input
 												type="checkbox"
 												class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-												onchange={(e) => {
+												onchange={async (e) => {
 													const target = e.target as HTMLInputElement;
-													if (target.checked && currentWorkoutLog) {
+													if (target.checked && currentWorkoutLog && currentWorkoutLog.id) {
 														const loggedSet: LoggedSet = {
 															exerciseId: set.exerciseId,
 															exerciseName: set.exerciseName,
@@ -858,7 +857,7 @@
 															loggedAt: new Date().toISOString()
 														};
 														currentWorkoutLog.sets.push(loggedSet);
-														updateWorkoutLog(currentWorkoutLog);
+														await updateWorkoutLog(currentWorkoutLog.id, { sets: currentWorkoutLog.sets });
 													}
 												}}
 											/>

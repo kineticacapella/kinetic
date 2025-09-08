@@ -173,6 +173,38 @@ export async function updateExerciseInWorkout(id: string, workoutExercise: Parti
 	return data?.[0];
 }
 
+// Workout Log CRUD functions
+export async function getWorkoutLogs(user: User) {
+	const { data, error } = await supabase
+		.from('workout_logs')
+		.select('*')
+		.eq('user_id', user.id)
+		.order('started_at', { ascending: false });
+	if (error) throw error;
+	return data as WorkoutLog[];
+}
+
+export async function addWorkoutLog(log: Omit<WorkoutLog, 'id' | 'user_id'>, user: User) {
+	const { data, error } = await supabase
+		.from('workout_logs')
+		.insert([{ ...log, user_id: user.id }])
+		.select()
+        .single();
+	if (error) throw error;
+	return data as WorkoutLog;
+}
+
+export async function updateWorkoutLog(id: string, log: Partial<WorkoutLog>) {
+	const { data, error } = await supabase
+		.from('workout_logs')
+		.update(log)
+		.eq('id', id)
+		.select()
+        .single();
+	if (error) throw error;
+	return data as WorkoutLog;
+}
+
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
@@ -193,6 +225,7 @@ export interface LoggedSet {
 
 export interface WorkoutLog {
     id: string;
+    user_id?: string;
     workoutName: string;
     startedAt: string; // ISO timestamp
     endedAt: string | null; // ISO timestamp, null if session is ongoing

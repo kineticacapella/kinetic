@@ -1,6 +1,7 @@
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import type { Session, User } from '@supabase/supabase-js';
-import type { Workout, WorkoutLog, LoggedSet } from './supabase'; // Added WorkoutLog, LoggedSet
+import type { Workout, WorkoutLog } from './supabase';
+import { addWorkoutLog as dbAddWorkoutLog, getWorkoutLogs, updateWorkoutLog as dbUpdateWorkoutLog } from './supabase';
 
 export const workouts = writable<Workout[]>([]);
 
@@ -29,60 +30,57 @@ export const equipmentTypes = writable([
 export const user = writable<User | null>(null);
 export const session = writable<Session | null>(null);
 
-export const workoutLogs = writable<WorkoutLog[]>([]); // Changed to writable of WorkoutLog[]
+export const workoutLogs = writable<WorkoutLog[]>([]);
 export const myoReps = writable([]);
 export const dropSets = writable([]);
 
-// Local Storage Helper Functions
-export function saveWorkoutLog(log: WorkoutLog) {
-    let logs: WorkoutLog[] = loadWorkoutLogs();
-    const index = logs.findIndex(l => l.id === log.id);
-    if (index > -1) {
-        logs[index] = log;
-    } else {
-        logs.push(log);
-    }
-    localStorage.setItem('workoutLogs', JSON.stringify(logs));
-    workoutLogs.set(logs); // Update the Svelte store
+export async function addWorkoutLog(log: Omit<WorkoutLog, 'id' | 'user_id'>) {
+    const currentUser = get(user);
+    if (!currentUser) throw new Error("User not logged in");
+    const newLog = await dbAddWorkoutLog(log, currentUser);
+    workoutLogs.update(logs => [newLog, ...logs]);
+    return newLog;
 }
 
-export function loadWorkoutLogs(): WorkoutLog[] {
-    const logs = localStorage.getItem('workoutLogs');
-    return logs ? JSON.parse(logs) : [];
+export async function updateWorkoutLog(id: string, log: Partial<WorkoutLog>) {
+    const updatedLog = await dbUpdateWorkoutLog(id, log);
+    workoutLogs.update(logs => logs.map(l => l.id === id ? updatedLog : l));
+    return updatedLog;
 }
 
-export function updateWorkoutLog(log: WorkoutLog) {
-    saveWorkoutLog(log); // saveWorkoutLog handles updates if ID exists
-}
-
-// Initialize workoutLogs store on load
-if (typeof window !== 'undefined') {
-    workoutLogs.set(loadWorkoutLogs());
-}
 
 // Persist user and session to local storage
 if (typeof window !== 'undefined') {
     const storedUser = localStorage.getItem('user');
-if (storedUser) {
-    user.set(JSON.parse(storedUser));
-}
-user.subscribe(value => {
-    if (value) {
-        localStorage.setItem('user', JSON.stringify(value));
-    } else {
-        localStorage.removeItem('user');
+    if (storedUser) {
+        user.set(JSON.parse(storedUser));
     }
-});
+    user.subscribe(async (value) => {
+        if (value) {
+            localStorage.setItem('user', JSON.stringify(value));
+            // Load user-specific data
+            try {
+                const logs = await getWorkoutLogs(value);
+                workoutLogs.set(logs);
+            } catch (error) {
+                console.error('Error loading workout logs:', error);
+            }
+        } else {
+            localStorage.removeItem('user');
+            // Clear user-specific data
+            workoutLogs.set([]);
+        }
+    });
 
-const storedSession = localStorage.getItem('session');
-if (storedSession) {
-    session.set(JSON.parse(storedSession));
-}
-session.subscribe(value => {
-    if (value) {
-        localStorage.setItem('session', JSON.stringify(value));
-    } else {
-        localStorage.removeItem('session');
+    const storedSession = localStorage.getItem('session');
+    if (storedSession) {
+        session.set(JSON.parse(storedSession));
     }
-});
+    session.subscribe(value => {
+        if (value) {
+            localStorage.setItem('session', JSON.stringify(value));
+        } else {
+            localStorage.removeItem('session');
+        }
+    });
 }
