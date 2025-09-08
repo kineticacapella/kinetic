@@ -418,7 +418,10 @@
 		// New logging logic
 		if (currentWorkoutLog && currentWorkoutLog.id) {
 			currentWorkoutLog.endedAt = new Date().toISOString();
-			await updateWorkoutLog(currentWorkoutLog.id, { endedAt: currentWorkoutLog.endedAt });
+			await updateWorkoutLog(currentWorkoutLog.id, { 
+				endedAt: currentWorkoutLog.endedAt,
+				sets: currentWorkoutLog.sets
+			 });
 			currentWorkoutLog = null; // Clear current log
 		}
 	}
