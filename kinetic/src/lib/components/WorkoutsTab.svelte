@@ -35,6 +35,7 @@
 	let workoutMode: 'edit' | 'play' = $state('edit');
 	let activeWorkoutId: string | null = $state(null);
 	let currentWorkoutLog: WorkoutLog | null = $state(null);
+	let isEndingSession = $state(false);
 
 	// Add workout state
 	let newWorkoutName = $state('');
@@ -185,6 +186,7 @@
 	});
 
 	$effect(() => {
+		if (isEndingSession) return;
         if ($workoutLogs) {
             const ongoing = $workoutLogs.filter(log => !log.ended_at);
             if (ongoing.length > 0) {
@@ -437,6 +439,7 @@
 	}
 
 	async function handleEndSession() {
+		isEndingSession = true;
 		stopTimer();
 		resetTimer();
 		activeWorkoutId = null;
@@ -451,6 +454,7 @@
 			 });
 			currentWorkoutLog = null; // Clear current log
 		}
+		isEndingSession = false;
 	}
 
 	async function startEdit(workout: Workout) {
