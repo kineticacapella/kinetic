@@ -8,7 +8,7 @@
     onMount(() => {
         const unsubscribe = workoutLogs.subscribe(logs => {
             const ongoing = logs.filter(log => !log.ended_at);
-            const completed = logs.filter(log => log.ended_at);
+            const completed = logs.filter(log => log.ended_at && log.sets && log.sets.length > 0);
 
             let latestOngoing: WorkoutLog[] = [];
             if (ongoing.length > 0) {
