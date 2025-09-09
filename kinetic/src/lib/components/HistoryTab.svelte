@@ -1,3 +1,4 @@
+
 <script lang="ts">
     import { onMount } from 'svelte';
     import { workoutLogs } from '$lib/stores';
@@ -75,21 +76,26 @@
 
                         {#if log.sets && log.sets.length > 0}
                             <div class="mt-4 space-y-3">
-                                <div class="grid grid-cols-4 gap-4 font-semibold text-gray-600 dark:text-gray-300 text-sm">
+                                <div class="grid grid-cols-3 gap-4 font-semibold text-gray-600 dark:text-gray-300 text-sm">
                                     <div>Exercise</div>
                                     <div>Weight</div>
                                     <div>Reps</div>
-                                    <div>Notes</div>
                                 </div>
                                 {#each log.sets as set (set.logged_at + set.exercise_id)}
-                                    <div class="grid grid-cols-4 gap-4 items-center text-sm text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-700 p-2 rounded-md">
-                                        <div class="font-medium">{set.exercise_name}</div>
+                                    <div class="grid grid-cols-3 gap-4 items-center text-sm text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-700 p-2 rounded-md">
+                                        <div>
+                                            <span class="font-medium">{set.exercise_name}</span>
+                                            {#if set.is_drop_set}
+                                                <span class="ml-2 bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">DS</span>
+                                            {/if}
+                                            {#if set.myo_rep === 'start'}
+                                                <span class="ml-2 bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-purple-900 dark:text-purple-300">Myo Start</span>
+                                            {:else if set.myo_rep === 'match'}
+                                                <span class="ml-2 bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-purple-900 dark:text-purple-300">Myo Match</span>
+                                            {/if}
+                                        </div>
                                         <div>{set.weight}kg</div>
                                         <div>{set.reps}</div>
-                                        <div>
-                                            {#if set.is_drop_set}<span class="text-blue-500">DS</span>{/if}
-                                            {#if set.myo_rep}<span class="text-purple-500 ml-1">Myo</span>{/if}
-                                        </div>
                                     </div>
                                 {/each}
                             </div>
