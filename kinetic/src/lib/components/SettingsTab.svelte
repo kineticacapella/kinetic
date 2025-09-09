@@ -141,7 +141,7 @@
     </div>
 
 	<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-2 border-blue-700 dark:border-blue-600">
 			<h2 class="text-2xl font-semibold mb-6 text-gray-700 dark:text-gray-300">Account</h2>
 			{#if $user}
 				<div class="flex items-center justify-between">
@@ -222,14 +222,14 @@
 				{/if}
 			{/if}
 		</div>
-		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-2 border-blue-700 dark:border-blue-600">
 			<h2 class="text-2xl font-semibold mb-6 text-gray-700 dark:text-gray-300">
 				Exercise Types
 			</h2>
 			{#if settingsError}
 				<p class="text-red-600 text-sm mb-2">{settingsError}</p>
 			{/if}
-			<ul class="space-y-3 mb-6">
+			<ul class="space-y-3 mb-4">
 				{#each exerciseTypes as type}
 					<li
 						class="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded-lg"
@@ -257,9 +257,9 @@
 			</form>
 		</div>
 
-		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-.6">
+		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-2 border-blue-700 dark:border-blue-600">
 			<h2 class="text-2xl font-semibold mb-6 text-gray-700 dark:text-gray-300">Equipment</h2>
-			<ul class="space-y-3 mb-6">
+			<ul class="space-y-3 mb-4">
 				{#each equipmentTypes as type}
 					<li
 						class="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded-lg"
