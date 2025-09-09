@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { initFlowbite, Modal, Dropdown } from 'flowbite';
-	import { workouts, addWorkoutLog, updateWorkoutLog } from '$lib/stores';
+	import { workoutLogs, workouts, addWorkoutLog, updateWorkoutLog } from '$lib/stores';
 	import {
 		getExercises,
 		getWorkouts,
@@ -181,6 +181,31 @@
 			void loadWorkouts();
 		}
 	});
+
+	$effect(() => {
+        if ($workoutLogs) {
+            const ongoing = $workoutLogs.filter(log => !log.ended_at);
+            if (ongoing.length > 0) {
+                const latestOngoing = ongoing.sort((a, b) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime())[0];
+                
+                const activeWorkout = ($workouts || []).find(w => w.name === latestOngoing.workout_name);
+
+                if (activeWorkout && activeWorkout.id) {
+                    activeWorkoutId = activeWorkout.id;
+                    currentWorkoutLog = latestOngoing;
+                }
+
+            } else {
+                if (workoutMode === 'play') {
+                    activeWorkoutId = null;
+                    currentWorkoutLog = null;
+                    workoutMode = 'edit';
+                    resetTimer();
+                    if (addWorkoutModal) addWorkoutModal.hide();
+                }
+            }
+        }
+    });
 
 	function startAdd() {
 		editingWorkout = null;
@@ -461,9 +486,22 @@
 			activeWorkoutId = workout.id;
 		}
 		addWorkoutModal.show();
-		startTimer();
+		
 		await tick();
 		initFlowbite();
+
+		// If there's already an ongoing log for this workout, use it.
+		if (currentWorkoutLog && currentWorkoutLog.workout_name === workout.name) {
+			const elapsed = (new Date().getTime() - new Date(currentWorkoutLog.started_at).getTime()) / 1000;
+    		timer = Math.floor(elapsed);
+			startTimer();
+			return;
+		}
+
+		// If we are here, it's a new session.
+		stopTimer();
+		resetTimer();
+		startTimer();
 
 		// New logging logic
 		const newLog = await addWorkoutLog({
