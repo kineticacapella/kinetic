@@ -164,7 +164,9 @@
 						newWorkoutExerciseId = '';
 						workoutMode = 'edit';
 						resetTimer();
-						activeWorkoutId = null;
+						if (!currentWorkoutLog) {
+							activeWorkoutId = null;
+						}
 					}
 				}
 			});
