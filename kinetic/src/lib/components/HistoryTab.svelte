@@ -1,7 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { workoutLogs } from '$lib/stores';
-    import type { WorkoutLog, LoggedSet } from '$lib/supabase';
+    import type { WorkoutLog } from '$lib/supabase';
+    import { sineIn } from 'svelte/easing';
 
     let history: WorkoutLog[] = [];
 
@@ -12,7 +13,6 @@
 
             let latestOngoing: WorkoutLog[] = [];
             if (ongoing.length > 0) {
-                // Sort by started_at descending to find the latest
                 const latest = ongoing.sort((a, b) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime())[0];
                 latestOngoing = [latest];
             }
@@ -27,50 +27,74 @@
         const date = new Date(isoString);
         return date.toLocaleString();
     }
+
+    function formatDuration(start: string, end: string | null): string {
+        if (!end) return 'Ongoing';
+        const duration = new Date(end).getTime() - new Date(start).getTime();
+        const minutes = Math.floor(duration / 60000);
+        const seconds = Math.floor((duration % 60000) / 1000);
+        return `${minutes}m ${seconds}s`;
+    }
 </script>
 
-<div class="p-4">
-    <h2 class="text-xl font-semibold mb-4">Workout History</h2>
+<div class="container mx-auto p-4 md:p-8">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white">History</h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">
+                A log of your completed workout sessions.
+            </p>
+        </div>
+    </div>
 
     {#if history.length === 0}
-        <p class="text-gray-500 dark:text-gray-400">No workout sessions logged yet.</p>
+        <div class="text-center p-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-white">No history yet!</h3>
+            <p class="text-gray-500 dark:text-gray-400 mt-2">Complete a workout to see it here.</p>
+        </div>
     {:else}
         <div class="space-y-6">
             {#each history as log (log.id)}
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                        {log.workout_name}
-                    </h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                        Started: {formatDateTime(log.started_at)}
-                    </p>
-                    {#if log.ended_at}
-                        <p class="text-sm text-gray-600 dark:text-gray-400">
-                            Ended: {formatDateTime(log.ended_at)}
-                        </p>
-                    {:else}
-                        <p class="text-sm text-red-500">Session ongoing...</p>
-                    {/if}
-
-                    {#if log.sets.length > 0}
-                        <h4 class="text-md font-semibold mt-4 mb-2 text-gray-800 dark:text-white">Logged Sets:</h4>
-                        <div class="space-y-2">
-                            {#each log.sets as set (set.logged_at + set.exercise_id)}
-                                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-md">
-                                    <p class="text-sm text-gray-800 dark:text-gray-200">
-                                        <span class="font-medium">{set.exercise_name}</span> - {set.weight}kg x {set.reps} reps
-                                        {#if set.is_drop_set}(Drop Set){/if}
-                                        {#if set.myo_rep}(Myo-Rep: {set.myo_rep}){/if}
-                                    </p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        Logged at: {formatDateTime(set.logged_at)} (Timer: {Math.floor(set.timer_time / 60).toString().padStart(2, '0')}:{(set.timer_time % 60).toString().padStart(2, '0')})
-                                    </p>
-                                </div>
-                            {/each}
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">{log.workout_name}</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    {new Date(log.started_at).toLocaleDateString()}
+                                </p>
+                            </div>
+                            {#if !log.ended_at}
+                                <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-green-900 dark:text-green-300">Ongoing</span>
+                            {:else}
+                                <span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                                    {formatDuration(log.started_at, log.ended_at)}
+                                </span>
+                            {/if}
                         </div>
-                    {:else}
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">No sets logged for this session.</p>
-                    {/if}
+
+                        {#if log.sets && log.sets.length > 0}
+                            <div class="mt-4 space-y-3">
+                                <div class="grid grid-cols-4 gap-4 font-semibold text-gray-600 dark:text-gray-300 text-sm">
+                                    <div>Exercise</div>
+                                    <div>Weight</div>
+                                    <div>Reps</div>
+                                    <div>Notes</div>
+                                </div>
+                                {#each log.sets as set (set.logged_at + set.exercise_id)}
+                                    <div class="grid grid-cols-4 gap-4 items-center text-sm text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-700 p-2 rounded-md">
+                                        <div class="font-medium">{set.exercise_name}</div>
+                                        <div>{set.weight}kg</div>
+                                        <div>{set.reps}</div>
+                                        <div>
+                                            {#if set.is_drop_set}<span class="text-blue-500">DS</span>{/if}
+                                            {#if set.myo_rep}<span class="text-purple-500 ml-1">Myo</span>{/if}
+                                        </div>
+                                    </div>
+                                {/each}
+                            </div>
+                        {/if}
+                    </div>
                 </div>
             {/each}
         </div>
