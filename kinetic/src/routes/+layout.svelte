@@ -27,7 +27,7 @@
 					<button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="history-tab" data-tabs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">History</button>
 				</li>
 				<li class="ml-auto" role="presentation">
-					<button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="settings-tab" data-tabs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">
+					<button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" id="settings-tab" data-tabs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">
 						<UserSettingsSolid class="shrink-0 h-6 w-6" />
 					</button>
 				</li>
