@@ -1,3 +1,17 @@
+import { dataStatus, type DataStatus } from './stores';
+
+async function withStatus<T>(status: DataStatus, fn: () => Promise<T>): Promise<T> {
+	dataStatus.set(status);
+	try {
+		const result = await fn();
+		dataStatus.set('synced');
+		return result;
+	} catch (error) {
+		dataStatus.set('error');
+		throw error;
+	}
+}
+
 // User settings CRUD functions
 export interface UserSettings {
 	user_id: string;
@@ -6,27 +20,31 @@ export interface UserSettings {
 }
 
 export async function getUserSettings(user: User): Promise<UserSettings | null> {
-	const { data, error } = await supabase
-		.from('user_settings')
-		.select('*')
-		.eq('user_id', user.id)
-		.single();
-	if (error) {
-		if (error.code === 'PGRST116') return null; // Not found
-		throw error;
-	}
-	return data as UserSettings;
+	return withStatus('loading', async () => {
+		const { data, error } = await supabase
+			.from('user_settings')
+			.select('*')
+			.eq('user_id', user.id)
+			.single();
+		if (error) {
+			if (error.code === 'PGRST116') return null; // Not found
+			throw error;
+		}
+		return data as UserSettings;
+	});
 }
 
 export async function upsertUserSettings(user: User, exercise_types: string[], equipment_types: string[]) {
-	const { error } = await supabase
-		.from('user_settings')
-		.upsert({
-			user_id: user.id,
-			exercise_types,
-			equipment_types
-		});
-	if (error) throw error;
+	return withStatus('syncing', async () => {
+		const { error } = await supabase
+			.from('user_settings')
+			.upsert({
+				user_id: user.id,
+				exercise_types,
+				equipment_types
+			});
+		if (error) throw error;
+	});
 }
 // Exercise CRUD functions
 import type { User } from '@supabase/supabase-js';
@@ -42,39 +60,47 @@ export interface Exercise {
 }
 
 export async function getExercises(user: User) {
-	const { data, error } = await supabase
-		.from('exercises')
-		.select('*')
-		.eq('user_id', user.id);
-	if (error) throw error;
-	return data;
+	return withStatus('loading', async () => {
+		const { data, error } = await supabase
+			.from('exercises')
+			.select('*')
+			.eq('user_id', user.id);
+		if (error) throw error;
+		return data;
+	});
 }
 
 export async function addExercise(exercise: Exercise, user: User) {
-	const { data, error } = await supabase
-		.from('exercises')
-		.insert([{ ...exercise, user_id: user.id }])
-		.select();
-	if (error) throw error;
-	return data?.[0];
+	return withStatus('syncing', async () => {
+		const { data, error } = await supabase
+			.from('exercises')
+			.insert([{ ...exercise, user_id: user.id }])
+			.select();
+		if (error) throw error;
+		return data?.[0];
+	});
 }
 
 export async function updateExercise(id: string, exercise: Exercise) {
-	const { data, error } = await supabase
-		.from('exercises')
-		.update(exercise)
-		.eq('id', id)
-		.select();
-	if (error) throw error;
-	return data?.[0];
+	return withStatus('syncing', async () => {
+		const { data, error } = await supabase
+			.from('exercises')
+			.update(exercise)
+			.eq('id', id)
+			.select();
+		if (error) throw error;
+		return data?.[0];
+	});
 }
 
 export async function deleteExercise(id: string) {
-	const { error } = await supabase
-		.from('exercises')
-		.delete()
-		.eq('id', id);
-	if (error) throw error;
+	return withStatus('syncing', async () => {
+		const { error } = await supabase
+			.from('exercises')
+			.delete()
+			.eq('id', id);
+		if (error) throw error;
+	});
 }
 
 // Workout CRUD functions
@@ -98,115 +124,137 @@ export interface WorkoutExercise {
 }
 
 export async function getWorkouts(user: User) {
-	const { data, error } = await supabase
-		.from('workouts')
-		.select('*, workout_exercises(*, exercises(*))')
-		.eq('user_id', user.id)
-		.order('created_at', { foreignTable: 'workout_exercises', ascending: true });
-	if (error) throw error;
-	return data;
+	return withStatus('loading', async () => {
+		const { data, error } = await supabase
+			.from('workouts')
+			.select('*, workout_exercises(*, exercises(*))')
+			.eq('user_id', user.id)
+			.order('created_at', { foreignTable: 'workout_exercises', ascending: true });
+		if (error) throw error;
+		return data;
+	});
 }
 
 export async function getWorkout(id: string) {
-	const { data, error } = await supabase
-		.from('workouts')
-		.select('*, workout_exercises(*, exercises(*))')
-		.eq('id', id)
-		.order('created_at', { foreignTable: 'workout_exercises', ascending: true })
-		.single();
-	if (error) throw error;
-	return data;
+	return withStatus('loading', async () => {
+		const { data, error } = await supabase
+			.from('workouts')
+			.select('*, workout_exercises(*, exercises(*))')
+			.eq('id', id)
+			.order('created_at', { foreignTable: 'workout_exercises', ascending: true })
+			.single();
+		if (error) throw error;
+		return data;
+	});
 }
 
 export async function addWorkout(workout: Workout, user: User) {
-	const { data, error } = await supabase
-		.from('workouts')
-		.insert([{ ...workout, user_id: user.id }])
-		.select();
-	if (error) throw error;
-	return data?.[0];
+	return withStatus('syncing', async () => {
+		const { data, error } = await supabase
+			.from('workouts')
+			.insert([{ ...workout, user_id: user.id }])
+			.select();
+		if (error) throw error;
+		return data?.[0];
+	});
 }
 
 export async function updateWorkout(id: string, workout: Workout) {
-	const { data, error } = await supabase
-		.from('workouts')
-		.update(workout)
-		.eq('id', id)
-		.select();
-	if (error) throw error;
-	return data?.[0];
+	return withStatus('syncing', async () => {
+		const { data, error } = await supabase
+			.from('workouts')
+			.update(workout)
+			.eq('id', id)
+			.select();
+		if (error) throw error;
+		return data?.[0];
+	});
 }
 
 export async function deleteWorkout(id: string) {
-	const { error } = await supabase
-		.from('workouts')
-		.delete()
-		.eq('id', id);
-	if (error) throw error;
+	return withStatus('syncing', async () => {
+		const { error } = await supabase
+			.from('workouts')
+			.delete()
+			.eq('id', id);
+		if (error) throw error;
+	});
 }
 
 export async function addExerciseToWorkout(workoutExercise: Partial<WorkoutExercise>) {
-	const { data, error } = await supabase
-		.from('workout_exercises')
-		.insert([workoutExercise])
-		.select();
-	if (error) throw error;
-	return data?.[0];
+	return withStatus('syncing', async () => {
+		const { data, error } = await supabase
+			.from('workout_exercises')
+			.insert([workoutExercise])
+			.select();
+		if (error) throw error;
+		return data?.[0];
+	});
 }
 
 export async function removeExerciseFromWorkout(id: string | undefined) {
 	if (!id) return;
-	const { error } = await supabase
-		.from('workout_exercises')
-		.delete()
-		.eq('id', id);
-	if (error) throw error;
+	return withStatus('syncing', async () => {
+		const { error } = await supabase
+			.from('workout_exercises')
+			.delete()
+			.eq('id', id);
+		if (error) throw error;
+	});
 }
 
 export async function updateExerciseInWorkout(id: string, workoutExercise: Partial<WorkoutExercise>) {
-	const { data, error } = await supabase
-		.from('workout_exercises')
-		.update(workoutExercise)
-		.eq('id', id)
-		.select();
-	if (error) throw error;
-	return data?.[0];
+	return withStatus('syncing', async () => {
+		const { data, error } = await supabase
+			.from('workout_exercises')
+			.update(workoutExercise)
+			.eq('id', id)
+			.select();
+		if (error) throw error;
+		return data?.[0];
+	});
 }
 
 // Workout Log CRUD functions
 export async function getWorkoutLogs(user: User) {
-	const { data, error } = await supabase
-		.from('workout_logs')
-		.select('*')
-		.eq('user_id', user.id)
-		.order('started_at', { ascending: false });
-	if (error) throw error;
-	return data as WorkoutLog[];
+	return withStatus('loading', async () => {
+		const { data, error } = await supabase
+			.from('workout_logs')
+			.select('*')
+			.eq('user_id', user.id)
+			.order('started_at', { ascending: false });
+		if (error) throw error;
+		return data as WorkoutLog[];
+	});
 }
 
 export async function addWorkoutLog(log: Omit<WorkoutLog, 'id' | 'user_id'>, user: User) {
-    console.log('supabase.ts: addWorkoutLog', log, user);
-	const { data, error } = await supabase
-		.from('workout_logs')
-		.insert([{ ...log, user_id: user.id }])
-		.select()
-        .single();
-    console.log('supabase.ts: addWorkoutLog result', { data, error });
-	if (error) throw error;
-	return data as WorkoutLog;
+	return withStatus('logging', async () => {
+		console.log('supabase.ts: addWorkoutLog', log, user);
+		const { data, error } = await supabase
+			.from('workout_logs')
+			.insert([{ ...log, user_id: user.id }])
+			.select()
+			.single();
+		console.log('supabase.ts: addWorkoutLog result', { data, error });
+		if (error) throw error;
+		return data as WorkoutLog;
+	});
 }
 
 export async function updateWorkoutLog(id: string, log: Partial<WorkoutLog>) {
-    console.log('supabase.ts: updateWorkoutLog', id, log);
-	const { data, error } = await supabase
-		.from('workout_logs')
-		.update(log)
-		.eq('id', id)
-		.select()
-        .single();
-    console.log('supabase.ts: updateWorkoutLog result', { data, error });
-	if (error) throw error;
-	return data as WorkoutLog;
+	return withStatus('logging', async () => {
+		console.log('supabase.ts: updateWorkoutLog', id, log);
+		const { data, error } = await supabase
+			.from('workout_logs')
+			.update(log)
+			.eq('id', id)
+			.select()
+			.single();
+		console.log('supabase.ts: updateWorkoutLog result', { data, error });
+		if (error) throw error;
+		return data as WorkoutLog;
+	});
 }
 
 import { createClient } from '@supabase/supabase-js'

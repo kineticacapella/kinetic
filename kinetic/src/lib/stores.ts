@@ -34,6 +34,9 @@ export const workoutLogs = writable<WorkoutLog[]>([]);
 export const myoReps = writable([]);
 export const dropSets = writable([]);
 
+export type DataStatus = 'loading' | 'syncing' | 'logging' | 'synced' | 'error';
+export const dataStatus = writable<DataStatus>('synced');
+
 export async function addWorkoutLog(log: Omit<WorkoutLog, 'id' | 'user_id'>) {
     const currentUser = get(user);
     if (!currentUser) throw new Error("User not logged in");

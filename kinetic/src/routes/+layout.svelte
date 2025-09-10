@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { UserSettingsSolid } from 'flowbite-svelte-icons';
+	import { UserSettingsSolid, RefreshOutline, ArrowUpOutline, CheckOutline, ExclamationCircleOutline } from 'flowbite-svelte-icons';
 	import '../app.css';
 	import ExercisesTab from '$lib/components/ExercisesTab.svelte';
 	import SettingsTab from '$lib/components/SettingsTab.svelte';
@@ -7,6 +7,7 @@
 	import HistoryTab from '$lib/components/HistoryTab.svelte';
 	import { onMount } from 'svelte';
 	import { initFlowbite } from 'flowbite';
+	import { dataStatus } from '$lib/stores';
 
 	onMount(() => {
 		initFlowbite();
@@ -26,7 +27,18 @@
 				<li class="mr-2" role="presentation">
 					<button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="history-tab" data-tabs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">History</button>
 				</li>
-				<li class="ml-auto" role="presentation">
+				<li class="ml-auto flex items-center" role="presentation">
+					<div class="mr-2">
+						{#if $dataStatus === 'loading' || $dataStatus === 'syncing'}
+							<RefreshOutline class="shrink-0 h-6 w-6 animate-spin" />
+						{:else if $dataStatus === 'logging'}
+							<ArrowUpOutline class="shrink-0 h-6 w-6" />
+						{:else if $dataStatus === 'synced'}
+							<CheckOutline class="shrink-0 h-6 w-6 text-green-500" />
+						{:else if $dataStatus === 'error'}
+							<ExclamationCircleOutline class="shrink-0 h-6 w-6 text-red-500" />
+						{/if}
+					</div>
 					<button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" id="settings-tab" data-tabs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">
 						<UserSettingsSolid class="shrink-0 h-6 w-6" />
 					</button>
