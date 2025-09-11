@@ -45,15 +45,15 @@
 				</li>
 			</ul>
 		</div>
-		<div class="fixed bottom-0 left-0 z-50 w-full h-16 bg-white border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+		<div class="fixed bottom-0 left-0 z-50 w-full h-14 bg-white border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
 			<div class="grid h-full max-w-lg grid-cols-3 mx-auto font-medium" id="myTab" data-tabs-toggle="#myTabContent">
-				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group" id="workouts-tab" data-tabs-target="#workouts" type="button" role="tab" aria-controls="workouts" aria-selected="true">
+				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" id="workouts-tab" data-tabs-target="#workouts" type="button" role="tab" aria-controls="workouts" aria-selected="true">
 					Workouts
 				</button>
-				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group" id="exercises-tab" data-tabs-target="#exercises" type="button" role="tab" aria-controls="exercises" aria-selected="false">
+				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" id="exercises-tab" data-tabs-target="#exercises" type="button" role="tab" aria-controls="exercises" aria-selected="false">
 					Exercises
 				</button>
-				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group" id="history-tab" data-tabs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">
+				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" id="history-tab" data-tabs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">
 					History
 				</button>
 			</div>
