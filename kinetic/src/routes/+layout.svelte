@@ -15,7 +15,7 @@
 </script>
 
 <div class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col">
-	<main class="flex-grow container mx-auto p-4">
+	<main class="flex-grow container mx-auto p-4" id="myTab" data-tabs-toggle="#myTabContent">
 		<div class="mb-4 border-b border-gray-200 dark:border-gray-700">
 			<ul class="flex flex-wrap -mb-px text-sm font-medium" role="tablist">
 				<li class="mr-2" role="presentation">
@@ -46,7 +46,7 @@
 			</ul>
 		</div>
 		<div class="fixed bottom-0 left-0 z-50 w-full h-14 bg-white border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
-			<div class="grid h-full max-w-lg grid-cols-3 mx-auto font-medium" id="myTab" data-tabs-toggle="#myTabContent">
+			<div class="grid h-full max-w-lg grid-cols-3 mx-auto font-medium">
 				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" id="workouts-tab" data-tabs-target="#workouts" type="button" role="tab" aria-controls="workouts" aria-selected="true">
 					Workouts
 				</button>
