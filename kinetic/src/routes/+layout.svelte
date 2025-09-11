@@ -15,7 +15,7 @@
 </script>
 
 <div class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col">
-	<main class="flex-grow container mx-auto p-4" id="myTab" data-tabs-toggle="#myTabContent">
+	<main class="flex-grow container mx-auto px-4 pt-4 pb-20" id="myTab" data-tabs-toggle="#myTabContent">
 		<div class="mb-4 border-b border-gray-200 dark:border-gray-700">
 			<ul class="flex flex-wrap -mb-px text-sm font-medium" role="tablist">
 				<li class="mr-2" role="presentation">
