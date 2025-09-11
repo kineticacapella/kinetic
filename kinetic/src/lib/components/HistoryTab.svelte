@@ -6,6 +6,22 @@
     import { sineIn } from 'svelte/easing';
 
     let history: WorkoutLog[] = [];
+    let expandedLogs = new Set<string>();
+
+    function toggleLog(logId: string) {
+        if (expandedLogs.has(logId)) {
+            expandedLogs.delete(logId);
+        } else {
+            expandedLogs.add(logId);
+        }
+        expandedLogs = expandedLogs;
+    }
+
+    function handleKeyDown(event: KeyboardEvent, logId: string) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            toggleLog(logId);
+        }
+    }
 
     onMount(() => {
         const unsubscribe = workoutLogs.subscribe(logs => {
@@ -57,7 +73,7 @@
         <div class="space-y-6">
             {#each history as log (log.id)}
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600">
-                    <div class="p-6">
+                    <div role="button" tabindex="0" class="p-6 cursor-pointer" on:click={() => toggleLog(log.id)} on:keydown={(e) => handleKeyDown(e, log.id)}>
                         <div class="flex justify-between items-start">
                             <div>
                                 <h3 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">{log.workout_name}</h3>
@@ -65,16 +81,19 @@
                                     {new Date(log.started_at).toLocaleDateString()}
                                 </p>
                             </div>
-                            {#if !log.ended_at}
-                                <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-green-900 dark:text-green-300">Ongoing</span>
-                            {:else}
-                                <span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300">
-                                    {formatDuration(log.started_at, log.ended_at)}
-                                </span>
-                            {/if}
+                            <div class="flex items-center">
+                                {#if !log.ended_at}
+                                    <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-green-900 dark:text-green-300">Ongoing</span>
+                                {:else}
+                                    <span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                                        {formatDuration(log.started_at, log.ended_at)}
+                                    </span>
+                                {/if}
+                                <svg class="w-6 h-6 text-gray-500 dark:text-gray-400 transform transition-transform {expandedLogs.has(log.id) ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
                         </div>
 
-                        {#if log.sets && log.sets.length > 0}
+                        {#if expandedLogs.has(log.id) && log.sets && log.sets.length > 0}
                             <div class="mt-4 space-y-3">
                                 <div class="grid grid-cols-3 gap-4 font-semibold text-gray-600 dark:text-gray-300 text-sm">
                                     <div>Exercise</div>
