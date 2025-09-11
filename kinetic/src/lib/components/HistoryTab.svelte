@@ -84,11 +84,14 @@
         <div
             role="button"
             tabindex="0"
-            class="flex justify-between items-center cursor-pointer mb-4"
+            class="flex justify-between items-center cursor-pointer mb-4 border-2 border-gray-300 dark:border-gray-700 rounded-lg p-4"
             on:click={toggleLogs}
             on:keydown={handleLogsKeyDown}
         >
-            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Logs</h2>
+            <div class="flex items-center">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Logs</h2>
+                <span class="ml-4 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm font-semibold px-2.5 py-0.5 rounded-full">{history.length}</span>
+            </div>
             <svg class="w-6 h-6 text-gray-500 dark:text-gray-400 transform transition-transform {logsVisible ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
         </div>
 
@@ -108,7 +111,7 @@
                                     {#if !log.ended_at}
                                         <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-green-900 dark:text-green-300">Ongoing</span>
                                     {:else}
-                                        <span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                                        <span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-900 dark.text-blue-300">
                                             {formatDuration(log.started_at, log.ended_at)}
                                         </span>
                                     {/if}
