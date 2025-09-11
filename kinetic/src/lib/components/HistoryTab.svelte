@@ -7,6 +7,7 @@
 
     let history: WorkoutLog[] = [];
     let expandedLogs = new Set<string>();
+    let logsVisible = true;
 
     function toggleLog(logId: string) {
         if (expandedLogs.has(logId)) {
@@ -20,6 +21,16 @@
     function handleKeyDown(event: KeyboardEvent, logId: string) {
         if (event.key === 'Enter' || event.key === ' ') {
             toggleLog(logId);
+        }
+    }
+
+    function toggleLogs() {
+        logsVisible = !logsVisible;
+    }
+
+    function handleLogsKeyDown(event: KeyboardEvent) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            toggleLogs();
         }
     }
 
@@ -70,58 +81,71 @@
             <p class="text-gray-500 dark:text-gray-400 mt-2">Complete a workout to see it here.</p>
         </div>
     {:else}
-        <div class="space-y-6">
-            {#each history as log (log.id)}
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600">
-                    <div role="button" tabindex="0" class="p-6 cursor-pointer" on:click={() => toggleLog(log.id)} on:keydown={(e) => handleKeyDown(e, log.id)}>
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h3 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">{log.workout_name}</h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    {new Date(log.started_at).toLocaleDateString()}
-                                </p>
-                            </div>
-                            <div class="flex items-center">
-                                {#if !log.ended_at}
-                                    <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-green-900 dark:text-green-300">Ongoing</span>
-                                {:else}
-                                    <span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300">
-                                        {formatDuration(log.started_at, log.ended_at)}
-                                    </span>
-                                {/if}
-                                <svg class="w-6 h-6 text-gray-500 dark:text-gray-400 transform transition-transform {expandedLogs.has(log.id) ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
-                        </div>
-
-                        {#if expandedLogs.has(log.id) && log.sets && log.sets.length > 0}
-                            <div class="mt-4 space-y-3">
-                                <div class="grid grid-cols-3 gap-4 font-semibold text-gray-600 dark:text-gray-300 text-sm">
-                                    <div>Exercise</div>
-                                    <div>Weight</div>
-                                    <div>Reps</div>
-                                </div>
-                                {#each log.sets as set (set.logged_at + set.exercise_id)}
-                                    <div class="grid grid-cols-3 gap-4 items-center text-sm text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-700 p-2 rounded-md">
-                                        <div>
-                                            <span class="font-medium">{set.exercise_name}</span>
-                                            {#if set.is_drop_set}
-                                                <span class="ml-2 bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">DS</span>
-                                            {/if}
-                                            {#if set.myo_rep === 'start'}
-                                                <span class="ml-2 bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-purple-900 dark:text-purple-300">Myo Start</span>
-                                            {:else if set.myo_rep === 'match'}
-                                                <span class="ml-2 bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-purple-900 dark:text-purple-300">Myo Match</span>
-                                            {/if}
-                                        </div>
-                                        <div>{set.weight}kg</div>
-                                        <div>{set.reps}</div>
-                                    </div>
-                                {/each}
-                            </div>
-                        {/if}
-                    </div>
-                </div>
-            {/each}
+        <div
+            role="button"
+            tabindex="0"
+            class="flex justify-between items-center cursor-pointer mb-4"
+            on:click={toggleLogs}
+            on:keydown={handleLogsKeyDown}
+        >
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Logs</h2>
+            <svg class="w-6 h-6 text-gray-500 dark:text-gray-400 transform transition-transform {logsVisible ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
         </div>
+
+        {#if logsVisible}
+            <div class="space-y-4">
+                {#each history as log (log.id)}
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600">
+                        <div role="button" tabindex="0" class="p-4 cursor-pointer" on:click={() => toggleLog(log.id)} on:keydown={(e) => handleKeyDown(e, log.id)}>
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">{log.workout_name}</h3>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        {new Date(log.started_at).toLocaleDateString()}
+                                    </p>
+                                </div>
+                                <div class="flex items-center">
+                                    {#if !log.ended_at}
+                                        <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-green-900 dark:text-green-300">Ongoing</span>
+                                    {:else}
+                                        <span class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300">
+                                            {formatDuration(log.started_at, log.ended_at)}
+                                        </span>
+                                    {/if}
+                                    <svg class="w-5 h-5 text-gray-500 dark:text-gray-400 transform transition-transform {expandedLogs.has(log.id) ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+                            </div>
+
+                            {#if expandedLogs.has(log.id) && log.sets && log.sets.length > 0}
+                                <div class="mt-4 space-y-3">
+                                    <div class="grid grid-cols-3 gap-4 font-semibold text-gray-600 dark:text-gray-300 text-sm">
+                                        <div>Exercise</div>
+                                        <div>Weight</div>
+                                        <div>Reps</div>
+                                    </div>
+                                    {#each log.sets as set (set.logged_at + set.exercise_id)}
+                                        <div class="grid grid-cols-3 gap-4 items-center text-sm text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-700 p-2 rounded-md">
+                                            <div>
+                                                <span class="font-medium">{set.exercise_name}</span>
+                                                {#if set.is_drop_set}
+                                                    <span class="ml-2 bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">DS</span>
+                                                {/if}
+                                                {#if set.myo_rep === 'start'}
+                                                    <span class="ml-2 bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-purple-900 dark:text-purple-300">Myo Start</span>
+                                                {:else if set.myo_rep === 'match'}
+                                                    <span class="ml-2 bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-purple-900 dark:text-purple-300">Myo Match</span>
+                                                {/if}
+                                            </div>
+                                            <div>{set.weight}kg</div>
+                                            <div>{set.reps}</div>
+                                        </div>
+                                    {/each}
+                                </div>
+                            {/if}
+                        </div>
+                    </div>
+                {/each}
+            </div>
+        {/if}
     {/if}
 </div>
