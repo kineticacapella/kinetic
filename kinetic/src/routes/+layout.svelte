@@ -45,9 +45,9 @@
 				<li class="ml-auto flex items-center" role="presentation">
 					<div class="mr-2">
 						{#if $dataStatus === 'loading' || $dataStatus === 'syncing'}
-							<RefreshOutline class="shrink-0 h-6 w-6 animate-spin" />
+							<RefreshOutline class="shrink-0 h-6 w-6 text-blue-600 dark:text-blue-400 animate-spin" />
 						{:else if $dataStatus === 'logging'}
-							<ArrowUpOutline class="shrink-0 h-6 w-6" />
+							<ArrowUpOutline class="shrink-0 h-6 w-6 text-blue-600 dark:text-blue-400" />
 						{:else if $dataStatus === 'synced'}
 							<CheckOutline class="shrink-0 h-6 w-6 text-green-500" />
 						{:else if $dataStatus === 'error'}
