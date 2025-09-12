@@ -705,7 +705,7 @@
 			>
 				<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
 					{#if workoutMode === 'play'}
-						<span class="text-green-600 dark:text-green-400"><PauseSolid class="shrink-0 h-6 w-6" /> {formatTime($sessionTimer)}</span>
+						<span class="text-green-600 dark:text-green-400">Active Session {formatTime($sessionTimer)}</span>
 					{:else if editingWorkout}
 						Edit Workout
 					{:else}
