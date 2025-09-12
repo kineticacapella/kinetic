@@ -1,1 +1,14 @@
 @import 'tailwindcss';
+
+@keyframes beat {
+    0%, 100% {
+        transform: scale(1);
+    }
+    15% {
+        transform: scale(1.2);
+    }
+}
+
+.beat-animation {
+    animation: beat 1s infinite;
+}

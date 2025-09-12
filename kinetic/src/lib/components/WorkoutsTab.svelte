@@ -36,7 +36,8 @@
 		PlayOutline,
 		CheckOutline,
 		CloseOutline,
-		PauseSolid
+		PauseSolid,
+		HeartSolid
 	} from 'flowbite-svelte-icons';
 	import { user } from '$lib/stores';
 
@@ -638,7 +639,7 @@
 								onclick={() => startWorkout(workout)}
 								class="absolute top-4 right-4 text-sm font-medium text-green-600 dark:text-green-400 hover:underline"
 							>
-								<PauseSolid class="shrink-0 h-6 w-6" />
+								<HeartSolid class="shrink-0 h-6 w-6 beat-animation" />
 							</button>
 						{:else}
 							<button
