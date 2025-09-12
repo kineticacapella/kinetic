@@ -104,7 +104,7 @@
                                 <div>
                                     <h3 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">{log.workout_name}</h3>
                                     <p class="text-sm text-gray-500 dark:text-gray-400">
-                                        {new Date(log.started_at).toLocaleDateString()}
+                                        {new Date(log.started_at).toLocaleString()}
                                     </p>
                                 </div>
                                 <div class="flex items-center">
