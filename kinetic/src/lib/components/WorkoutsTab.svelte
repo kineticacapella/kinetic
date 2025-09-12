@@ -33,11 +33,11 @@
 		EyeOutline,
 		PenOutline,
 		ArrowDownOutline,
-		PlayOutline,
 		CheckOutline,
 		CloseOutline,
 		PauseSolid,
-		HeartSolid
+		HeartSolid,
+		PlaySolid
 	} from 'flowbite-svelte-icons';
 	import { user } from '$lib/stores';
 
@@ -646,7 +646,7 @@
 								onclick={() => startWorkout(workout)}
 								class="absolute top-4 right-4 text-sm font-medium text-green-600 dark:text-green-400 hover:underline font-bold"
 							>
-								<PlayOutline class="w-6 h-6" />
+								<PlaySolid class="shrink-0 h-6 w-6" />
 							</button>
 						{/if}
 						<h5 class="mb-3 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
