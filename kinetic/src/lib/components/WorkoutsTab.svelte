@@ -1000,22 +1000,22 @@
 	<div class="relative p-4 w-full max-w-sm max-h-full">
 		<div class="relative bg-white rounded-lg shadow-xl dark:bg-gray-800 border-2 border-red-700 dark:border-red-600">
 			<div class="flex items-center justify-between p-4 rounded-t dark:border-gray-600">
-				<h3 class="text-lg font-semibold text-gray-900 dark:text-white">End workout session?</h3>
+				<h3 class="text-base font-semibold text-gray-900 dark:text-white">End workout session?</h3>
 				<div class="flex items-center gap-2">
 					<button
 						onclick={confirmEndSession}
 						type="button"
-						class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+						class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm p-2 text-center inline-flex items-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
 					>
-						<CheckOutline class="w-6 h-6" />
+						<CheckOutline class="w-5 h-5" />
 						<span class="sr-only">Confirm</span>
 					</button>
 					<button
 						data-modal-hide="confirm-end-session-modal"
 						type="button"
-						class="text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 p-2.5"
+						class="text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 p-2"
 					>
-						<CloseOutline class="w-6 h-6" />
+						<CloseOutline class="w-5 h-5" />
 						<span class="sr-only">Cancel</span>
 					</button>
 				</div>
