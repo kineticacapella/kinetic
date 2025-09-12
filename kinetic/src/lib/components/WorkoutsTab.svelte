@@ -674,11 +674,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 flex justify-end space-x-3">
-						<button
-							onclick={() => viewWorkout(workout)}
-							class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">View</button
-						>
+					<div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 flex justify-end space-x-6">
 						<button
 							onclick={() => startEdit(workout)}
 							class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">Edit</button

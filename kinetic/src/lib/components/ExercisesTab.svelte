@@ -232,7 +232,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 flex justify-end space-x-3">
+                    <div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 flex justify-end space-x-6">
 						<button onclick={() => startEdit(exercise)} class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">Edit</button>
 						<button onclick={() => handleDeleteExercise(exercise.id)} class="text-sm font-medium text-red-600 dark:text-red-400 hover:underline">Delete</button>
                     </div>
