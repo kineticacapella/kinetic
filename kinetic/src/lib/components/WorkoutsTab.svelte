@@ -436,19 +436,25 @@
 		confirmEndSessionModal.show();
 	}
 
-	async function confirmEndSession() {
+		async function confirmEndSession() {
 		confirmEndSessionModal.hide();
 		isEndingSession = true;
 		stopSessionTimer();
 		addWorkoutModal.hide();
 
-		// New logging logic
 		if ($activeWorkoutLog && $activeWorkoutLog.id) {
-			$activeWorkoutLog.ended_at = new Date().toISOString();
-			await updateWorkoutLog($activeWorkoutLog.id, {
-				ended_at: $activeWorkoutLog.ended_at,
-				sets: $activeWorkoutLog.sets
-			});
+			const logId = $activeWorkoutLog.id;
+			const currentEndedAt = new Date().toISOString();
+			const currentSets = $activeWorkoutLog.sets;
+
+			// Always update ended_at first
+			await updateWorkoutLog(logId, { ended_at: currentEndedAt });
+
+			// If there are sets, update them separately
+			if (currentSets && currentSets.length > 0) {
+				await updateWorkoutLog(logId, { sets: currentSets });
+			}
+
 			activeWorkoutLog.set(null); // Clear current log
 			activeWorkout.set(null);
 		}
