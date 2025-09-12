@@ -7,7 +7,7 @@
 	import HistoryTab from '$lib/components/HistoryTab.svelte';
 	import { onMount } from 'svelte';
 	import { initFlowbite } from 'flowbite';
-	import { dataStatus } from '$lib/stores';
+	import { dataStatus, activeWorkout, activeWorkoutLog, sessionTimer, formatTime } from '$lib/stores';
 
 	onMount(() => {
 		initFlowbite();
@@ -28,6 +28,19 @@
 					<div class="inline-block p-4 border-b-2 rounded-t-lg invisible">History</div>
 				</li>
 				<li class="ml-auto flex items-center" role="presentation">
+					{#if $activeWorkout}
+						<div class="text-right mr-4">
+							<div class="font-bold text-sm text-blue-600 dark:text-blue-400">{$activeWorkout.name}</div>
+							<div class="text-xs text-gray-500 dark:text-gray-400">
+								<span>{formatTime($sessionTimer)}</span>
+								<span class="mx-1">|</span>
+								<span
+									>{$activeWorkoutLog?.sets?.length || 0} / {$activeWorkout.workout_exercises
+										?.length || 0} sets logged</span
+								>
+							</div>
+						</div>
+					{/if}
 					<div class="mr-2">
 						{#if $dataStatus === 'loading' || $dataStatus === 'syncing'}
 							<RefreshOutline class="shrink-0 h-6 w-6 animate-spin" />

@@ -34,6 +34,39 @@ export const workoutLogs = writable<WorkoutLog[]>([]);
 export const myoReps = writable([]);
 export const dropSets = writable([]);
 
+// Stores for active session
+export const activeWorkout = writable<Workout | null>(null);
+export const activeWorkoutLog = writable<WorkoutLog | null>(null);
+export const sessionTimer = writable<number>(0);
+
+export function formatTime(seconds: number) {
+	const minutes = Math.floor(seconds / 60);
+	const remainingSeconds = seconds % 60;
+	return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+let timerInterval: NodeJS.Timeout | null = null;
+
+export function startSessionTimer() {
+	if (timerInterval) clearInterval(timerInterval);
+	timerInterval = setInterval(() => {
+		sessionTimer.update((t) => t + 1);
+	}, 1000);
+}
+
+export function stopSessionTimer() {
+	if (timerInterval) {
+		clearInterval(timerInterval);
+		timerInterval = null;
+	}
+}
+
+export function resetSessionTimer() {
+	stopSessionTimer();
+	sessionTimer.set(0);
+}
+
+
 export type DataStatus = 'loading' | 'syncing' | 'logging' | 'synced' | 'error';
 export const dataStatus = writable<DataStatus>('synced');
 

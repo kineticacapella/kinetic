@@ -1,7 +1,19 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { initFlowbite, Modal, Dropdown } from 'flowbite';
-	import { workoutLogs, workouts, addWorkoutLog, updateWorkoutLog } from '$lib/stores';
+	import {
+		workoutLogs,
+		workouts,
+		addWorkoutLog,
+		updateWorkoutLog,
+		activeWorkout,
+		activeWorkoutLog,
+		sessionTimer,
+		formatTime,
+		startSessionTimer,
+		stopSessionTimer,
+		resetSessionTimer
+	} from '$lib/stores';
 	import {
 		getExercises,
 		getWorkouts,
@@ -33,8 +45,6 @@
 	let addWorkoutModal: Modal;
 	let dropSetModal: Modal;
 	let workoutMode: 'edit' | 'play' = $state('edit');
-	let activeWorkoutId: string | null = $state(null);
-	let currentWorkoutLog: WorkoutLog | null = $state(null);
 	let isEndingSession = $state(false);
 
 	// Add workout state
@@ -51,40 +61,6 @@
 			myo_rep?: 'start' | 'match' | null;
 		}[]
 	>([]);
-
-	// Timer state
-	let timer = $state(0);
-	let timerInterval: NodeJS.Timeout | null = $state(null);
-
-	function formatTime(seconds: number) {
-		const minutes = Math.floor(seconds / 60);
-		const remainingSeconds = seconds % 60;
-		return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-	}
-
-	function startTimer() {
-		if (timerInterval) {
-			clearInterval(timerInterval);
-		}
-		timerInterval = setInterval(() => {
-			timer++;
-		}, 1000);
-	}
-
-	function stopTimer() {
-		if (timerInterval) {
-			clearInterval(timerInterval);
-			timerInterval = null;
-		}
-	}
-
-	function resetTimer() {
-		stopTimer();
-		timer = 0;
-	}
-
-
-	
 
 	// New state for drop set feature
 	let activeSetForDropSet: { id: string; exerciseId: string } | null = $state(null);
@@ -164,9 +140,9 @@
 						newWorkoutSets = [];
 						newWorkoutExerciseId = '';
 						workoutMode = 'edit';
-						resetTimer();
-						if (!currentWorkoutLog) {
-							activeWorkoutId = null;
+						resetSessionTimer();
+						if (!$activeWorkoutLog) {
+							activeWorkout.set(null);
 						}
 					}
 				}
@@ -187,29 +163,33 @@
 
 	$effect(() => {
 		if (isEndingSession) return;
-        if ($workoutLogs) {
-            const ongoing = $workoutLogs.filter(log => !log.ended_at);
-            if (ongoing.length > 0) {
-                const latestOngoing = ongoing.sort((a, b) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime())[0];
-                
-                const activeWorkout = ($workouts || []).find(w => w.name === latestOngoing.workout_name);
+		if ($workoutLogs) {
+			const ongoing = $workoutLogs.filter((log) => !log.ended_at);
+			if (ongoing.length > 0) {
+				const latestOngoing = ongoing.sort(
+					(a, b) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime()
+				)[0];
 
-                if (activeWorkout && activeWorkout.id) {
-                    activeWorkoutId = activeWorkout.id;
-                    currentWorkoutLog = latestOngoing;
-                }
+				const workout = ($workouts || []).find((w) => w.name === latestOngoing.workout_name);
 
-            } else {
-                if (workoutMode === 'play') {
-                    activeWorkoutId = null;
-                    currentWorkoutLog = null;
-                    workoutMode = 'edit';
-                    resetTimer();
-                    if (addWorkoutModal) addWorkoutModal.hide();
-                }
-            }
-        }
-    });
+				if (workout && workout.id) {
+					activeWorkout.set(workout);
+					activeWorkoutLog.set(latestOngoing);
+					const elapsed = (new Date().getTime() - new Date(latestOngoing.started_at).getTime()) / 1000;
+					sessionTimer.set(Math.floor(elapsed));
+					startSessionTimer();
+				}
+			} else {
+				if (workoutMode === 'play') {
+					activeWorkout.set(null);
+					activeWorkoutLog.set(null);
+					workoutMode = 'edit';
+					resetSessionTimer();
+					if (addWorkoutModal) addWorkoutModal.hide();
+				}
+			}
+		}
+	});
 
 	function startAdd() {
 		editingWorkout = null;
@@ -359,7 +339,6 @@
 			exerciseDropSetInfo[exerciseId] = {
 				auto: true,
 				reduction: {
-
 					type: reductionType,
 					value: reductionType === 'percent' ? weightReductionPercentage : weightReductionAmount
 				}
@@ -440,19 +419,18 @@
 
 	async function handleEndSession() {
 		isEndingSession = true;
-		stopTimer();
-		resetTimer();
-		activeWorkoutId = null;
+		stopSessionTimer();
 		addWorkoutModal.hide();
 
 		// New logging logic
-		if (currentWorkoutLog && currentWorkoutLog.id) {
-			currentWorkoutLog.ended_at = new Date().toISOString();
-			await updateWorkoutLog(currentWorkoutLog.id, { 
-				ended_at: currentWorkoutLog.ended_at,
-				sets: currentWorkoutLog.sets
-			 });
-			currentWorkoutLog = null; // Clear current log
+		if ($activeWorkoutLog && $activeWorkoutLog.id) {
+			$activeWorkoutLog.ended_at = new Date().toISOString();
+			await updateWorkoutLog($activeWorkoutLog.id, {
+				ended_at: $activeWorkoutLog.ended_at,
+				sets: $activeWorkoutLog.sets
+			});
+			activeWorkoutLog.set(null); // Clear current log
+			activeWorkout.set(null);
 		}
 		isEndingSession = false;
 	}
@@ -488,26 +466,24 @@
 			myo_rep: we.myo_rep || null
 		}));
 		workoutMode = 'play';
-		if (workout.id) {
-			activeWorkoutId = workout.id;
-		}
+		activeWorkout.set(workout);
+
 		addWorkoutModal.show();
-		
+
 		await tick();
 		initFlowbite();
 
 		// If there's already an ongoing log for this workout, use it.
-		if (currentWorkoutLog && currentWorkoutLog.workout_name === workout.name) {
-			const elapsed = (new Date().getTime() - new Date(currentWorkoutLog.started_at).getTime()) / 1000;
-    		timer = Math.floor(elapsed);
-			startTimer();
+		if ($activeWorkoutLog && $activeWorkoutLog.workout_name === workout.name) {
+			const elapsed = (new Date().getTime() - new Date($activeWorkoutLog.started_at).getTime()) / 1000;
+			sessionTimer.set(Math.floor(elapsed));
+			startSessionTimer();
 			return;
 		}
 
 		// If we are here, it's a new session.
-		stopTimer();
-		resetTimer();
-		startTimer();
+		resetSessionTimer();
+		startSessionTimer();
 
 		// New logging logic
 		const newLog = await addWorkoutLog({
@@ -516,7 +492,7 @@
 			ended_at: null,
 			sets: []
 		});
-		currentWorkoutLog = newLog;
+		activeWorkoutLog.set(newLog);
 	}
 
 	function viewWorkout(workout: Workout) {
@@ -570,7 +546,6 @@
 		} catch (error) {
 			console.error('Error adding exercise to workout:', error);
 		}
-
 
 		selectedExerciseId = '';
 		sets = 3;
@@ -631,7 +606,7 @@
 					class="relative flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600"
 				>
 					<div class="p-6 flex-grow">
-						{#if activeWorkoutId === workout.id}
+						{#if $activeWorkout?.id === workout.id}
 							<button
 								onclick={() => startWorkout(workout)}
 								class="absolute top-4 right-4 text-sm font-medium text-green-600 dark:text-green-400 hover:underline"
@@ -707,7 +682,7 @@
 			>
 				<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
 					{#if workoutMode === 'play'}
-						<span class="text-green-600 dark:text-green-400">Active Session {formatTime(timer)}</span>
+						<span class="text-green-600 dark:text-green-400">Active Session {formatTime($sessionTimer)}</span>
 					{:else if editingWorkout}
 						Edit Workout
 					{:else}
@@ -892,7 +867,7 @@
 												class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
 												onchange={async (e) => {
 													const target = e.target as HTMLInputElement;
-													if (target.checked && currentWorkoutLog && currentWorkoutLog.id) {
+													if (target.checked && $activeWorkoutLog && $activeWorkoutLog.id) {
 														const loggedSet: LoggedSet = {
 															exercise_id: set.exercise_id,
 															exercise_name: set.exercise_name,
@@ -900,11 +875,11 @@
 															reps: set.reps,
 															is_drop_set: set.is_drop_set || false,
 															myo_rep: set.myo_rep || null,
-															timer_time: timer,
+															timer_time: $sessionTimer,
 															logged_at: new Date().toISOString()
 														};
-														currentWorkoutLog.sets.push(loggedSet);
-														await updateWorkoutLog(currentWorkoutLog.id, { sets: currentWorkoutLog.sets });
+														$activeWorkoutLog.sets.push(loggedSet);
+														await updateWorkoutLog($activeWorkoutLog.id, { sets: $activeWorkoutLog.sets });
 													}
 												}}
 											/>
