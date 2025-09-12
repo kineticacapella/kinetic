@@ -17,19 +17,10 @@
 <div class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col">
 	<main class="flex-grow container mx-auto px-4 pt-4 pb-20" id="myTab" data-tabs-toggle="#myTabContent">
 		<div class="mb-4 border-b border-gray-200 dark:border-gray-700">
-			<ul class="flex flex-wrap -mb-px text-sm font-medium" role="tablist">
-				<li class="mr-2" role="presentation">
-					<div class="inline-block p-4 border-b-2 rounded-t-lg invisible">Workouts</div>
-				</li>
-				<li class="mr-2" role="presentation">
-					<div class="inline-block p-4 border-b-2 rounded-t-lg invisible">Exercises</div>
-				</li>
-				<li class="mr-2" role="presentation">
-					<div class="inline-block p-4 border-b-2 rounded-t-lg invisible">History</div>
-				</li>
-				<li class="ml-auto flex items-center" role="presentation">
-					{#if $activeWorkout}
-						<div class="text-right mr-4">
+			<ul class="flex flex-wrap -mb-px text-sm font-medium items-center" role="tablist">
+				{#if $activeWorkout}
+					<li class="mr-4">
+						<div>
 							<div class="font-bold text-sm text-blue-600 dark:text-blue-400">{$activeWorkout.name}</div>
 							<div class="text-xs text-gray-500 dark:text-gray-400">
 								<span>{formatTime($sessionTimer)}</span>
@@ -40,7 +31,18 @@
 								>
 							</div>
 						</div>
-					{/if}
+					</li>
+				{/if}
+				<li class="mr-2" role="presentation">
+					<div class="inline-block p-4 border-b-2 rounded-t-lg invisible">Workouts</div>
+				</li>
+				<li class="mr-2" role="presentation">
+					<div class="inline-block p-4 border-b-2 rounded-t-lg invisible">Exercises</div>
+				</li>
+				<li class="mr-2" role="presentation">
+					<div class="inline-block p-4 border-b-2 rounded-t-lg invisible">History</div>
+				</li>
+				<li class="ml-auto flex items-center" role="presentation">
 					<div class="mr-2">
 						{#if $dataStatus === 'loading' || $dataStatus === 'syncing'}
 							<RefreshOutline class="shrink-0 h-6 w-6 animate-spin" />
