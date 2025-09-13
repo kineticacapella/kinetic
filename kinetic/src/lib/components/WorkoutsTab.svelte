@@ -147,8 +147,8 @@
 						newWorkoutSets = [];
 						newWorkoutExerciseId = '';
 						workoutMode = 'edit';
-						resetSessionTimer();
 						if (!$activeWorkoutLog) {
+							resetSessionTimer();
 							activeWorkout.set(null);
 						}
 					}
