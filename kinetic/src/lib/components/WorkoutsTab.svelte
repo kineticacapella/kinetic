@@ -53,6 +53,7 @@
 	let workoutToDeleteId: string | null = $state(null);
 	let workoutMode: 'edit' | 'play' = $state('edit');
 	let isEndingSession = $state(false);
+	let lastSelectedExercise: Exercise | null = $state(null);
 
 	let addExerciseModal: Modal;
 	let exerciseSearchText = $state('');
@@ -390,10 +391,21 @@
 
 	function selectExercise(exerciseId: string | undefined) {
 		if (!exerciseId) return;
+		const exercise = exercises.find((e) => e.id === exerciseId);
+		if (exercise) {
+			lastSelectedExercise = exercise;
+		}
 		newWorkoutExerciseId = exerciseId;
 		addSet();
 		addExerciseModal.hide();
 		exerciseSearchText = '';
+	}
+
+	function addSetForLastSelected() {
+		if (lastSelectedExercise && lastSelectedExercise.id) {
+			newWorkoutExerciseId = lastSelectedExercise.id;
+			addSet();
+		}
 	}
 
 	async function handleAddWorkout(event: Event) {
@@ -785,14 +797,52 @@
 				<div class="mb-4">
 					<div class="flex justify-between items-center mb-2">
 						<h4 class="text-md font-semibold text-gray-800 dark:text-white">Exercises</h4>
-						<button
-							type="button"
-							onclick={() => addExerciseModal.show()}
-							class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-						>
-							<PlusOutline class="w-6 h-6" />
-							<span class="sr-only">Add Exercise</span>
-						</button>
+						<div class="flex items-center gap-2">
+							{#if lastSelectedExercise}
+								<span
+									class="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-500"
+								>
+									{lastSelectedExercise.name}
+									<button
+										type="button"
+										aria-label="Remove exercise filter"
+										onclick={() => (lastSelectedExercise = null)}
+										class="flex-shrink-0 h-4 w-4 inline-flex items-center justify-center rounded-full text-blue-600 hover:bg-blue-200 hover:text-blue-800 focus:outline-none focus:bg-blue-200 focus:text-blue-800 dark:text-blue-500 dark:hover:bg-blue-900"
+									>
+										<svg
+											class="flex-shrink-0 h-3 w-3"
+											xmlns="http://www.w3.org/2000/svg"
+											width="24"
+											height="24"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg
+										>
+									</button>
+								</span>
+								<button
+									type="button"
+									onclick={addSetForLastSelected}
+									class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+								>
+									<PlusOutline class="w-6 h-6" />
+									<span class="sr-only">Add Set</span>
+								</button>
+							{:else}
+								<button
+									type="button"
+									onclick={() => addExerciseModal.show()}
+									class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+								>
+									<PlusOutline class="w-6 h-6" />
+									<span class="sr-only">Add Exercise</span>
+								</button>
+							{/if}
+						</div>
 					</div>
 					<div class="flex flex-col gap-3">
 						{#each groupedSets as group (group.exercise_id)}
