@@ -854,7 +854,7 @@
 								<button
 									type="button"
 									onclick={() => addExerciseModal.show()}
-									class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+									class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm text-center inline-flex items-center justify-center w-[42px] h-[42px] dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
 								>
 									<PlusOutline class="w-6 h-6" />
 									<span class="sr-only">Add Exercise</span>
@@ -965,7 +965,8 @@
 										<div class="flex justify-center">
 											<input
 												type="checkbox"
-												class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+												class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+												disabled={workoutMode === 'edit'}
 												onchange={async (e) => {
 													const target = e.target as HTMLInputElement;
 													if (target.checked && $activeWorkoutLog && $activeWorkoutLog.id) {
