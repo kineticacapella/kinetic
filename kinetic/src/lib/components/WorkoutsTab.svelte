@@ -878,7 +878,7 @@
 										<div class="text-sm text-left">Set</div>
 										<div class="text-sm text-left">Weight</div>
 										<div class="text-sm text-left">Reps</div>
-										<div class="text-sm text-center">Log</div>
+										<div class="text-sm flex justify-center relative right-2.5">Log</div>
 									</div>
 								{/if}
 								{#each group.sets as set, i (set.id)}
