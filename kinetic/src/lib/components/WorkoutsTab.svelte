@@ -1176,12 +1176,12 @@
 						placeholder="Search for an exercise"
 					/>
 				</div>
-				<div class="flex flex-col gap-2 max-h-60 overflow-y-auto">
+				<div class="flex flex-col gap-2 max-h-60 overflow-y-auto rounded-lg border border-gray-300 dark:border-gray-600 p-2">
 					{#each filteredExercises as exercise (exercise.id)}
 						<button
 							type="button"
 							onclick={() => selectExercise(exercise.id)}
-							class="text-left p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600"
+							class="text-left w-full text-sm font-medium text-gray-900 dark:text-white p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600"
 						>
 							{exercise.name}
 						</button>
