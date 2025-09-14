@@ -1181,7 +1181,7 @@
 						<button
 							type="button"
 							onclick={() => selectExercise(exercise.id)}
-							class="text-left w-full text-sm font-medium text-gray-900 dark:text-white p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600"
+							class="text-left w-full text-sm font-medium text-gray-900 dark:text-white p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-700"
 						>
 							{exercise.name}
 						</button>
