@@ -55,11 +55,14 @@
 	let isEndingSession = $state(false);
 	let lastSelectedExercise: Exercise | null = $state(null);
 	let initialWorkoutState = $state('');
-	let hasWorkoutChanged = $derived(
-		workoutMode === 'play' &&
+	let hasWorkoutChanged = $state(false);
+	$effect(() => {
+		hasWorkoutChanged = !!(
+			workoutMode === 'play' &&
 			initialWorkoutState &&
 			initialWorkoutState !== JSON.stringify(newWorkoutSets)
-	);
+		);
+	});
 
 	let addExerciseModal: Modal;
 	let exerciseSearchText = $state('');
