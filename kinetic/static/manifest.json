@@ -4,7 +4,7 @@
   "description": "A workout tracker app.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1e3a8a",
+  "background_color": "#101828",
   "theme_color": "#1d4ed8",
   "icons": [
     {
