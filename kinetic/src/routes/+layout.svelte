@@ -5,6 +5,7 @@
 	import SettingsTab from '$lib/components/SettingsTab.svelte';
 	import WorkoutsTab from '$lib/components/WorkoutsTab.svelte';
 	import HistoryTab from '$lib/components/HistoryTab.svelte';
+	import HomeTab from '$lib/components/HomeTab.svelte';
 	import { onMount } from 'svelte';
 	import { initFlowbite } from 'flowbite';
 	import { dataStatus, activeWorkout, activeWorkoutLog, sessionTimer, formatTime } from '$lib/stores';
@@ -61,8 +62,11 @@
 			</ul>
 		</div>
 		<div class="fixed bottom-0 left-0 z-50 w-full h-14 bg-white border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
-			<div class="grid h-full max-w-lg grid-cols-3 mx-auto font-medium">
-				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" id="workouts-tab" data-tabs-target="#workouts" type="button" role="tab" aria-controls="workouts" aria-selected="true">
+			<div class="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
+				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" id="home-tab" data-tabs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">
+					Home
+				</button>
+				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" id="workouts-tab" data-tabs-target="#workouts" type="button" role="tab" aria-controls="workouts" aria-selected="false">
 					Workouts
 				</button>
 				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500" id="exercises-tab" data-tabs-target="#exercises" type="button" role="tab" aria-controls="exercises" aria-selected="false">
@@ -74,6 +78,9 @@
 			</div>
 		</div>
 		<div id="myTabContent">
+			<div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="home" role="tabpanel" aria-labelledby="home-tab">
+				<HomeTab />
+			</div>
 			<div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="workouts" role="tabpanel" aria-labelledby="workouts-tab">
 				<WorkoutsTab />
 			</div>
