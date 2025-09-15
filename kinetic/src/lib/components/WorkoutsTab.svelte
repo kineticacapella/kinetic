@@ -201,13 +201,13 @@
 	$effect(() => {
 		if (isEndingSession) return;
 		if ($workoutLogs) {
-			const ongoing = $workoutLogs.filter((log) => !log.ended_at);
+			const ongoing = $workoutLogs.filter((log: WorkoutLog) => !log.ended_at);
 			if (ongoing.length > 0) {
 				const latestOngoing = ongoing.sort(
-					(a, b) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime()
+					(a: WorkoutLog, b: WorkoutLog) => new Date(b.started_at).getTime() - new Date(a.started_at).getTime()
 				)[0];
 
-				const workout = ($workouts || []).find((w) => w.name === latestOngoing.workout_name);
+				const workout = ($workouts || []).find((w: Workout) => w.name === latestOngoing.workout_name);
 
 				if (workout && workout.id) {
 					activeWorkout.set(workout);
