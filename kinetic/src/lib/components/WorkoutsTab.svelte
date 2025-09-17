@@ -711,34 +711,40 @@
 								<PlaySolid class="shrink-0 h-6 w-6" />
 							</button>
 						{/if}
-						<h5 class="mb-1 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+						<h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
 							{workout.name}
 						</h5>
-						<div class="mb-3">
-							<p class="text-2xl font-bold text-gray-800 dark:text-white">
-								{totalVolume.toLocaleString()} kg
-							</p>
-							<p class="text-sm text-gray-500 dark:text-gray-400">
-								&bull; {numExercises} {numExercises === 1 ? 'exercise' : 'exercises'} &bull; {numSets}
-								{numSets === 1 ? 'set' : 'sets'}
+
+						<div class="mb-3 text-sm text-gray-500 dark:text-gray-400">
+							<span>&bull; {numExercises} {numExercises === 1 ? 'exercise' : 'exercises'}</span>
+							<span class="mx-1">&bull;</span>
+							<span>{numSets} {numSets === 1 ? 'set' : 'sets'}</span>
+						</div>
+
+						<div class="mb-3 text-sm">
+							<p class="text-gray-500 dark:text-gray-400 truncate">
+								{Array.from(new Set((workout.workout_exercises || []).map((e) => e.exercises?.name))).join(', ')}
 							</p>
 						</div>
 
-						<div class="space-y-3 text-sm">
-							<div class="pt-2 min-h-[34px]">
-								{#if hasDropSet}
-									<span
-										class="inline-flex items-center bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300"
-										>Drop Set</span
-									>
-								{/if}
-								{#if hasMyoRep}
-									<span
-										class="inline-flex items-center bg-purple-100 text-purple-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-purple-900 dark:text-purple-300"
-										>Myo-reps</span
-									>
-								{/if}
-							</div>
+						<div class="pt-2 min-h-[34px]">
+							<span
+								class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-green-900 dark:text-green-300"
+							>
+								{totalVolume.toLocaleString()} kg
+							</span>
+							{#if hasDropSet}
+								<span
+									class="inline-flex items-center bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300"
+									>Drop Set</span
+								>
+							{/if}
+							{#if hasMyoRep}
+								<span
+									class="inline-flex items-center bg-purple-100 text-purple-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-purple-900 dark:text-purple-300"
+									>Myo-reps</span
+								>
+							{/if}
 						</div>
 					</div>
 					<div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 flex justify-end space-x-6">
