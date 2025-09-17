@@ -686,6 +686,12 @@
 			{#each $workouts as workout (workout.id)}
 				{@const hasDropSet = (workout.workout_exercises || []).some((ex: WorkoutExercise) => ex.is_drop_set)}
 				{@const hasMyoRep = (workout.workout_exercises || []).some((ex: WorkoutExercise) => ex.myo_rep)}
+				{@const totalVolume = (workout.workout_exercises || []).reduce(
+					(total, ex) => total + ex.weight * ex.reps,
+					0
+				)}
+				{@const numExercises = new Set((workout.workout_exercises || []).map((e) => e.exercise_id)).size}
+				{@const numSets = (workout.workout_exercises || []).length}
 				<div
 					class="relative flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600"
 				>
@@ -705,17 +711,20 @@
 								<PlaySolid class="shrink-0 h-6 w-6" />
 							</button>
 						{/if}
-						<h5 class="mb-3 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+						<h5 class="mb-1 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
 							{workout.name}
 						</h5>
+						<div class="mb-3">
+							<p class="text-2xl font-bold text-gray-800 dark:text-white">
+								{totalVolume.toLocaleString()} kg
+							</p>
+							<p class="text-sm text-gray-500 dark:text-gray-400">
+								&bull; {numExercises} {numExercises === 1 ? 'exercise' : 'exercises'} &bull; {numSets}
+								{numSets === 1 ? 'set' : 'sets'}
+							</p>
+						</div>
 
 						<div class="space-y-3 text-sm">
-							<div>
-								<span class="font-semibold text-gray-600 dark:text-gray-300">Exercises:</span>
-								<span class="text-gray-500 dark:text-gray-400">
-									{Array.from(new Set((workout.workout_exercises || []).map((e: WorkoutExercise) => e.exercises?.name))).join(', ')}</span
-								>
-							</div>
 							<div class="pt-2 min-h-[34px]">
 								{#if hasDropSet}
 									<span
