@@ -715,14 +715,14 @@
 							{workout.name}
 						</h5>
 
-						<div class="mb-3 text-sm text-gray-500 dark:text-gray-400">
+						<div class="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
 							<span>&bull; {numExercises} {numExercises === 1 ? 'exercise' : 'exercises'}</span>
 							<span class="mx-1">&bull;</span>
 							<span>{numSets} {numSets === 1 ? 'set' : 'sets'}</span>
 						</div>
 
 						<div class="mb-3 text-sm">
-							<p class="text-gray-500 dark:text-gray-400 truncate">
+							<p class="font-semibold text-gray-700 dark:text-gray-300 truncate">
 								{Array.from(new Set((workout.workout_exercises || []).map((e) => e.exercises?.name))).join(', ')}
 							</p>
 						</div>
