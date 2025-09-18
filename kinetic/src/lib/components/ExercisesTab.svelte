@@ -222,7 +222,7 @@
 									<span class="text-gray-500 dark:text-gray-400"> {exercise.secondarymuscles.join(', ')}</span>
 								</div>
 							{/if}
-                            <div class="pt-2">
+                            <div class="pt-2 min-h-[34px]">
                                 <span class="inline-flex items-center bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300">
                                     {exercise.type}
                                 </span>
