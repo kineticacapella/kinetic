@@ -20,7 +20,7 @@
 		<div class="mb-4 border-b border-gray-200 dark:border-gray-700">
 			<ul class="flex flex-wrap -mb-px text-sm font-medium items-center" role="tablist">
 				{#if $activeWorkout}
-					<li class="mr-4">
+					<li class="mr-4 -translate-y-2">
 						<div>
 							<div class="font-bold text-sm text-blue-600 dark:text-blue-400">{$activeWorkout.name}</div>
 							<div class="text-xs text-gray-500 dark:text-gray-400">
