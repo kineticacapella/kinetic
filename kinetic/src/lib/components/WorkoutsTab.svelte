@@ -712,7 +712,7 @@
 									onclick={() => startWorkout(workout)}
 									class="text-green-600 dark:text-green-400"
 								>
-									<PlaySolid class="shrink-0 h-6 w-6" />
+									<PlaySolid class="shrink-0 h-7 w-7" />
 								</button>
 							{/if}
 						</div>
