@@ -695,7 +695,7 @@
 				<div
 					class="relative flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600"
 				>
-					<div class="p-6 flex-grow">
+					<div class="p-6">
 						<div class="flex justify-between items-center mb-2">
 							<h5 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
 								{workout.name}
