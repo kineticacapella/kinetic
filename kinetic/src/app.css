@@ -1,5 +1,11 @@
 @import 'tailwindcss';
 
+@layer base {
+    body {
+        font-family: "Fira Code", monospace;
+    }
+}
+
 @keyframes beat {
     0%, 100% {
         transform: scale(1);
