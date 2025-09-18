@@ -35,7 +35,7 @@
 					</li>
 				{/if}
 				
-				<li class="ml-auto flex items-center" role="presentation">
+				<li class="ml-auto flex items-center -translate-y-2" role="presentation">
 					<div class="mr-2">
 						{#if $dataStatus === 'loading' || $dataStatus === 'syncing'}
 							<RefreshOutline class="shrink-0 h-6 w-6 text-blue-600 dark:text-blue-400 animate-spin" />
