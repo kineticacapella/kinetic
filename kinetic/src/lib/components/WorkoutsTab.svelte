@@ -696,24 +696,26 @@
 					class="relative flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600"
 				>
 					<div class="p-6 flex-grow">
-						{#if $activeWorkout?.id === workout.id}
-							<button
-								onclick={() => startWorkout(workout)}
-								class="absolute top-4 right-4 text-sm font-medium text-green-600 dark:text-green-400 hover:underline"
-							>
-								<HeartSolid class="shrink-0 h-6 w-6 beat-animation" />
-							</button>
-						{:else}
-							<button
-								onclick={() => startWorkout(workout)}
-								class="absolute top-4 right-4 text-sm font-medium text-green-600 dark:text-green-400 hover:underline font-bold"
-							>
-								<PlaySolid class="shrink-0 h-6 w-6" />
-							</button>
-						{/if}
-						<h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-							{workout.name}
-						</h5>
+						<div class="flex justify-between items-center mb-2">
+							<h5 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+								{workout.name}
+							</h5>
+							{#if $activeWorkout?.id === workout.id}
+								<button
+									onclick={() => startWorkout(workout)}
+									class="text-green-600 dark:text-green-400"
+								>
+									<HeartSolid class="shrink-0 h-6 w-6 beat-animation" />
+								</button>
+							{:else}
+								<button
+									onclick={() => startWorkout(workout)}
+									class="text-green-600 dark:text-green-400"
+								>
+									<PlaySolid class="shrink-0 h-6 w-6" />
+								</button>
+							{/if}
+						</div>
 
 						<div class="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
 							<span>&bull; {numExercises} {numExercises === 1 ? 'exercise' : 'exercises'}</span>
