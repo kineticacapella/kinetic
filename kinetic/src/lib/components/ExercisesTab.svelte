@@ -4,6 +4,7 @@
 	import { user } from '$lib/stores';
 	import { getExercises, addExercise, updateExercise, deleteExercise, getWorkoutLogs, type WorkoutLog, type LoggedSet } from '$lib/supabase';
 	import { PlusOutline, CheckOutline, CloseOutline, FileChartBarSolid } from 'flowbite-svelte-icons';
+	import { Chart } from '@flowbite-svelte-plugins/chart';
 
 	type Exercise = {
 		id: string;
@@ -26,6 +27,8 @@
 	let selectedExercise: Exercise | null = $state(null);
 	let stats = $state({ totalSets: 0, totalReps: 0, totalVolume: 0, maxWeight: 0 });
 	let statsLoading = $state(false);
+	let chartLabels: string[] = $state([]);
+	let chartData: number[] = $state([]);
 
 	async function loadExercises() {
 		if (!$user) return;
@@ -127,6 +130,22 @@
 			const maxWeight = exerciseSets.reduce((max, set) => Math.max(max, set.weight), 0);
 
 			stats = { totalSets, totalReps, totalVolume, maxWeight };
+
+			const setsByDate = workoutLogs.reduce((acc, log) => {
+				const date = new Date(log.started_at).toLocaleDateString();
+				if (!acc[date]) {
+					acc[date] = [];
+				}
+				acc[date].push(...log.sets.filter(set => set.exercise_id === exerciseId));
+				return acc;
+			}, {} as Record<string, LoggedSet[]>);
+
+			chartLabels = Object.keys(setsByDate);
+			chartData = chartLabels.map(date => {
+				const sets = setsByDate[date];
+				return sets.reduce((max, set) => Math.max(max, set.weight), 0);
+			});
+
 		} catch (error) {
 			console.error('Error fetching exercise stats:', error);
 		} finally {
@@ -454,8 +473,35 @@
 				{#if selectedExercise}
 					<h4 class="text-lg font-semibold text-gray-800 dark:text-white">{selectedExercise.name}</h4>
 					{#if statsLoading}
-						<p class="text-gray-500 dark:text-gray-400 mt-2">Loading stats...</p>
+						<p class="text-gray-500 dark:text-gray-400 mt-2">Loading chart...</p>
 					{:else}
+						<Chart options={{ 
+							series: [
+							{
+								name: 'Max Weight',
+								data: chartData,
+							},
+							],
+							chart: {
+								height: 350,
+								type: 'area',
+							},
+							dataLabels: {
+								enabled: false,
+							},
+							stroke: {
+								curve: 'smooth',
+							},
+							xaxis: {
+								type: 'datetime',
+								categories: chartLabels,
+							},
+							tooltip: {
+								x: {
+									format: 'dd/MM/yy',
+								},
+							},
+						}} />
 						<div class="grid grid-cols-2 gap-4 mt-4">
 							<div>
 								<p class="text-gray-500 dark:text-gray-400">Total Sets</p>
