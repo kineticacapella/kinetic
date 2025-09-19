@@ -140,11 +140,19 @@
 				return acc;
 			}, {} as Record<string, LoggedSet[]>);
 
-			chartLabels = Object.keys(setsByDate);
-			chartData = chartLabels.map(date => {
+			const dates = Object.keys(setsByDate).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+			let currentPr = 0;
+			const prData = dates.map(date => {
 				const sets = setsByDate[date];
-				return sets.reduce((max, set) => Math.max(max, set.weight), 0);
+				const maxWeightForDay = sets.reduce((max, set) => Math.max(max, set.weight), 0);
+				if (maxWeightForDay > currentPr) {
+					currentPr = maxWeightForDay;
+				}
+				return currentPr;
 			});
+
+			chartLabels = dates;
+			chartData = prData;
 
 		} catch (error) {
 			console.error('Error fetching exercise stats:', error);
