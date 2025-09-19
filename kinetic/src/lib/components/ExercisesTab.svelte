@@ -465,7 +465,9 @@
 		<div class="relative bg-white rounded-lg shadow-xl dark:bg-gray-800 border-2 border-blue-700 dark:border-blue-600">
 			<!-- Modal header -->
 			<div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-				<h3 class="text-xl font-semibold text-gray-900 dark:text-white">Exercise Stats</h3>
+				{#if selectedExercise}
+				<h3 class="text-xl font-semibold text-gray-900 dark:text-white">{selectedExercise.name}</h3>
+				{/if}
 				<button
 					type="button"
 					class="text-red-500 bg-transparent hover:bg-red-100 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:text-red-400 dark:hover:bg-red-900"
@@ -480,11 +482,10 @@
 			<!-- Modal body -->
 			<div class="p-4 md:p-5">
 				{#if selectedExercise}
-					<h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">{selectedExercise.name}</h4>
 					{#if statsLoading}
 						<p class="text-gray-500 dark:text-gray-400 mt-2">Loading stats...</p>
 					{:else}
-						<Tabs>
+						<Tabs style="underline">
 							<TabItem title="Stats">
 								<div class="grid grid-cols-2 gap-4 mt-4">
 									<div>
