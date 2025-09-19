@@ -53,6 +53,14 @@
 	let workoutToDeleteId: string | null = $state(null);
 	let workoutMode: 'edit' | 'play' = $state('edit');
 	let isEndingSession = $state(false);
+
+	function isSetLogged(setId: string) {
+		if (!$activeWorkoutLog || !$activeWorkoutLog.sets) {
+			return false;
+		}
+		return $activeWorkoutLog.sets.some((s: any) => s.set_id === setId);
+	}
+
 	let lastSelectedExercise: Exercise | null = $state(null);
 	let initialWorkoutState = $state('');
 	let hasWorkoutChanged = $state(false);
@@ -983,11 +991,13 @@
 											<input
 												type="checkbox"
 												class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-												disabled={workoutMode === 'edit'}
+												disabled={workoutMode === 'edit' || isSetLogged(set.id)}
+												checked={isSetLogged(set.id)}
 												onchange={async (e) => {
 													const target = e.target as HTMLInputElement;
 													if (target.checked && $activeWorkoutLog && $activeWorkoutLog.id) {
-														const loggedSet: LoggedSet = {
+														const loggedSet: any = {
+															set_id: set.id,
 															exercise_id: set.exercise_id,
 															exercise_name: set.exercise_name,
 															weight: set.weight,
@@ -997,8 +1007,14 @@
 															timer_time: $sessionTimer,
 															logged_at: new Date().toISOString()
 														};
+														if (!$activeWorkoutLog.sets) {
+															$activeWorkoutLog.sets = [];
+														}
 														$activeWorkoutLog.sets.push(loggedSet);
-														await updateWorkoutLog($activeWorkoutLog.id, { sets: $activeWorkoutLog.sets });
+														$activeWorkoutLog = $activeWorkoutLog;
+														await updateWorkoutLog($activeWorkoutLog.id, {
+															sets: $activeWorkoutLog.sets
+														});
 													}
 												}}
 											/>
