@@ -485,8 +485,8 @@
 					{#if statsLoading}
 						<p class="text-gray-500 dark:text-gray-400 mt-2">Loading stats...</p>
 					{:else}
-						<Tabs style="underline">
-							<TabItem title="Stats">
+						<Tabs tabStyle="underline">
+							<TabItem title="Stats" open>
 								<div class="grid grid-cols-2 gap-4 mt-4">
 									<div>
 										<p class="text-gray-500 dark:text-gray-400">Total Sets</p>
