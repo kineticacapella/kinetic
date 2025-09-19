@@ -5,6 +5,7 @@
 	import { getExercises, addExercise, updateExercise, deleteExercise, getWorkoutLogs, type WorkoutLog, type LoggedSet } from '$lib/supabase';
 	import { PlusOutline, CheckOutline, CloseOutline, FileChartBarSolid } from 'flowbite-svelte-icons';
 	import { Chart } from '@flowbite-svelte-plugins/chart';
+	import { Tabs, TabItem } from 'flowbite-svelte';
 
 	type Exercise = {
 		id: string;
@@ -479,55 +480,61 @@
 			<!-- Modal body -->
 			<div class="p-4 md:p-5">
 				{#if selectedExercise}
-					<h4 class="text-lg font-semibold text-gray-800 dark:text-white">{selectedExercise.name}</h4>
+					<h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">{selectedExercise.name}</h4>
 					{#if statsLoading}
-						<p class="text-gray-500 dark:text-gray-400 mt-2">Loading chart...</p>
+						<p class="text-gray-500 dark:text-gray-400 mt-2">Loading stats...</p>
 					{:else}
-						<Chart options={{ 
-							series: [
-							{
-								name: 'Max Weight',
-								data: chartData,
-							},
-							],
-							chart: {
-								height: 350,
-								type: 'area',
-							},
-							dataLabels: {
-								enabled: false,
-							},
-							stroke: {
-								curve: 'smooth',
-							},
-							xaxis: {
-								type: 'datetime',
-								categories: chartLabels,
-							},
-							tooltip: {
-								x: {
-									format: 'dd/MM/yy',
-								},
-							},
-						}} />
-						<div class="grid grid-cols-2 gap-4 mt-4">
-							<div>
-								<p class="text-gray-500 dark:text-gray-400">Total Sets</p>
-								<p class="text-2xl font-bold text-gray-800 dark:text-white">{stats.totalSets}</p>
-							</div>
-							<div>
-								<p class="text-gray-500 dark:text-gray-400">Total Reps</p>
-								<p class="text-2xl font-bold text-gray-800 dark:text-white">{stats.totalReps}</p>
-							</div>
-							<div>
-								<p class="text-gray-500 dark:text-gray-400">Total Volume</p>
-								<p class="text-2xl font-bold text-gray-800 dark:text-white">{stats.totalVolume} kg</p>
-							</div>
-							<div>
-								<p class="text-gray-500 dark:text-gray-400">Max Weight</p>
-								<p class="text-2xl font-bold text-gray-800 dark:text-white">{stats.maxWeight} kg</p>
-							</div>
-						</div>
+						<Tabs>
+							<TabItem title="Stats">
+								<div class="grid grid-cols-2 gap-4 mt-4">
+									<div>
+										<p class="text-gray-500 dark:text-gray-400">Total Sets</p>
+										<p class="text-2xl font-bold text-gray-800 dark:text-white">{stats.totalSets}</p>
+									</div>
+									<div>
+										<p class="text-gray-500 dark:text-gray-400">Total Reps</p>
+										<p class="text-2xl font-bold text-gray-800 dark:text-white">{stats.totalReps}</p>
+									</div>
+									<div>
+										<p class="text-gray-500 dark:text-gray-400">Total Volume</p>
+										<p class="text-2xl font-bold text-gray-800 dark:text-white">{stats.totalVolume} kg</p>
+									</div>
+									<div>
+										<p class="text-gray-500 dark:text-gray-400">Max Weight</p>
+										<p class="text-2xl font-bold text-gray-800 dark:text-white">{stats.maxWeight} kg</p>
+									</div>
+								</div>
+							</TabItem>
+							<TabItem title="PR Chart">
+								<Chart options={{ 
+									series: [
+									{
+										name: 'Max Weight',
+										data: chartData,
+									},
+									],
+									chart: {
+										height: 350,
+										type: 'area',
+									},
+									dataLabels: {
+										enabled: false,
+									},
+									stroke: {
+										curve: 'smooth',
+									},
+									xaxis: {
+										type: 'datetime',
+										categories: chartLabels,
+									},
+									tooltip: {
+										x: {
+											format: 'dd/MM/yy',
+										},
+									},
+								}} />
+							</TabItem>
+						</Tabs>
 					{/if}
 				{:else}
 					<p class="text-gray-500 dark:text-gray-400">No exercise selected.</p>
