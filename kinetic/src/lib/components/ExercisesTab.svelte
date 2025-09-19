@@ -3,7 +3,7 @@
 	import { initFlowbite, Modal } from 'flowbite';
 	import { user } from '$lib/stores';
 	import { getExercises, addExercise, updateExercise, deleteExercise, getWorkoutLogs, type WorkoutLog, type LoggedSet } from '$lib/supabase';
-	import { PlusOutline, CheckOutline, CloseOutline } from 'flowbite-svelte-icons';
+	import { PlusOutline, CheckOutline, CloseOutline, FileChartBarSolid } from 'flowbite-svelte-icons';
 
 	type Exercise = {
 		id: string;
@@ -244,7 +244,17 @@
 			{#each exercises as exercise (exercise.id)}
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600 self-start">
                     <div class="p-6">
-                        <h5 class="mb-3 text-xl font-bold tracking-tight text-gray-900 dark:text-white">{exercise.name}</h5>
+						<div class="flex justify-between items-center mb-3">
+							<h5 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+								{exercise.name}
+							</h5>
+							<button
+								onclick={() => showStats(exercise)}
+								class="text-blue-600 dark:text-blue-400"
+							>
+								<FileChartBarSolid class="shrink-0 h-6 w-6" />
+							</button>
+						</div>
                         <div class="space-y-3 text-sm">
                             <div>
 								<span class="font-semibold text-gray-600 dark:text-gray-300">Primary Muscles:</span>
@@ -267,7 +277,6 @@
                         </div>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-700 px-6 py-3 flex justify-end space-x-6">
-						<button onclick={() => showStats(exercise)} class="text-sm font-medium text-green-600 dark:text-green-400 hover:underline">Stats</button>
 						<button onclick={() => startEdit(exercise)} class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">Edit</button>
 						<button onclick={() => handleDeleteExercise(exercise.id)} class="text-sm font-medium text-red-600 dark:text-red-400 hover:underline">Delete</button>
                     </div>
