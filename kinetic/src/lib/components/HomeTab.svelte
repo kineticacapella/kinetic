@@ -119,7 +119,7 @@
                 </button>
             </div>
             <div class="p-4 md:p-5">
-                <form class="space-y-4" onsubmit|preventDefault={createMicrocycle}>
+                <form class="space-y-4" on:submit|preventDefault={createMicrocycle}>
                     <div>
                         <label for="microcycle-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
                         <input type="text" id="microcycle-name" bind:value={newMicrocycleName} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="e.g. Deload Week" required>
