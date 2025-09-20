@@ -87,9 +87,9 @@
         {#each microcycles as microcycle (microcycle.id)}
             <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-2 border-blue-700 dark:border-blue-600">
                 <h2 class="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-300">{microcycle.name}</h2>
-                <div class="grid grid-cols-1 md:grid-cols-7 gap-4">
+                <div class="flex overflow-x-auto space-x-4 p-2">
                     {#each getWeekDays(microcycle.startDate) as day}
-                        <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
+                        <div class="flex-shrink-0 w-48 p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
                             <p class="font-semibold text-gray-900 dark:text-white">{day.toLocaleDateString('en-US', { weekday: 'short' })}</p>
                             <p class="text-sm text-gray-500 dark:text-gray-400">{day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                             <div class="mt-4">
