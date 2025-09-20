@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
   import { Modal, initFlowbite } from 'flowbite';
-  import { ChevronLeftOutline, ChevronRightOutline, PlusOutline } from 'flowbite-svelte-icons';
+  import { ChevronLeftOutline, ChevronRightOutline, PlusOutline, TrashBinOutline } from 'flowbite-svelte-icons';
   import { workouts, user } from '$lib/stores';
   import { getWorkouts } from '$lib/supabase';
 
@@ -151,6 +151,11 @@
     workoutModal.hide();
     selectedDay = null;
   }
+
+  function deleteMicrocycle(id: string) {
+    microcycles = microcycles.filter(mc => mc.id !== id);
+    saveMicrocycles();
+  }
 </script>
 
 <div class="container mx-auto p-4 md:p-8">
@@ -169,7 +174,12 @@
     {:else}
         {#each microcycles as microcycle (microcycle.id)}
             <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-2 border-blue-700 dark:border-blue-600">
-                <h2 class="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">{microcycle.name}</h2>
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">{microcycle.name}</h2>
+                    <button onclick={() => deleteMicrocycle(microcycle.id)} class="text-red-500 hover:text-red-700">
+                        <TrashBinOutline class="w-6 h-6" />
+                    </button>
+                </div>
                 <div class="relative">
                     <div bind:this={scrollContainer} onscroll={handleScroll} class="flex overflow-x-auto space-x-4 p-2 scrollbar-hide">
                         {#each microcycle.days as day (day.date)}
