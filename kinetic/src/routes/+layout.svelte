@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { UserSettingsSolid, RefreshOutline, ArrowUpOutline, CheckOutline, ExclamationCircleOutline, HomeSolid, ListOutline, FireSolid, ClockSolid } from 'flowbite-svelte-icons';
 	import '../app.css';
-	import '@fontsource/source-code-pro';
 	import ExercisesTab from '$lib/components/ExercisesTab.svelte';
 	import SettingsTab from '$lib/components/SettingsTab.svelte';
 	import WorkoutsTab from '$lib/components/WorkoutsTab.svelte';
