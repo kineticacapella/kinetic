@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@fontsource/jetbrains-mono':
+        specifier: ^5.2.8
+        version: 5.2.8
       firebase:
         specifier: ^12.2.0
         version: 12.2.0
@@ -236,6 +239,9 @@ packages:
     peerDependencies:
       svelte: ^5.0.0
       tailwindcss: ^4.1.4
+
+  '@fontsource/jetbrains-mono@5.2.8':
+    resolution: {integrity: sha512-6w8/SG4kqvIMu7xd7wt6x3idn1Qux3p9N62s6G3rfldOUYHpWcc2FKrqf+Vo44jRvqWj2oAtTHrZXEP23oSKwQ==}
 
   '@grpc/grpc-js@1.9.15':
     resolution: {integrity: sha512-nqE7Hc0AzI+euzUwDAy0aY5hCp10r734gMGRdU+qOPX0XSceI2ULrcXB5U2xSc5VkWwalCj4M7GzCAygZl2KoQ==}
@@ -809,6 +815,8 @@ snapshots:
       apexcharts: 4.7.0
       svelte: 5.39.2
       tailwindcss: 4.1.13
+
+  '@fontsource/jetbrains-mono@5.2.8': {}
 
   '@grpc/grpc-js@1.9.15':
     dependencies:

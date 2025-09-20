@@ -1,9 +1,10 @@
 @import 'tailwindcss';
 @import 'flowbite/dist/flowbite.css';
+@import '@fontsource/jetbrains-mono';
 
 @layer base {
     body {
-        font-family: "Source Code Pro", monospace;
+        font-family: "JetBrains Mono", monospace;
     }
 }
 

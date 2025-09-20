@@ -6,7 +6,7 @@ export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
 	build: {
 		rollupOptions: {
-			external: ['@fontsource/source-code-pro']
+			external: ['@fontsource/jetbrains-mono']
 		}
 	}
 });
