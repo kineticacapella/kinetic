@@ -527,6 +527,11 @@
 									xaxis: {
 										type: 'datetime',
 										categories: chartLabels,
+										labels: {
+											style: {
+												colors: '#2563eb',
+											},
+										},
 									},
 									tooltip: {
 										x: {
