@@ -110,7 +110,7 @@
                 <div class="relative">
                     <div bind:this={scrollContainer} onscroll={handleScroll} class="flex overflow-x-auto space-x-4 p-2 scrollbar-hide">
                         {#each getWeekDays(microcycle.startDate) as day}
-                            <div class="flex-shrink-0 w-64 p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
+                            <div class="flex-shrink-0 w-96 h-64 p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
                                 <p class="font-semibold text-gray-900 dark:text-white">{day.toLocaleDateString('en-US', { weekday: 'short' })}</p>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">{day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                                 <div class="mt-4">
