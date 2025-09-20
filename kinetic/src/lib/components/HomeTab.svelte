@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { Modal, initFlowbite } from 'flowbite';
+  import { ChevronLeftOutline, ChevronRightOutline } from 'flowbite-svelte-icons';
 
   type Microcycle = {
     id: string;
@@ -13,14 +14,33 @@
   let newMicrocycleStartDate = $state('');
   let modal: Modal;
 
-  onMount(() => {
+  let scrollContainer = $state<HTMLElement | undefined>();
+  let showLeftButton = $state(false);
+  let showRightButton = $state(true);
+
+  onMount(async () => {
     initFlowbite();
     const modalElement = document.getElementById('microcycle-modal');
     if (modalElement) {
       modal = new Modal(modalElement);
     }
     loadMicrocycles();
+    await tick();
+    handleScroll();
   });
+
+  function handleScroll() {
+    if (!scrollContainer) return;
+    const { scrollLeft, scrollWidth, clientWidth } = scrollContainer;
+    showLeftButton = scrollLeft > 0;
+    showRightButton = scrollLeft < scrollWidth - clientWidth;
+  }
+
+  function scroll(direction: 'left' | 'right') {
+    if (!scrollContainer) return;
+    const scrollAmount = direction === 'left' ? -300 : 300; // scroll by 300px
+    scrollContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  }
 
   function loadMicrocycles() {
     const stored = localStorage.getItem('microcycles');
@@ -87,16 +107,28 @@
         {#each microcycles as microcycle (microcycle.id)}
             <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-2 border-blue-700 dark:border-blue-600">
                 <h2 class="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-300">{microcycle.name}</h2>
-                <div class="flex overflow-x-auto space-x-4 p-2">
-                    {#each getWeekDays(microcycle.startDate) as day}
-                        <div class="flex-shrink-0 w-48 p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
-                            <p class="font-semibold text-gray-900 dark:text-white">{day.toLocaleDateString('en-US', { weekday: 'short' })}</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">{day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
-                            <div class="mt-4">
-                                <!-- Workout will be added here later -->
+                <div class="relative">
+                    <div bind:this={scrollContainer} onscroll={handleScroll} class="flex overflow-x-auto space-x-4 p-2 scrollbar-hide">
+                        {#each getWeekDays(microcycle.startDate) as day}
+                            <div class="flex-shrink-0 w-64 p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
+                                <p class="font-semibold text-gray-900 dark:text-white">{day.toLocaleDateString('en-US', { weekday: 'short' })}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">{day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                                <div class="mt-4">
+                                    <!-- Workout will be added here later -->
+                                </div>
                             </div>
-                        </div>
-                    {/each}
+                        {/each}
+                    </div>
+                    {#if showLeftButton}
+                        <button onclick={() => scroll('left')} class="absolute top-1/2 left-0 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 p-2 rounded-full shadow-md">
+                            <ChevronLeftOutline class="w-6 h-6" />
+                        </button>
+                    {/if}
+                    {#if showRightButton}
+                        <button onclick={() => scroll('right')} class="absolute top-1/2 right-0 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 p-2 rounded-full shadow-md">
+                            <ChevronRightOutline class="w-6 h-6" />
+                        </button>
+                    {/if}
                 </div>
             </div>
         {/each}
