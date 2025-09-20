@@ -32,7 +32,7 @@
 		]
 	},
 	"dependencies": {
-		"@fontsource/fira-code": "^5.2.7",
+		"@fontsource/source-code-pro": "^5.2.7",
 		"@supabase/supabase-js": "^2.56.0",
 		"firebase": "^12.2.1"
 	}
