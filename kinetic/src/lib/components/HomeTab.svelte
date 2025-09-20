@@ -7,7 +7,7 @@
 
   type Day = {
     date: string;
-    workoutId: string | null;
+    workoutIds: string[];
   };
 
   type Microcycle = {
@@ -106,7 +106,7 @@
       startDate: newMicrocycleStartDate,
       days: weekDays.map(date => ({
         date: date.toISOString(),
-        workoutId: null,
+        workoutIds: [],
       })),
     };
 
@@ -142,7 +142,7 @@
     microcycles = microcycles.map(mc => {
         const dayIndex = mc.days.findIndex(d => d.date === selectedDay?.date);
         if (dayIndex > -1) {
-            mc.days[dayIndex].workoutId = workoutId;
+            mc.days[dayIndex].workoutIds.push(workoutId);
         }
         return mc;
     });
@@ -150,6 +150,17 @@
     saveMicrocycles();
     workoutModal.hide();
     selectedDay = null;
+  }
+
+  function removeWorkout(day: Day, workoutId: string) {
+    microcycles = microcycles.map(mc => {
+        const dayIndex = mc.days.findIndex(d => d.date === day.date);
+        if (dayIndex > -1) {
+            mc.days[dayIndex].workoutIds = mc.days[dayIndex].workoutIds.filter(id => id !== workoutId);
+        }
+        return mc;
+    });
+    saveMicrocycles();
   }
 
   function deleteMicrocycle(id: string) {
@@ -184,19 +195,35 @@
                     <div bind:this={scrollContainer} onscroll={handleScroll} class="flex overflow-x-auto space-x-4 p-2 scrollbar-hide">
                         {#each microcycle.days as day (day.date)}
                             <div class="relative flex-shrink-0 w-96 h-64 p-4 rounded-lg bg-gray-50 dark:bg-gray-700 flex flex-col border border-gray-200 dark:border-gray-600">
-                                <p class="font-semibold text-gray-900 dark:text-white">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">{new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
-
-                                {#if day.workoutId}
-                                    {@const workout = $workouts.find(w => w.id === day.workoutId)}
-                                    <div class="mt-4 flex-grow flex items-center justify-center">
-                                        <p class="font-semibold text-lg">{workout?.name || 'Workout not found'}</p>
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="font-semibold text-gray-900 dark:text-white">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">{new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                                     </div>
-                                {:else}
-                                    <button onclick={() => openWorkoutModal(day)} class="absolute top-4 right-4 bg-blue-500 hover:bg-blue-600 text-white font-bold p-2 rounded-full">
+                                    <button onclick={() => openWorkoutModal(day)} class="bg-blue-500 hover:bg-blue-600 text-white font-bold p-2 rounded-full">
                                         <PlusOutline class="w-6 h-6" />
                                     </button>
-                                {/if}
+                                </div>
+
+                                <div class="mt-4 flex-grow overflow-y-auto">
+                                    {#if day.workoutIds.length > 0}
+                                        <ul class="space-y-2">
+                                            {#each day.workoutIds as workoutId (workoutId)}
+                                                {@const workout = $workouts.find(w => w.id === workoutId)}
+                                                <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-600 p-2 rounded-lg">
+                                                    <span class="font-semibold text-sm">{workout?.name || 'Workout not found'}</span>
+                                                    <button onclick={() => removeWorkout(day, workoutId)} class="text-red-500 hover:text-red-700">
+                                                        <TrashBinOutline class="w-4 h-4" />
+                                                    </button>
+                                                </li>
+                                            {/each}
+                                        </ul>
+                                    {:else}
+                                        <div class="flex items-center justify-center h-full">
+                                            <p class="text-gray-500">No workouts assigned.</p>
+                                        </div>
+                                    {/if}
+                                </div>
                             </div>
                         {/each}
                     </div>
