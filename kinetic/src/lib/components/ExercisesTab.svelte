@@ -529,7 +529,14 @@
 										categories: chartLabels,
 										labels: {
 											style: {
-												colors: '#2563eb',
+												colors: '#ffffff',
+											},
+										},
+									},
+									yaxis: {
+										labels: {
+											style: {
+												colors: '#ffffff',
 											},
 										},
 									},
