@@ -106,7 +106,7 @@
     {:else}
         {#each microcycles as microcycle (microcycle.id)}
             <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-2 border-blue-700 dark:border-blue-600">
-                <h2 class="text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-300">{microcycle.name}</h2>
+                <h2 class="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">{microcycle.name}</h2>
                 <div class="relative">
                     <div bind:this={scrollContainer} onscroll={handleScroll} class="flex overflow-x-auto space-x-4 p-2 scrollbar-hide">
                         {#each getWeekDays(microcycle.startDate) as day}
