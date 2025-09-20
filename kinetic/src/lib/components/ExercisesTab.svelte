@@ -30,6 +30,7 @@
 	let statsLoading = $state(false);
 	let chartLabels: string[] = $state([]);
 	let chartData: number[] = $state([]);
+	let selectedTimeframe = $state('all');
 
 	async function loadExercises() {
 		if (!$user) return;
@@ -118,11 +119,38 @@
 		modal.show();
 	}
 
-	async function getExerciseStats(exerciseId: string) {
+	async function getExerciseStats(exerciseId: string, timeframe: string) {
 		if (!$user) return;
 		statsLoading = true;
 		try {
-			const workoutLogs = await getWorkoutLogs($user);
+			let startDate: Date | null = null;
+			const now = new Date();
+
+			switch (timeframe) {
+				case '7d':
+					startDate = new Date(now.setDate(now.getDate() - 7));
+					break;
+				case '30d':
+					startDate = new Date(now.setDate(now.getDate() - 30));
+					break;
+				case '90d':
+					startDate = new Date(now.setDate(now.getDate() - 90));
+					break;
+				case '365d':
+					startDate = new Date(now.setDate(now.getDate() - 365));
+					break;
+				case 'all':
+				default:
+					startDate = null; // No date restriction
+					break;
+			}
+
+			let workoutLogs = await getWorkoutLogs($user);
+
+			if (startDate) {
+				workoutLogs = workoutLogs.filter(log => new Date(log.started_at) >= startDate!);
+			}
+
 			const exerciseSets = workoutLogs.flatMap(log => log.sets).filter(set => set.exercise_id === exerciseId);
 
 			const totalSets = exerciseSets.length;
@@ -164,9 +192,14 @@
 
 	function showStats(exercise: Exercise) {
 		selectedExercise = exercise;
-		void getExerciseStats(exercise.id);
 		statsModal.show();
 	}
+
+	$effect(() => {
+		if (selectedExercise) {
+			void getExerciseStats(selectedExercise.id, selectedTimeframe);
+		}
+	});
 
 	async function saveExercise() {
 		exerciseError = '';
@@ -485,6 +518,20 @@
 					{#if statsLoading}
 						<p class="text-gray-500 dark:text-gray-400 mt-2">Loading stats...</p>
 					{:else}
+						<div class="mb-4">
+							<label for="timeframe" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Filter by Timeframe</label>
+							<select
+								id="timeframe"
+								class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+								bind:value={selectedTimeframe}
+							>
+								<option value="all">All Time</option>
+								<option value="7d">Last 7 Days</option>
+								<option value="30d">Last 30 Days</option>
+								<option value="90d">Last 90 Days</option>
+								<option value="365d">Last Year</option>
+							</select>
+						</div>
 						<Tabs tabStyle="underline">
 							<TabItem title="Stats" open>
 								<div class="grid grid-cols-2 gap-4 mt-4">
