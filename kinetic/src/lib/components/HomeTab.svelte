@@ -183,20 +183,20 @@
                 <div class="relative">
                     <div bind:this={scrollContainer} onscroll={handleScroll} class="flex overflow-x-auto space-x-4 p-2 scrollbar-hide">
                         {#each microcycle.days as day (day.date)}
-                            <div class="flex-shrink-0 w-96 h-64 p-4 rounded-lg bg-gray-50 dark:bg-gray-700 flex flex-col">
+                            <div class="relative flex-shrink-0 w-96 h-64 p-4 rounded-lg bg-gray-50 dark:bg-gray-700 flex flex-col border border-gray-200 dark:border-gray-600">
                                 <p class="font-semibold text-gray-900 dark:text-white">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}</p>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">{new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
-                                <div class="mt-4 flex-grow flex items-center justify-center">
-                                    {#if day.workoutId}
-                                        {@const workout = $workouts.find(w => w.id === day.workoutId)}
+
+                                {#if day.workoutId}
+                                    {@const workout = $workouts.find(w => w.id === day.workoutId)}
+                                    <div class="mt-4 flex-grow flex items-center justify-center">
                                         <p class="font-semibold text-lg">{workout?.name || 'Workout not found'}</p>
-                                    {:else}
-                                        <button onclick={() => openWorkoutModal(day)} class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full flex items-center">
-                                            <PlusOutline class="w-6 h-6 mr-2" />
-                                            <span>Add Workout</span>
-                                        </button>
-                                    {/if}
-                                </div>
+                                    </div>
+                                {:else}
+                                    <button onclick={() => openWorkoutModal(day)} class="absolute top-4 right-4 bg-blue-500 hover:bg-blue-600 text-white font-bold p-2 rounded-full">
+                                        <PlusOutline class="w-6 h-6" />
+                                    </button>
+                                {/if}
                             </div>
                         {/each}
                     </div>
