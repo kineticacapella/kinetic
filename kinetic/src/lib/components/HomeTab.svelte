@@ -1,22 +1,46 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
   import { Modal, initFlowbite } from 'flowbite';
-  import { ChevronLeftOutline, ChevronRightOutline } from 'flowbite-svelte-icons';
+  import { ChevronLeftOutline, ChevronRightOutline, PlusOutline } from 'flowbite-svelte-icons';
+  import { workouts, user } from '$lib/stores';
+  import { getWorkouts } from '$lib/supabase';
+
+  type Day = {
+    date: string;
+    workoutId: string | null;
+  };
 
   type Microcycle = {
     id: string;
     name: string;
     startDate: string;
+    days: Day[];
   };
 
   let microcycles = $state<Microcycle[]>([]);
   let newMicrocycleName = $state('');
   let newMicrocycleStartDate = $state('');
   let modal: Modal;
+  let workoutModal: Modal;
+  let selectedDay: Day | null = $state(null);
 
   let scrollContainer = $state<HTMLElement | undefined>();
   let showLeftButton = $state(false);
   let showRightButton = $state(true);
+
+  async function loadWorkouts() {
+    if (!$user) return;
+    try {
+      const data = await getWorkouts($user);
+      workouts.set(data || []);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Error fetching workouts:', error.message);
+      } else {
+        console.error('Unknown error fetching workouts:', error);
+      }
+    }
+  }
 
   onMount(async () => {
     initFlowbite();
@@ -24,9 +48,22 @@
     if (modalElement) {
       modal = new Modal(modalElement);
     }
+    const workoutModalElement = document.getElementById('workout-modal');
+    if (workoutModalElement) {
+        workoutModal = new Modal(workoutModalElement);
+    }
     loadMicrocycles();
+    if ($user) {
+        loadWorkouts();
+    }
     await tick();
     handleScroll();
+  });
+
+  $effect(() => {
+    if ($user) {
+        loadWorkouts();
+    }
   });
 
   function handleScroll() {
@@ -62,10 +99,15 @@
   function createMicrocycle() {
     if (!newMicrocycleName || !newMicrocycleStartDate) return;
 
+    const weekDays = getWeekDays(newMicrocycleStartDate);
     const newMicrocycle: Microcycle = {
       id: crypto.randomUUID(),
       name: newMicrocycleName,
       startDate: newMicrocycleStartDate,
+      days: weekDays.map(date => ({
+        date: date.toISOString(),
+        workoutId: null,
+      })),
     };
 
     microcycles = [...microcycles, newMicrocycle];
@@ -88,6 +130,27 @@
     }
     return week;
   }
+
+  function openWorkoutModal(day: Day) {
+    selectedDay = day;
+    workoutModal.show();
+  }
+
+  function assignWorkout(workoutId: string) {
+    if (!selectedDay) return;
+
+    microcycles = microcycles.map(mc => {
+        const dayIndex = mc.days.findIndex(d => d.date === selectedDay?.date);
+        if (dayIndex > -1) {
+            mc.days[dayIndex].workoutId = workoutId;
+        }
+        return mc;
+    });
+
+    saveMicrocycles();
+    workoutModal.hide();
+    selectedDay = null;
+  }
 </script>
 
 <div class="container mx-auto p-4 md:p-8">
@@ -109,12 +172,20 @@
                 <h2 class="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-300">{microcycle.name}</h2>
                 <div class="relative">
                     <div bind:this={scrollContainer} onscroll={handleScroll} class="flex overflow-x-auto space-x-4 p-2 scrollbar-hide">
-                        {#each getWeekDays(microcycle.startDate) as day}
-                            <div class="flex-shrink-0 w-96 h-64 p-4 rounded-lg bg-gray-50 dark:bg-gray-700">
-                                <p class="font-semibold text-gray-900 dark:text-white">{day.toLocaleDateString('en-US', { weekday: 'short' })}</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">{day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
-                                <div class="mt-4">
-                                    <!-- Workout will be added here later -->
+                        {#each microcycle.days as day (day.date)}
+                            <div class="flex-shrink-0 w-96 h-64 p-4 rounded-lg bg-gray-50 dark:bg-gray-700 flex flex-col">
+                                <p class="font-semibold text-gray-900 dark:text-white">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">{new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                                <div class="mt-4 flex-grow flex items-center justify-center">
+                                    {#if day.workoutId}
+                                        {@const workout = $workouts.find(w => w.id === day.workoutId)}
+                                        <p class="font-semibold text-lg">{workout?.name || 'Workout not found'}</p>
+                                    {:else}
+                                        <button onclick={() => openWorkoutModal(day)} class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full flex items-center">
+                                            <PlusOutline class="w-6 h-6 mr-2" />
+                                            <span>Add Workout</span>
+                                        </button>
+                                    {/if}
                                 </div>
                             </div>
                         {/each}
@@ -135,7 +206,7 @@
     {/if}
 </div>
 
-<!-- Modal -->
+<!-- Microcycle Modal -->
 <div id="microcycle-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-md max-h-full">
         <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -162,6 +233,36 @@
                     </div>
                     <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Create</button>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Workout Selection Modal -->
+<div id="workout-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    Select a Workout
+                </h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="workout-modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <div class="p-4 md:p-5">
+                <ul class="space-y-2">
+                    {#each $workouts.filter(w => w.id) as workout (workout.id)}
+                        <li>
+                            <button onclick={() => assignWorkout(workout.id as string)} class="w-full text-left p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+                                {workout.name}
+                            </button>
+                        </li>
+                    {/each}
+                </ul>
             </div>
         </div>
     </div>
