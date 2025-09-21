@@ -279,7 +279,7 @@
                                         {/if}
                                         {#each day.workoutIds as workoutId (workoutId)}
                                             {@const workout = $workouts.find(w => w.id === workoutId)}
-                                            <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-600 p-2 rounded-lg">
+                                            <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-600 px-2 rounded-lg h-9">
                                                 <button onclick={() => startWorkoutFromHome(workoutId)} class="font-semibold text-sm text-left w-full text-blue-500">{workout?.name || 'Workout not found'}</button>
                                                 <button onclick={() => removeWorkout(day, workoutId)} class="text-red-500 hover:text-red-700">
                                                     <TrashBinOutline class="w-4 h-4" />
@@ -287,7 +287,7 @@
                                             </li>
                                         {/each}
                                         <li>
-                                            <button onclick={() => openWorkoutModal(day)} class="w-full flex items-center justify-center p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-500 dark:text-gray-400">
+                                            <button onclick={() => openWorkoutModal(day)} class="w-full flex items-center justify-center px-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-500 dark:text-gray-400 h-9">
                                                 <PlusOutline class="w-5 h-5" />
                                                 <span class="ml-2 font-semibold">Add Workout</span>
                                             </button>
