@@ -230,8 +230,7 @@
     {:else}
         {#each microcycles as microcycle (microcycle.id)}
             <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-2 border-blue-700 dark:border-blue-600">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center">
+                <div class="flex items-center w-full">
                         <button onclick={() => toggleMicrocycleCollapse(microcycle.id)} type="button" class="mr-4 text-gray-500 dark:text-gray-400">
                             {#if microcycle.isCollapsed}
                                 <ChevronDownOutline class="w-6 h-6" />
@@ -239,17 +238,16 @@
                                 <ChevronUpOutline class="w-6 h-6" />
                             {/if}
                         </button>
-                        <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300">{microcycle.name}</h2>
+                        <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300 flex-grow">{microcycle.name}</h2>
+                        <div class="flex items-center">
+                            <button onclick={() => openEditMicrocycleModal(microcycle)} type="button" class="text-blue-500 hover:text-blue-700 mr-4">
+                                <EditSolid class="shrink-0 h-6 w-6" />
+                            </button>
+                            <button onclick={() => deleteMicrocycle(microcycle.id)} class="text-red-500 hover:text-red-700">
+                                <TrashBinOutline class="w-6 h-6" />
+                            </button>
+                        </div>
                     </div>
-                    <div class="flex items-center">
-                        <button onclick={() => openEditMicrocycleModal(microcycle)} type="button" class="text-blue-500 hover:text-blue-700 mr-4">
-                            <EditSolid class="shrink-0 h-6 w-6" />
-                        </button>
-                        <button onclick={() => deleteMicrocycle(microcycle.id)} class="text-red-500 hover:text-red-700">
-                            <TrashBinOutline class="w-6 h-6" />
-                        </button>
-                    </div>
-                </div>
 
                 {#if microcycle.isCollapsed}
                     {@const totalWorkouts = microcycle.days.reduce((acc, day) => acc + day.workoutIds.length, 0)}
@@ -283,7 +281,7 @@
                                             {#each day.workoutIds as workoutId (workoutId)}
                                                 {@const workout = $workouts.find(w => w.id === workoutId)}
                                                 <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-600 p-2 rounded-lg">
-                                                    <button onclick={() => startWorkoutFromHome(workoutId)} class="font-semibold text-sm text-left w-full text-green-500">{workout?.name || 'Workout not found'}</button>
+                                                    <button onclick={() => startWorkoutFromHome(workoutId)} class="font-semibold text-sm text-left w-full text-blue-500">{workout?.name || 'Workout not found'}</button>
                                                     <button onclick={() => removeWorkout(day, workoutId)} class="text-red-500 hover:text-red-700">
                                                         <TrashBinOutline class="w-4 h-4" />
                                                     </button>
@@ -324,7 +322,7 @@
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                     {editingMicrocycle ? 'Edit Microcycle' : 'New Microcycle'}
                 </h3>
-                <button type="button" class="text-red-500 bg-transparent hover:bg-red-100 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:text-red-400 dark:hover:bg-red-900" data-modal-hide="microcycle-modal">
+                <button type="button" class="text-blue-500 bg-transparent hover:bg-blue-100 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:text-blue-400 dark:hover:bg-blue-900" data-modal-hide="microcycle-modal">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                     </svg>
