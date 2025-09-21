@@ -962,7 +962,7 @@
 												{#if set.myo_rep === 'start'}
 													<span class="text-lg font-bold text-purple-800 dark:text-purple-300">m</span>
 												{:else if set.myo_rep === 'match'}
-													<span class="text-lg font-bold text-purple-800 dark:text-purple-300">mm</span>
+													<span class="text-lg font-bold text-purple-800">mm</span>
 												{/if}
 											</div>
 										</div>
