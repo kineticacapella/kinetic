@@ -287,7 +287,7 @@
                                             </li>
                                         {/each}
                                         <li>
-                                            <button onclick={() => openWorkoutModal(day)} class="w-full flex items-center justify-center p-2 rounded-lg bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400 border-2 border-dashed border-gray-300 dark:border-gray-500">
+                                            <button onclick={() => openWorkoutModal(day)} class="w-full flex items-center justify-center p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-500 dark:text-gray-400">
                                                 <PlusOutline class="w-5 h-5" />
                                                 <span class="ml-2 font-semibold">Add Workout</span>
                                             </button>
