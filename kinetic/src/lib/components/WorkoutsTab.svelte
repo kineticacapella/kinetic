@@ -847,8 +847,8 @@
 				</div>
 
 				<div class="mb-4">
-					<div class="flex justify-between items-center mb-2">
-						<h4 class="text-md font-semibold text-gray-800 dark:text-white">Exercises</h4>
+					<div class="flex justify-end items-center mb-2">
+						
 						<div class="flex items-center gap-2">
 							{#if lastSelectedExercise}
 								<span
