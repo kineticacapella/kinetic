@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { UserSettingsSolid, RefreshOutline, ArrowUpOutline, CheckOutline, ExclamationCircleOutline, HomeSolid, ListOutline, FireSolid, ClockSolid } from 'flowbite-svelte-icons';
+	import { CogSolid, RefreshOutline, ArrowUpOutline, CheckOutline, ExclamationCircleOutline, HomeSolid, ListOutline, FireSolid, ClockSolid } from 'flowbite-svelte-icons';
 	import '../app.css';
 	import ExercisesTab from '$lib/components/ExercisesTab.svelte';
 	import SettingsTab from '$lib/components/SettingsTab.svelte';
@@ -48,7 +48,7 @@
 						{/if}
 					</div>
 					<button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" id="settings-tab" data-tabs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">
-						<UserSettingsSolid class="shrink-0 h-6 w-6" />
+						<CogSolid class="shrink-0 h-6 w-6" />
 					</button>
 				</li>
 			</ul>
