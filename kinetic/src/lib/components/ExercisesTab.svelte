@@ -313,7 +313,7 @@
 								onclick={() => showStats(exercise)}
 								class="text-blue-600 dark:text-blue-400"
 							>
-								<FileChartBarSolid class="shrink-0 h-6 w-6" />
+								<FileChartBarSolid class="shrink-0 h-7 w-7" />
 							</button>
 						</div>
                         <div class="space-y-3 text-sm">
