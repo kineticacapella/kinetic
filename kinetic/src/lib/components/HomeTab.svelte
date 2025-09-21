@@ -270,29 +270,29 @@
                                         <p class="font-semibold text-gray-900 dark:text-white">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}</p>
                                         <p class="text-sm text-gray-500 dark:text-gray-400">{new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                                     </div>
-                                    <button onclick={() => openWorkoutModal(day)} class="bg-blue-500 hover:bg-blue-600 text-white font-bold p-2 rounded-full">
-                                        <PlusOutline class="w-6 h-6" />
-                                    </button>
                                 </div>
 
                                 <div class="mt-4 flex-grow overflow-y-auto">
-                                    {#if day.workoutIds.length > 0}
-                                        <ul class="space-y-2">
-                                            {#each day.workoutIds as workoutId (workoutId)}
-                                                {@const workout = $workouts.find(w => w.id === workoutId)}
-                                                <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-600 p-2 rounded-lg">
-                                                    <button onclick={() => startWorkoutFromHome(workoutId)} class="font-semibold text-sm text-left w-full text-blue-500">{workout?.name || 'Workout not found'}</button>
-                                                    <button onclick={() => removeWorkout(day, workoutId)} class="text-red-500 hover:text-red-700">
-                                                        <TrashBinOutline class="w-4 h-4" />
-                                                    </button>
-                                                </li>
-                                            {/each}
-                                        </ul>
-                                    {:else}
-                                        <div class="flex items-center justify-center h-full">
-                                            <p class="text-gray-500">No workouts assigned.</p>
-                                        </div>
-                                    {/if}
+                                    <ul class="space-y-2">
+                                        {#if day.workoutIds.length === 0}
+                                            <li class="text-center text-gray-500 p-4">No workouts assigned.</li>
+                                        {/if}
+                                        {#each day.workoutIds as workoutId (workoutId)}
+                                            {@const workout = $workouts.find(w => w.id === workoutId)}
+                                            <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-600 p-2 rounded-lg">
+                                                <button onclick={() => startWorkoutFromHome(workoutId)} class="font-semibold text-sm text-left w-full text-blue-500">{workout?.name || 'Workout not found'}</button>
+                                                <button onclick={() => removeWorkout(day, workoutId)} class="text-red-500 hover:text-red-700">
+                                                    <TrashBinOutline class="w-4 h-4" />
+                                                </button>
+                                            </li>
+                                        {/each}
+                                        <li>
+                                            <button onclick={() => openWorkoutModal(day)} class="w-full flex items-center justify-center p-2 rounded-lg bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-500 dark:text-gray-400 border-2 border-dashed border-gray-300 dark:border-gray-500">
+                                                <PlusOutline class="w-5 h-5" />
+                                                <span class="ml-2 font-semibold">Add Workout</span>
+                                            </button>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         {/each}
