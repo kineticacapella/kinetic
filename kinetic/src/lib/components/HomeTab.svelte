@@ -274,9 +274,6 @@
 
                                 <div class="mt-4 flex-grow overflow-y-auto">
                                     <ul class="space-y-2">
-                                        {#if day.workoutIds.length === 0}
-                                            <li class="text-center text-gray-500 p-4">No workouts assigned.</li>
-                                        {/if}
                                         {#each day.workoutIds as workoutId (workoutId)}
                                             {@const workout = $workouts.find(w => w.id === workoutId)}
                                             <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-600 px-2 rounded-lg h-9">
