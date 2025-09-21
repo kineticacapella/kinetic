@@ -38,6 +38,7 @@ export const dropSets = writable([]);
 export const activeWorkout = writable<Workout | null>(null);
 export const activeWorkoutLog = writable<WorkoutLog | null>(null);
 export const sessionTimer = writable<number>(0);
+export const workoutToStart = writable<Workout | null>(null);
 
 export function formatTime(seconds: number) {
 	const minutes = Math.floor(seconds / 60);

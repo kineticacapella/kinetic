@@ -12,7 +12,8 @@
 		formatTime,
 		startSessionTimer,
 		stopSessionTimer,
-		resetSessionTimer
+		resetSessionTimer,
+		workoutToStart
 	} from '$lib/stores';
 	import {
 		getExercises,
@@ -203,6 +204,14 @@
 		if ($user) {
 			void loadExercises();
 			void loadWorkouts();
+		}
+	});
+
+	$effect(() => {
+		const workout = $workoutToStart;
+		if (workout) {
+			startWorkout(workout);
+			workoutToStart.set(null); // Reset the store
 		}
 	});
 

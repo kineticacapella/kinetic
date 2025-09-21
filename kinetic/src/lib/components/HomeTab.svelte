@@ -2,8 +2,9 @@
   import { onMount, tick } from 'svelte';
   import { Modal, initFlowbite } from 'flowbite';
   import { ChevronLeftOutline, ChevronRightOutline, PlusOutline, TrashBinOutline, ChevronDownOutline, ChevronUpOutline, EditSolid } from 'flowbite-svelte-icons';
-  import { workouts, user } from '$lib/stores';
+  import { workouts, user, workoutToStart } from '$lib/stores';
   import { getWorkouts } from '$lib/supabase';
+  import type { Workout } from '$lib/supabase';
 
   type Day = {
     date: string;
@@ -200,6 +201,17 @@
     });
     saveMicrocycles();
   }
+
+  function startWorkoutFromHome(workoutId: string) {
+    const workout = $workouts.find(w => w.id === workoutId);
+    if (workout) {
+        workoutToStart.set(workout as Workout);
+        const tab = document.getElementById('workouts-tab');
+        if (tab) {
+            tab.click();
+        }
+    }
+  }
 </script>
 
 <div class="container mx-auto p-4 md:p-8">
@@ -271,7 +283,7 @@
                                             {#each day.workoutIds as workoutId (workoutId)}
                                                 {@const workout = $workouts.find(w => w.id === workoutId)}
                                                 <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-600 p-2 rounded-lg">
-                                                    <span class="font-semibold text-sm">{workout?.name || 'Workout not found'}</span>
+                                                    <button onclick={() => startWorkoutFromHome(workoutId)} class="font-semibold text-sm text-left w-full">{workout?.name || 'Workout not found'}</button>
                                                     <button onclick={() => removeWorkout(day, workoutId)} class="text-red-500 hover:text-red-700">
                                                         <TrashBinOutline class="w-4 h-4" />
                                                     </button>
