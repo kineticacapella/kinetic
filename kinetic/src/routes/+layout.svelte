@@ -20,7 +20,7 @@
 		<div class="mb-4 border-b border-gray-200 dark:border-gray-700">
 			<ul class="flex flex-wrap -mb-px text-sm font-medium items-center" role="tablist">
 				{#if $activeWorkout}
-					<li class="mr-4">
+					<li class="mr-4 transform -translate-y-1">
 						<div>
 							<div class="font-bold text-sm text-blue-600 dark:text-blue-400">{$activeWorkout.name}</div>
 							<div class="text-xs text-gray-500 dark:text-gray-400">
@@ -35,7 +35,7 @@
 					</li>
 				{/if}
 				
-				<li class="ml-auto flex items-center" role="presentation">
+				<li class="ml-auto flex items-center transform -translate-y-1" role="presentation">
 					<div class="mr-2">
 						{#if $dataStatus === 'loading' || $dataStatus === 'syncing'}
 							<RefreshOutline class="shrink-0 h-6 w-6 text-blue-600 dark:text-blue-400 animate-spin" />
