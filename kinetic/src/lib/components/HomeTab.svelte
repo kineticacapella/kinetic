@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
   import { Modal, initFlowbite } from 'flowbite';
-  import { ChevronLeftOutline, ChevronRightOutline, PlusOutline, TrashBinOutline, ChevronDownOutline, ChevronUpOutline } from 'flowbite-svelte-icons';
+  import { ChevronLeftOutline, ChevronRightOutline, PlusOutline, TrashBinOutline, ChevronDownOutline, ChevronUpOutline, EditSolid } from 'flowbite-svelte-icons';
   import { workouts, user } from '$lib/stores';
   import { getWorkouts } from '$lib/supabase';
 
@@ -24,6 +24,7 @@
   let modal: Modal;
   let workoutModal: Modal;
   let selectedDay: Day | null = $state(null);
+  let editingMicrocycle: Microcycle | null = $state(null);
 
   let scrollContainer = $state<HTMLElement | undefined>();
   let showLeftButton = $state(false);
@@ -92,29 +93,49 @@
   }
 
   function openNewMicrocycleModal() {
+    editingMicrocycle = null;
     newMicrocycleName = '';
     newMicrocycleStartDate = new Date().toISOString().split('T')[0]; // default to today
     modal.show();
   }
 
-  function createMicrocycle() {
+  function openEditMicrocycleModal(microcycle: Microcycle) {
+    editingMicrocycle = microcycle;
+    newMicrocycleName = microcycle.name;
+    newMicrocycleStartDate = microcycle.startDate;
+    modal.show();
+  }
+
+  function saveMicrocycle() {
     if (!newMicrocycleName || !newMicrocycleStartDate) return;
 
-    const weekDays = getWeekDays(newMicrocycleStartDate);
-    const newMicrocycle: Microcycle = {
-      id: crypto.randomUUID(),
-      name: newMicrocycleName,
-      startDate: newMicrocycleStartDate,
-      days: weekDays.map(date => ({
-        date: date.toISOString(),
-        workoutIds: [],
-      })),
-      isCollapsed: false,
-    };
-
-    microcycles = [...microcycles, newMicrocycle];
+    if (editingMicrocycle) {
+        const toUpdate = editingMicrocycle;
+        microcycles = microcycles.map(mc => {
+            if (mc.id === toUpdate.id) {
+                return { ...mc, name: newMicrocycleName, startDate: newMicrocycleStartDate };
+            }
+            return mc;
+        });
+    } else {
+        const weekDays = getWeekDays(newMicrocycleStartDate);
+        const newMicrocycle: Microcycle = {
+          id: crypto.randomUUID(),
+          name: newMicrocycleName,
+          startDate: newMicrocycleStartDate,
+          days: weekDays.map(date => ({
+            date: date.toISOString(),
+            workoutIds: [],
+          })),
+          isCollapsed: false,
+        };
+        microcycles = [...microcycles, newMicrocycle];
+    }
     saveMicrocycles();
     modal.hide();
+    editingMicrocycle = null;
+    newMicrocycleName = '';
+    newMicrocycleStartDate = '';
   }
 
   function getWeekDays(startDate: string): Date[] {
@@ -208,9 +229,14 @@
                         </button>
                         <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300">{microcycle.name}</h2>
                     </div>
-                    <button onclick={() => deleteMicrocycle(microcycle.id)} class="text-red-500 hover:text-red-700">
-                        <TrashBinOutline class="w-6 h-6" />
-                    </button>
+                    <div class="flex items-center">
+                        <button onclick={() => openEditMicrocycleModal(microcycle)} type="button" class="text-blue-500 hover:text-blue-700 mr-4">
+                            <EditSolid class="shrink-0 h-6 w-6" />
+                        </button>
+                        <button onclick={() => deleteMicrocycle(microcycle.id)} class="text-red-500 hover:text-red-700">
+                            <TrashBinOutline class="w-6 h-6" />
+                        </button>
+                    </div>
                 </div>
 
                 {#if microcycle.isCollapsed}
@@ -220,7 +246,7 @@
                         <span class="mx-2">|</span>
                         <span>Starts on {new Date(microcycle.startDate).toLocaleDateString()}</span>
                         <span class="mx-2">|</span>
-                        <span>{totalWorkouts} {totalWorkouts === 1 ? 'workout' : 'workouts'}</span>
+                        <span>{totalWorkouts > 0 ? `${totalWorkouts} ${totalWorkouts === 1 ? 'workout' : 'workouts'}` : 'Empty'}</span>
                     </div>
                 {/if}
 
@@ -284,7 +310,7 @@
         <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                    New Microcycle
+                    {editingMicrocycle ? 'Edit Microcycle' : 'New Microcycle'}
                 </h3>
                 <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="microcycle-modal">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
@@ -294,7 +320,7 @@
                 </button>
             </div>
             <div class="p-4 md:p-5">
-                <form class="space-y-4" onsubmit={(event) => { event.preventDefault(); createMicrocycle(); }}>
+                <form class="space-y-4" onsubmit={(event) => { event.preventDefault(); saveMicrocycle(); }}>
                     <div>
                         <label for="microcycle-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
                         <input type="text" id="microcycle-name" bind:value={newMicrocycleName} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="e.g. Deload Week" required>
@@ -303,7 +329,7 @@
                         <label for="microcycle-start-date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Start Date</label>
                         <input type="date" id="microcycle-start-date" bind:value={newMicrocycleStartDate} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
                     </div>
-                    <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Create</button>
+                    <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{editingMicrocycle ? 'Save Changes' : 'Create'}</button>
                 </form>
             </div>
         </div>
