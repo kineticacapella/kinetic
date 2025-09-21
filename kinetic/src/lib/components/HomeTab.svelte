@@ -171,16 +171,17 @@
 
 <div class="container mx-auto p-4 md:p-8">
     <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Home</h1>
+        
         <button onclick={openNewMicrocycleModal} type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-            Plan Your Week
+            New Microcycle
         </button>
     </div>
 
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Microcycles</h2>
     {#if microcycles.length === 0}
         <div class="text-center p-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
             <h3 class="text-xl font-semibold text-gray-800 dark:text-white">No training weeks planned yet.</h3>
-            <p class="text-gray-500 dark:text-gray-400 mt-2">Click "Plan Your Week" to get started.</p>
+            <p class="text-gray-500 dark:text-gray-400 mt-2">Click "New Microcycle" to get started.</p>
         </div>
     {:else}
         {#each microcycles as microcycle (microcycle.id)}
@@ -249,7 +250,7 @@
         <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                    New Training Week
+                    New Microcycle
                 </h3>
                 <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="microcycle-modal">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
