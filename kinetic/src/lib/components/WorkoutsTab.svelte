@@ -960,7 +960,7 @@
 											</div>
 											<div class="w-5 h-5 ml-1">
 												{#if set.myo_rep === 'start'}
-													<span class="text-lg font-bold text-purple-800 dark:text-purple-300">m</span>
+													<span class="text-lg font-bold text-purple-800">m</span>
 												{:else if set.myo_rep === 'match'}
 													<span class="text-lg font-bold text-purple-800">mm</span>
 												{/if}
