@@ -7,29 +7,30 @@
   import type { Workout } from '$lib/supabase';
 
   type Day = {
-    date: string;
+    dayIndex: number; // 0 for Monday, 6 for Sunday
     workoutIds: string[];
   };
 
   type Microcycle = {
     id: string;
     name: string;
-    startDate: string;
     days: Day[];
     isCollapsed?: boolean;
   };
 
   let microcycles = $state<Microcycle[]>([]);
   let newMicrocycleName = $state('');
-  let newMicrocycleStartDate = $state('');
   let modal: Modal;
   let workoutModal: Modal;
   let selectedDay: Day | null = $state(null);
+  let selectedMicrocycleId: string | null = $state(null);
   let editingMicrocycle: Microcycle | null = $state(null);
 
   let scrollContainer = $state<HTMLElement | undefined>();
   let showLeftButton = $state(false);
   let showRightButton = $state(true);
+  
+  let currentWeekDates = $state<Date[]>([]);
 
   async function loadWorkouts() {
     if (!$user) return;
@@ -47,6 +48,7 @@
 
   onMount(async () => {
     initFlowbite();
+    calculateCurrentWeekDates();
     const modalElement = document.getElementById('microcycle-modal');
     if (modalElement) {
       modal = new Modal(modalElement);
@@ -96,36 +98,32 @@
   function openNewMicrocycleModal() {
     editingMicrocycle = null;
     newMicrocycleName = '';
-    newMicrocycleStartDate = new Date().toISOString().split('T')[0]; // default to today
     modal.show();
   }
 
   function openEditMicrocycleModal(microcycle: Microcycle) {
     editingMicrocycle = microcycle;
     newMicrocycleName = microcycle.name;
-    newMicrocycleStartDate = microcycle.startDate;
     modal.show();
   }
 
   function saveMicrocycle() {
-    if (!newMicrocycleName || !newMicrocycleStartDate) return;
+    if (!newMicrocycleName) return;
 
     if (editingMicrocycle) {
-        const toUpdate = editingMicrocycle;
+        const microcycleToEdit = editingMicrocycle;
         microcycles = microcycles.map(mc => {
-            if (mc.id === toUpdate.id) {
-                return { ...mc, name: newMicrocycleName, startDate: newMicrocycleStartDate };
+            if (mc.id === microcycleToEdit.id) {
+                return { ...mc, name: newMicrocycleName };
             }
             return mc;
         });
     } else {
-        const weekDays = getWeekDays(newMicrocycleStartDate);
         const newMicrocycle: Microcycle = {
           id: crypto.randomUUID(),
           name: newMicrocycleName,
-          startDate: newMicrocycleStartDate,
-          days: weekDays.map(date => ({
-            date: date.toISOString(),
+          days: Array.from({ length: 7 }, (_, i) => ({
+            dayIndex: i, // 0 = Monday, 6 = Sunday
             workoutIds: [],
           })),
           isCollapsed: false,
@@ -136,37 +134,39 @@
     modal.hide();
     editingMicrocycle = null;
     newMicrocycleName = '';
-    newMicrocycleStartDate = '';
   }
 
-  function getWeekDays(startDate: string): Date[] {
-    const start = new Date(startDate);
-    const dayOfWeek = start.getDay(); // 0 (Sun) to 6 (Sat)
+  function calculateCurrentWeekDates() {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 (Sun) to 6 (Sat)
     // Adjust to start the week on Monday
-    const diff = start.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-    const monday = new Date(start.setDate(diff));
+    const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+    const monday = new Date(today.setDate(diff));
 
-    const week = [];
+    const week: Date[] = [];
     for (let i = 0; i < 7; i++) {
       const nextDay = new Date(monday);
       nextDay.setDate(monday.getDate() + i);
       week.push(nextDay);
     }
-    return week;
+    currentWeekDates = week;
   }
 
-  function openWorkoutModal(day: Day) {
+  function openWorkoutModal(day: Day, microcycleId: string) {
     selectedDay = day;
+    selectedMicrocycleId = microcycleId;
     workoutModal.show();
   }
 
   function assignWorkout(workoutId: string) {
-    if (!selectedDay) return;
+    if (!selectedDay || !selectedMicrocycleId) return;
 
     microcycles = microcycles.map(mc => {
-        const dayIndex = mc.days.findIndex(d => d.date === selectedDay?.date);
-        if (dayIndex > -1) {
-            mc.days[dayIndex].workoutIds.push(workoutId);
+        if (mc.id === selectedMicrocycleId) {
+            const day = mc.days.find(d => d.dayIndex === selectedDay?.dayIndex);
+            if (day) {
+                day.workoutIds.push(workoutId);
+            }
         }
         return mc;
     });
@@ -174,13 +174,16 @@
     saveMicrocycles();
     workoutModal.hide();
     selectedDay = null;
+    selectedMicrocycleId = null;
   }
 
-  function removeWorkout(day: Day, workoutId: string) {
+  function removeWorkout(day: Day, workoutId: string, microcycleId: string) {
     microcycles = microcycles.map(mc => {
-        const dayIndex = mc.days.findIndex(d => d.date === day.date);
-        if (dayIndex > -1) {
-            mc.days[dayIndex].workoutIds = mc.days[dayIndex].workoutIds.filter(id => id !== workoutId);
+        if (mc.id === microcycleId) {
+            const dayToUpdate = mc.days.find(d => d.dayIndex === day.dayIndex);
+            if (dayToUpdate) {
+                dayToUpdate.workoutIds = dayToUpdate.workoutIds.filter(id => id !== workoutId);
+            }
         }
         return mc;
     });
@@ -251,10 +254,12 @@
 
                 {#if microcycle.isCollapsed}
                     {@const totalWorkouts = microcycle.days.reduce((acc, day) => acc + day.workoutIds.length, 0)}
+                    {@const startDate = currentWeekDates[0]}
+                    {@const endDate = currentWeekDates[6]}
                     <div class="text-sm text-gray-500 dark:text-gray-400 mt-2 ml-10">
                         <span>{microcycle.days.length} days</span>
                         <span class="mx-2">|</span>
-                        <span>Starts on {new Date(microcycle.startDate).toLocaleDateString()}</span>
+                        <span>{startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}</span>
                         <span class="mx-2">|</span>
                         <span>{totalWorkouts > 0 ? `${totalWorkouts} ${totalWorkouts === 1 ? 'workout' : 'workouts'}` : 'Empty'}</span>
                     </div>
@@ -263,36 +268,39 @@
                 {#if !microcycle.isCollapsed}
                 <div class="relative mt-4">
                     <div bind:this={scrollContainer} onscroll={handleScroll} class="flex overflow-x-auto space-x-4 p-2 scrollbar-hide">
-                        {#each microcycle.days as day (day.date)}
-                            <div class="relative flex-shrink-0 w-96 h-64 p-4 rounded-lg bg-gray-50 dark:bg-gray-700 flex flex-col border border-gray-200 dark:border-gray-600">
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <p class="font-semibold text-gray-900 dark:text-white">{new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}</p>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">{new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                        {#if currentWeekDates.length > 0}
+                            {#each microcycle.days as day (day.dayIndex)}
+                                {@const currentDate = currentWeekDates[day.dayIndex]}
+                                <div class="relative flex-shrink-0 w-96 h-64 p-4 rounded-lg bg-gray-50 dark:bg-gray-700 flex flex-col border border-gray-200 dark:border-gray-600">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="font-semibold text-gray-900 dark:text-white">{currentDate.toLocaleDateString('en-US', { weekday: 'short' })}</p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">{currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="mt-4 flex-grow overflow-y-auto">
-                                    <ul class="space-y-2">
-                                        {#each day.workoutIds as workoutId (workoutId)}
-                                            {@const workout = $workouts.find(w => w.id === workoutId)}
-                                            <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-600 px-2 rounded-lg h-9">
-                                                <button onclick={() => startWorkoutFromHome(workoutId)} class="font-semibold text-sm text-left w-full text-blue-500">{workout?.name || 'Workout not found'}</button>
-                                                <button onclick={() => removeWorkout(day, workoutId)} class="text-red-500 hover:text-red-700">
-                                                    <TrashBinOutline class="w-4 h-4" />
+                                    <div class="mt-4 flex-grow overflow-y-auto">
+                                        <ul class="space-y-2">
+                                            {#each day.workoutIds as workoutId (workoutId)}
+                                                {@const workout = $workouts.find(w => w.id === workoutId)}
+                                                <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-600 px-2 rounded-lg h-9">
+                                                    <button onclick={() => startWorkoutFromHome(workoutId)} class="font-semibold text-sm text-left w-full text-blue-500">{workout?.name || 'Workout not found'}</button>
+                                                    <button onclick={() => removeWorkout(day, workoutId, microcycle.id)} class="text-red-500 hover:text-red-700">
+                                                        <TrashBinOutline class="w-4 h-4" />
+                                                    </button>
+                                                </li>
+                                            {/each}
+                                            <li>
+                                                <button onclick={() => openWorkoutModal(day, microcycle.id)} class="w-full flex items-center justify-center px-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-500 dark:text-gray-400 h-9">
+                                                    <PlusOutline class="w-5 h-5" />
+                                                    <span class="ml-2 font-semibold text-sm">Add Workout</span>
                                                 </button>
                                             </li>
-                                        {/each}
-                                        <li>
-                                            <button onclick={() => openWorkoutModal(day)} class="w-full flex items-center justify-center px-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-500 dark:text-gray-400 h-9">
-                                                <PlusOutline class="w-5 h-5" />
-                                                <span class="ml-2 font-semibold text-sm">Add Workout</span>
-                                            </button>
-                                        </li>
-                                    </ul>
+                                        </ul>
+                                    </div>
                                 </div>
-                            </div>
-                        {/each}
+                            {/each}
+                        {/if}
                     </div>
                     {#if showLeftButton}
                         <button onclick={() => scroll('left')} class="absolute top-1/2 left-0 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 p-2 rounded-full shadow-md">
@@ -331,10 +339,6 @@
                     <div>
                         <label for="microcycle-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
                         <input type="text" id="microcycle-name" bind:value={newMicrocycleName} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="e.g. Deload Week" required>
-                    </div>
-                    <div>
-                        <label for="microcycle-start-date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Start Date</label>
-                        <input type="date" id="microcycle-start-date" bind:value={newMicrocycleStartDate} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
                     </div>
                     <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{editingMicrocycle ? 'Save Changes' : 'Create'}</button>
                 </form>
