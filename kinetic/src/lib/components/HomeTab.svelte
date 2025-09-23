@@ -16,10 +16,12 @@
     name: string;
     days: Day[];
     isCollapsed?: boolean;
+    color?: string;
   };
 
   let microcycles = $state<Microcycle[]>([]);
   let newMicrocycleName = $state('');
+  let newMicrocycleColor = $state('#3b82f6'); // Default to blue
   let modal: Modal;
   let workoutModal: Modal;
   let selectedDay: Day | null = $state(null);
@@ -33,6 +35,18 @@
   let currentWeekDates = $state<Date[]>([]);
 
   const todayString = new Date().toISOString().split('T')[0];
+  const presetColors = [
+    { name: 'Red', hex: '#ef4444' },
+    { name: 'Orange', hex: '#f97316' },
+    { name: 'Amber', hex: '#eab308' },
+    { name: 'Lime', hex: '#84cc16' },
+    { name: 'Green', hex: '#22c55e' },
+    { name: 'Teal', hex: '#14b8a6' },
+    { name: 'Cyan', hex: '#06b6d4' },
+    { name: 'Blue', hex: '#3b82f6' },
+    { name: 'Violet', hex: '#8b5cf6' },
+    { name: 'Fuchsia', hex: '#d946ef' },
+  ];
 
   async function loadWorkouts() {
     if (!$user) return;
@@ -116,12 +130,14 @@
   function openNewMicrocycleModal() {
     editingMicrocycle = null;
     newMicrocycleName = '';
+    newMicrocycleColor = '#3b82f6'; // Default to blue
     modal.show();
   }
 
   function openEditMicrocycleModal(microcycle: Microcycle) {
     editingMicrocycle = microcycle;
     newMicrocycleName = microcycle.name;
+    newMicrocycleColor = microcycle.color || '#3b82f6'; // Fallback to blue
     modal.show();
   }
 
@@ -132,7 +148,7 @@
         const microcycleToEdit = editingMicrocycle;
         microcycles = microcycles.map(mc => {
             if (mc.id === microcycleToEdit.id) {
-                return { ...mc, name: newMicrocycleName };
+                return { ...mc, name: newMicrocycleName, color: newMicrocycleColor };
             }
             return mc;
         });
@@ -145,6 +161,7 @@
             workoutIds: [],
           })),
           isCollapsed: false,
+          color: newMicrocycleColor,
         };
         microcycles = [...microcycles, newMicrocycle];
     }
@@ -250,7 +267,7 @@
         </div>
     {:else}
         {#each microcycles as microcycle (microcycle.id)}
-            <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-2 border-blue-700 dark:border-blue-600">
+            <div class="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-2" style="border-color: {microcycle.color || '#3b82f6'}">
                 <div class="flex items-center w-full">
                         <button onclick={() => toggleMicrocycleCollapse(microcycle.id)} type="button" class="mr-4 text-gray-500 dark:text-gray-400">
                             {#if microcycle.isCollapsed}
@@ -342,7 +359,7 @@
 <!-- Microcycle Modal -->
 <div id="microcycle-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-md max-h-full">
-        <div class="relative bg-white rounded-lg shadow-xl dark:bg-gray-800 border-2 border-blue-700 dark:border-blue-600">
+        <div class="relative bg-white rounded-lg shadow-xl dark:bg-gray-800 border-2" style="border-color: {newMicrocycleColor || '#3b82f6'}">
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                     {editingMicrocycle ? 'Edit Microcycle' : 'New Microcycle'}
@@ -360,6 +377,29 @@
                         <label for="microcycle-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
                         <input type="text" id="microcycle-name" bind:value={newMicrocycleName} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="e.g. Deload Week" required>
                     </div>
+                    <fieldset>
+                        <legend class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Color</legend>
+                        <div class="flex flex-wrap gap-2">
+                            {#each presetColors as color (color.hex)}
+                                <button
+                                    type="button"
+                                    onclick={() => newMicrocycleColor = color.hex}
+                                    class="w-8 h-8 rounded-full border border-gray-300"
+                                    style="background-color: {color.hex}"
+                                    class:ring-2={newMicrocycleColor === color.hex}
+                                    class:ring-offset-2={newMicrocycleColor === color.hex}
+                                    class:ring-gray-800={newMicrocycleColor === color.hex}
+                                    title={color.name}
+                                    aria-label="Select color {color.name}"
+                                ></button>
+                            {/each}
+                        </div>
+                        <div class="mt-4 flex items-center gap-2">
+                             <label for="custom-color-picker" class="text-sm font-medium text-gray-900 dark:text-white">Custom:</label>
+                             <input type="color" id="custom-color-picker" bind:value={newMicrocycleColor} class="p-1 h-10 w-14 block bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none">
+                             <input type="text" bind:value={newMicrocycleColor} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="#RRGGBB">
+                        </div>
+                    </fieldset>
                     <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{editingMicrocycle ? 'Save Changes' : 'Create'}</button>
                 </form>
             </div>
