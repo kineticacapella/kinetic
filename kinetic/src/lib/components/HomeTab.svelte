@@ -87,7 +87,23 @@
   function loadMicrocycles() {
     const stored = localStorage.getItem('microcycles');
     if (stored) {
-      microcycles = JSON.parse(stored);
+      try {
+        const parsed = JSON.parse(stored);
+        // Validate the data structure before loading it into state
+        if (Array.isArray(parsed) && (parsed.length === 0 || (parsed[0].days && parsed[0].days.length > 0 && typeof parsed[0].days[0].dayIndex === 'number'))) {
+          microcycles = parsed;
+        } else {
+          // Data is in an old format or corrupted, clear it
+          console.warn('Old or invalid microcycle data format detected. Clearing localStorage.');
+          localStorage.removeItem('microcycles');
+          microcycles = [];
+        }
+      } catch (e) {
+        console.error('Failed to parse microcycles from localStorage', e);
+        // Clear corrupted data
+        localStorage.removeItem('microcycles');
+        microcycles = [];
+      }
     }
   }
 
