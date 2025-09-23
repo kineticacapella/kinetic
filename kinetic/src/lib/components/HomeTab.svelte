@@ -32,6 +32,8 @@
   
   let currentWeekDates = $state<Date[]>([]);
 
+  const todayString = new Date().toISOString().split('T')[0];
+
   async function loadWorkouts() {
     if (!$user) return;
     try {
@@ -287,7 +289,9 @@
                         {#if currentWeekDates.length > 0}
                             {#each microcycle.days as day (day.dayIndex)}
                                 {@const currentDate = currentWeekDates[day.dayIndex]}
-                                <div class="relative flex-shrink-0 w-96 h-64 p-4 rounded-lg bg-gray-50 dark:bg-gray-700 flex flex-col border border-gray-200 dark:border-gray-600">
+                                {@const isToday = currentDate.toISOString().split('T')[0] === todayString}
+                                {@const borderClass = isToday ? 'border-2 border-green-500' : 'border border-gray-200 dark:border-gray-600'}
+                                <div class="relative flex-shrink-0 w-96 h-64 p-4 rounded-lg bg-gray-50 dark:bg-gray-700 flex flex-col {borderClass}">
                                     <div class="flex justify-between items-start">
                                         <div>
                                             <p class="font-semibold text-gray-900 dark:text-white">{currentDate.toLocaleDateString('en-US', { weekday: 'short' })}</p>
