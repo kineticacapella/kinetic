@@ -254,7 +254,12 @@
 
 <div class="container mx-auto p-4 md:p-8">
     <div class="flex justify-between items-center mb-8">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Microcycles</h2>
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Microcycles</h1>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">
+                Plan your training weeks and assign workouts to specific days.
+            </p>
+        </div>
         <button onclick={openNewMicrocycleModal} type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
             <PlusOutline class="w-6 h-6" />
             <span class="sr-only">New Microcycle</span>
