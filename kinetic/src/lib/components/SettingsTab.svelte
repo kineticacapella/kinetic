@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { user, session } from '$lib/stores';
-	import { supabase, getUserSettings, upsertUserSettings } from '$lib/supabase';
+	import { supabase, getUserSettings, upsertUserSettings, deleteUserAccount } from '$lib/supabase';
+	import { Modal, initFlowbite } from 'flowbite';
 
 	let newExerciseType = $state('');
 	let newEquipmentType = $state('');
@@ -16,6 +17,7 @@
 	let password = $state('');
 	let isSignUp = $state(false);
 	let authError = $state('');
+	let deleteModal: Modal;
 
 
 	async function loadUserSettings() {
@@ -33,11 +35,16 @@
 	}
 
 	onMount(() => {
+		initFlowbite();
 		const { data } = supabase.auth.onAuthStateChange((event, newSession) => {
 			session.set(newSession);
 			user.set(newSession?.user ?? null);
 		});
 		loadUserSettings();
+		const modalElement = document.getElementById('delete-account-modal');
+		if (modalElement) {
+			deleteModal = new Modal(modalElement);
+		}
 	});
 
 	$effect(() => {
@@ -130,6 +137,23 @@
 			console.error('Error signing out:', error.message);
 		}
 	}
+
+	function openDeleteModal() {
+		deleteModal.show();
+	}
+
+	async function deleteAccount() {
+		if (!$user) return;
+		try {
+			await deleteUserAccount($user.id);
+			await signOut();
+		} catch (error) {
+			if (error instanceof Error) {
+				authError = error.message;
+			}
+		}
+		deleteModal.hide();
+	}
 </script>
 
 <div class="container mx-auto p-4 md:p-8">
@@ -150,6 +174,15 @@
 						onclick={signOut}
 						class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800 transition-colors"
 						>Sign Out</button
+					>
+				</div>
+				<div class="mt-8">
+					<h3 class="text-lg font-semibold text-gray-800 dark:text-white">Delete Account</h3>
+					<p class="text-gray-500 dark:text-gray-400 mt-1 mb-4">Permanently delete your account and all of your data. This action is irreversible.</p>
+					<button
+						onclick={openDeleteModal}
+						class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800 transition-colors"
+						>Delete Account</button
 					>
 				</div>
 			{:else}
@@ -183,7 +216,8 @@
 						<button
 							type="submit"
 							class="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800 transition-colors"
-							>Sign Up</button>
+							>Sign Up</button
+						>
 						<button type="button" class="ml-2 text-blue-600 underline" onclick={() => { isSignUp = false; authError = ''; }}>Already have an account? Sign In</button>
 					</form>
 				{:else}
@@ -216,7 +250,8 @@
 						<button
 							type="submit"
 							class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800 transition-colors"
-							>Sign In</button>
+							>Sign In</button
+						>
 						<button type="button" class="ml-2 text-green-600 underline" onclick={() => { isSignUp = true; authError = ''; }}>Need an account? Sign Up</button>
 					</form>
 				{/if}
@@ -287,4 +322,36 @@
 			</form>
 		</div>
 	</div>
+</div>
+
+<!-- Delete Account Modal -->
+<div id="delete-account-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-lg shadow-xl dark:bg-gray-800 border-2 border-red-600">
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Delete Account
+                </h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" onclick={() => deleteModal.hide()}>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <div class="p-4 md:p-5 text-center">
+				<p class="mb-4 text-gray-500 dark:text-gray-400">Are you sure you want to delete your account? All of your data will be permanently removed. This action cannot be undone.</p>
+				<button
+					onclick={deleteAccount}
+					class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800 transition-colors"
+					>Yes, I'm sure</button
+				>
+				<button
+					onclick={() => deleteModal.hide()}
+					class="ml-2 text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+					>No, cancel</button
+				>
+            </div>
+        </div>
+    </div>
 </div>

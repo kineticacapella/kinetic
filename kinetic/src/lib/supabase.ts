@@ -46,6 +46,37 @@ export async function upsertUserSettings(user: User, exercise_types: string[], e
 		if (error) throw error;
 	});
 }
+
+export async function deleteUserAccount(userId: string) {
+    return withStatus('syncing', async () => {
+        // Note: This function requires a Supabase RPC function to be created
+        // to delete the user from auth.users. The RPC function should be called
+        // 'delete_user' and should have the following SQL:
+        //
+        // CREATE OR REPLACE FUNCTION delete_user()
+        // RETURNS void AS $$
+        // BEGIN
+        //   DELETE FROM auth.users WHERE id = auth.uid();
+        // END;
+        // $$ LANGUAGE plpgsql SECURITY DEFINER;
+        //
+        // Also, make sure to enable row level security on all tables and
+        // create policies that only allow users to access their own data.
+
+        const tables = ["workout_logs", "workout_exercises", "workouts", "exercises", "user_settings"];
+        for (const table of tables) {
+            const { error } = await supabase
+                .from(table)
+                .delete()
+                .eq('user_id', userId);
+            if (error) throw error;
+        }
+
+        const { error } = await supabase.rpc('delete_user');
+        if (error) throw error;
+    });
+}
+
 // Exercise CRUD functions
 import type { User } from '@supabase/supabase-js';
 
@@ -283,3 +314,5 @@ export interface WorkoutLog {
     ended_at: string | null; 
     sets: LoggedSet[];
 }
+
+// Add any other Supabase-related code here.
