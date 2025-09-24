@@ -8,15 +8,19 @@
 	import HomeTab from '$lib/components/HomeTab.svelte';
 	import { onMount } from 'svelte';
 	import { initFlowbite } from 'flowbite';
-	import { dataStatus, activeWorkout, activeWorkoutLog, sessionTimer, formatTime } from '$lib/stores';
+	import { dataStatus, activeWorkout, activeWorkoutLog, sessionTimer, formatTime, activeTab } from '$lib/stores';
 
 	onMount(() => {
 		initFlowbite();
 	});
+
+	function switchTab(tab: string) {
+		activeTab.set(tab);
+	}
 </script>
 
 <div class="bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col">
-	<main class="flex-grow container mx-auto px-4 pt-4 pb-20" id="myTab" data-tabs-toggle="#myTabContent">
+	<main class="flex-grow container mx-auto px-4 pt-4 pb-20" id="myTab">
 		<div class="mb-4 border-b border-gray-200 dark:border-gray-700">
 			<ul class="flex flex-wrap -mb-px text-sm font-medium items-center" role="tablist">
 				{#if $activeWorkout}
@@ -47,7 +51,7 @@
 							<ExclamationCircleOutline class="shrink-0 h-6 w-6 text-red-500" />
 						{/if}
 					</div>
-					<button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" id="settings-tab" data-tabs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">
+					<button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" type="button" role="tab" aria-controls="settings" aria-selected={$activeTab === 'settings'} on:click={() => switchTab('settings')}>
 						<CogSolid class="shrink-0 h-6 w-6" />
 					</button>
 				</li>
@@ -55,41 +59,48 @@
 		</div>
 		<div class="fixed bottom-0 left-0 z-50 w-full h-14 bg-white border-t border-gray-200 dark:bg-gray-700 dark:border-gray-600">
 			<div class="grid h-full max-w-lg grid-cols-4 mx-auto font-medium">
-				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500 aria-selected:text-blue-600 aria-selected:dark:text-blue-500" id="home-tab" data-tabs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">
+				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500 aria-selected:text-blue-600 aria-selected:dark:text-blue-500" type="button" role="tab" aria-controls="home" aria-selected={$activeTab === 'home'} on:click={() => switchTab('home')}>
 					<HomeSolid class="w-5 h-5 mb-1" />
 					Home
 				</button>
-				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500 aria-selected:text-blue-600 aria-selected:dark:text-blue-500" id="workouts-tab" data-tabs-target="#workouts" type="button" role="tab" aria-controls="workouts" aria-selected="false">
+				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500 aria-selected:text-blue-600 aria-selected:dark:text-blue-500" type="button" role="tab" aria-controls="workouts" aria-selected={$activeTab === 'workouts'} on:click={() => switchTab('workouts')}>
 					<ListOutline class="w-5 h-5 mb-1" />
 					Workouts
 				</button>
-				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500 aria-selected:text-blue-600 aria-selected:dark:text-blue-500" id="exercises-tab" data-tabs-target="#exercises" type="button" role="tab" aria-controls="exercises" aria-selected="false">
+				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500 aria-selected:text-blue-600 aria-selected:dark:text-blue-500" type="button" role="tab" aria-controls="exercises" aria-selected={$activeTab === 'exercises'} on:click={() => switchTab('exercises')}>
 					<FireSolid class="w-5 h-5 mb-1" />
 					Exercises
 				</button>
-				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500 aria-selected:text-blue-600 aria-selected:dark:text-blue-500" id="history-tab" data-tabs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">
+				<button class="inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group text-sm text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500 aria-selected:text-blue-600 aria-selected:dark:text-blue-500" type="button" role="tab" aria-controls="history" aria-selected={$activeTab === 'history'} on:click={() => switchTab('history')}>
 					<ClockSolid class="w-5 h-5 mb-1" />
 					History
 				</button>
 			</div>
 		</div>
 		<div id="myTabContent">
-			<div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="home" role="tabpanel" aria-labelledby="home-tab">
+			<div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 {$activeTab === 'home' ? '' : 'hidden'}" id="home" role="tabpanel" aria-labelledby="home-tab">
 				<HomeTab />
 			</div>
-			<div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="workouts" role="tabpanel" aria-labelledby="workouts-tab">
+			<div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 {$activeTab === 'workouts' ? '' : 'hidden'}" id="workouts" role="tabpanel" aria-labelledby="workouts-tab">
 				<WorkoutsTab />
 			</div>
-			<div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="exercises" role="tabpanel" aria-labelledby="exercises-tab">
+			<div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 {$activeTab === 'exercises' ? '' : 'hidden'}" id="exercises" role="tabpanel" aria-labelledby="exercises-tab">
 				<ExercisesTab />
 			</div>
-			<div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="history" role="tabpanel" aria-labelledby="history-tab">
+			<div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 {$activeTab === 'history' ? '' : 'hidden'}" id="history" role="tabpanel" aria-labelledby="history-tab">
 				<HistoryTab />
 			</div>
-			<div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+			<div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 {$activeTab === 'settings' ? '' : 'hidden'}" id="settings" role="tabpanel" aria-labelledby="settings-tab">
 				<SettingsTab />
 			</div>
 		</div>
 	</main>
 	<slot />
 </div>
+
+
+<style>
+	:global(body) {
+		overscroll-behavior: none;
+	}
+</style>
