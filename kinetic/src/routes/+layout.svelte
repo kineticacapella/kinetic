@@ -51,7 +51,7 @@
 							<ExclamationCircleOutline class="shrink-0 h-6 w-6 text-red-500" />
 						{/if}
 					</div>
-					<button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" type="button" role="tab" aria-controls="settings" aria-selected={$activeTab === 'settings'} on:click={() => switchTab('settings')}>
+					<button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-500 aria-selected:text-blue-600 aria-selected:dark:text-blue-500" type="button" role="tab" aria-controls="settings" aria-selected={$activeTab === 'settings'} on:click={() => switchTab('settings')}>
 						<CogSolid class="shrink-0 h-6 w-6" />
 					</button>
 				</li>
