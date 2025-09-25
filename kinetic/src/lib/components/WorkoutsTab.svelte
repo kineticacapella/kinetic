@@ -753,12 +753,6 @@
 								>
 									{totalVolume.toLocaleString()} kg
 								</span>
-							{:else}
-								<span
-									class="inline-flex items-center bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-gray-900 dark:text-gray-300"
-								>
-									No reps or weights assigned
-								</span>
 							{/if}
 							{#if hasDropSet}
 								<span
