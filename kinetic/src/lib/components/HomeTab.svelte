@@ -279,13 +279,9 @@
                             {/if}
                         </button>
                         <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300 flex-grow">{microcycle.name}</h2>
-                        <div class="flex items-center">
-                            <button onclick={() => openEditMicrocycleModal(microcycle)} type="button" class="text-blue-500 hover:text-blue-700 mr-4">
-                                <EditSolid class="shrink-0 h-6 w-6" />
-                            </button>
-                            <button onclick={() => deleteMicrocycle(microcycle.id)} class="text-red-500 hover:text-red-700">
-                                <TrashBinOutline class="w-6 h-6" />
-                            </button>
+                        <div class="flex items-center space-x-6">
+                            <button onclick={() => openEditMicrocycleModal(microcycle)} class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">Edit</button>
+                            <button onclick={() => deleteMicrocycle(microcycle.id)} class="text-sm font-medium text-red-600 dark:text-red-400 hover:underline">Delete</button>
                         </div>
                     </div>
 
