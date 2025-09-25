@@ -747,11 +747,19 @@
 						</div>
 
 						<div class="pt-2 min-h-[34px]">
-							<span
-								class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-green-900 dark:text-green-300"
-							>
-								{totalVolume.toLocaleString()} kg
-							</span>
+							{#if totalVolume > 0}
+								<span
+									class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-green-900 dark:text-green-300"
+								>
+									{totalVolume.toLocaleString()} kg
+								</span>
+							{:else}
+								<span
+									class="inline-flex items-center bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-gray-900 dark:text-gray-300"
+								>
+									No reps or weights assigned
+								</span>
+							{/if}
 							{#if hasDropSet}
 								<span
 									class="inline-flex items-center bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300"
