@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
   import { Modal, initFlowbite } from 'flowbite';
-  import { ChevronLeftOutline, ChevronRightOutline, PlusOutline, TrashBinOutline, ChevronDownOutline, ChevronUpOutline, EditSolid } from 'flowbite-svelte-icons';
+  import { ChevronLeftOutline, ChevronRightOutline, PlusOutline, ChevronDownOutline, ChevronUpOutline, EditSolid, CloseCircleSolid } from 'flowbite-svelte-icons';
   import { workouts, user, workoutToStart, activeTab } from '$lib/stores';
   import { getWorkouts } from '$lib/supabase';
   import type { Workout } from '$lib/supabase';
@@ -328,7 +328,7 @@
                                                 <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-600 px-2 rounded-lg h-9">
                                                     <button onclick={() => startWorkoutFromHome(workoutId)} class="font-semibold text-sm text-left w-full text-blue-500">{workout?.name || 'Workout not found'}</button>
                                                     <button onclick={() => removeWorkout(day, workoutId, microcycle.id)} class="text-red-500 hover:text-red-700">
-                                                        <TrashBinOutline class="w-4 h-4" />
+                                                        <CloseCircleSolid class="shrink-0 h-6 w-6" />
                                                     </button>
                                                 </li>
                                             {/each}
