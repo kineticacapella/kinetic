@@ -864,18 +864,30 @@
 					   </div>
 <!-- Note Edit Modal -->
 {#if showNoteModal}
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-	<div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 border-2 border-blue-700 dark:border-blue-600">
-		<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{newWorkoutNote ? 'Edit Note' : 'Add Note'}</h3>
-		<textarea
-			bind:value={tempNote}
-			rows="4"
-			class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white mb-4"
-			placeholder="Add a note for your workout"
-		></textarea>
-		<div class="flex justify-end gap-2">
-			<button type="button" class="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600" onclick={() => showNoteModal = false}>Cancel</button>
-			<button type="button" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700" onclick={() => { newWorkoutNote = tempNote; showNoteModal = false; }}>Save</button>
+<div class="fixed top-0 left-0 right-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full overflow-y-auto overflow-x-hidden bg-gray-900 bg-opacity-50">
+	<div class="relative p-4 w-full max-w-md max-h-full">
+		<div class="relative bg-white rounded-lg shadow-xl dark:bg-gray-800 border-2 border-blue-700 dark:border-blue-600">
+			<div class="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">
+				<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{newWorkoutNote ? 'Edit Note' : 'Add Note'}</h3>
+				<button type="button" class="text-red-500 bg-transparent hover:bg-red-100 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:text-red-400 dark:hover:bg-red-900" onclick={() => showNoteModal = false}>
+					<svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+					</svg>
+					<span class="sr-only">Close modal</span>
+				</button>
+			</div>
+			<div class="p-4">
+				<textarea
+					bind:value={tempNote}
+					rows="4"
+					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white mb-4"
+					placeholder="Add a note for your workout"
+				></textarea>
+				<div class="flex justify-end gap-2">
+					<button type="button" class="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600" onclick={() => showNoteModal = false}>Cancel</button>
+					<button type="button" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700" onclick={() => { newWorkoutNote = tempNote; showNoteModal = false; }}>Save</button>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
