@@ -578,22 +578,13 @@ import '$lib/chart.css';
 													curve: 'smooth',
 												},
 												xaxis: {
-													type: 'category',
+													type: 'datetime',
 													categories: chartLabels,
 													labels: {
-														rotate: -45,
-														hideOverlappingLabels: true,
-														showDuplicates: false,
-														trim: true,
-														minHeight: 20,
-														maxHeight: 40,
 														style: {
 															colors: '#ffffff',
-															fontSize: '10px',
 														},
 													},
-													tickPlacement: 'on',
-													tooltip: { enabled: false },
 												},
 												yaxis: {
 													labels: {
