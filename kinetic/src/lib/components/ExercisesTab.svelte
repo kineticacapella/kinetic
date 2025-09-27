@@ -556,46 +556,59 @@ import '$lib/chart.css';
 							</TabItem>
 							<TabItem title="PR Chart">
 								<div class="w-full max-w-full overflow-x-auto">
-									<div class="min-w-[320px] w-full" style="width:100%;max-width:100%;">
-										<Chart options={{ 
-											series: [
-											{
-												name: 'Max Weight',
-												data: chartData,
-											},
-											],
-											chart: {
-												height: 350,
-												type: 'area',
-											},
-											dataLabels: {
-												enabled: false,
-											},
-											stroke: {
-												curve: 'smooth',
-											},
-											xaxis: {
-												type: 'datetime',
-												categories: chartLabels,
-												labels: {
-													style: {
-														colors: '#ffffff',
+									<div class="min-w-[320px] w-full border-2 border-red-500 bg-yellow-100" style="width:100%;max-width:100%;">
+										{#if chartData && chartData.length > 0}
+											<Chart options={{ 
+												series: [
+												{
+													name: 'Max Weight',
+													data: chartData,
+												},
+												],
+												chart: {
+													height: 350,
+													type: 'area',
+												},
+												dataLabels: {
+													enabled: false,
+												},
+												stroke: {
+													curve: 'smooth',
+												},
+												xaxis: {
+													type: 'datetime',
+													categories: chartLabels,
+													labels: {
+														style: {
+															colors: '#ffffff',
+														},
 													},
 												},
-											},
-											yaxis: {
-												labels: {
-													style: {
-														colors: '#ffffff',
+												yaxis: {
+													labels: {
+														style: {
+															colors: '#ffffff',
+														},
 													},
 												},
-											},
-											tooltip: {
-												x: {
-													format: 'dd/MM/yy',
+												tooltip: {
+													x: {
+														format: 'dd/MM/yy',
+													},
 												},
-											},
-										}} />
+											}} />
+										{:else}
+											<div class="text-center text-red-700 py-4">No chart data available.</div>
+										{/if}
+										<!-- Minimal hardcoded chart for debug -->
+										<div class="mt-4">
+											<Chart options={{
+												series: [{ name: 'Test', data: [1, 2, 3, 4, 5] }],
+												chart: { height: 200, type: 'line' },
+												xaxis: { categories: ['A', 'B', 'C', 'D', 'E'] }
+											}} />
+											<div class="text-xs text-gray-500 text-center">(Debug: Minimal chart should always show)</div>
+										</div>
 									</div>
 								</div>
 							</TabItem>
