@@ -854,10 +854,8 @@
 						/>
 					</div>
 					   <div>
-						   <label id="note-label" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="edit-note-btn">Note</label>
 						   <div class="flex items-center gap-2">
-							   <span class="truncate text-gray-800 dark:text-white text-sm max-w-xs">{newWorkoutNote || 'No note added.'}</span>
-							   <button id="edit-note-btn" aria-labelledby="note-label edit-note-btn" type="button" class="ml-2 px-3 py-1 text-xs rounded bg-blue-600 text-white hover:bg-blue-700" onclick={() => { tempNote = newWorkoutNote; showNoteModal = true; }}>
+							   <button id="edit-note-btn" type="button" class="px-3 py-1 text-xs rounded bg-blue-600 text-white hover:bg-blue-700" onclick={() => { tempNote = newWorkoutNote; showNoteModal = true; }}>
 								   {newWorkoutNote ? 'Edit Note' : 'Add Note'}
 							   </button>
 						   </div>
