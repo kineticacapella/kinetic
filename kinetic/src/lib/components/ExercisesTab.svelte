@@ -555,45 +555,49 @@ import '$lib/chart.css';
 								</div>
 							</TabItem>
 							<TabItem title="PR Chart">
-								<Chart options={{ 
-									series: [
-									{
-										name: 'Max Weight',
-										data: chartData,
-									},
-									],
-									chart: {
-										height: 350,
-										type: 'area',
-									},
-									dataLabels: {
-										enabled: false,
-									},
-									stroke: {
-										curve: 'smooth',
-									},
-									xaxis: {
-										type: 'datetime',
-										categories: chartLabels,
-										labels: {
-											style: {
-												colors: '#ffffff',
+								<div class="w-full max-w-full overflow-x-auto">
+									<div class="min-w-[320px] w-full" style="width:100%;max-width:100%;">
+										<Chart options={{ 
+											series: [
+											{
+												name: 'Max Weight',
+												data: chartData,
 											},
-										},
-									},
-									yaxis: {
-										labels: {
-											style: {
-												colors: '#ffffff',
+											],
+											chart: {
+												height: 350,
+												type: 'area',
 											},
-										},
-									},
-									tooltip: {
-										x: {
-											format: 'dd/MM/yy',
-										},
-									},
-								}} />
+											dataLabels: {
+												enabled: false,
+											},
+											stroke: {
+												curve: 'smooth',
+											},
+											xaxis: {
+												type: 'datetime',
+												categories: chartLabels,
+												labels: {
+													style: {
+														colors: '#ffffff',
+													},
+												},
+											},
+											yaxis: {
+												labels: {
+													style: {
+														colors: '#ffffff',
+													},
+												},
+											},
+											tooltip: {
+												x: {
+													format: 'dd/MM/yy',
+												},
+											},
+										}} />
+									</div>
+								</div>
 							</TabItem>
 						</Tabs>
 					{/if}
