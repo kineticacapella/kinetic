@@ -85,7 +85,7 @@
 	// Add workout state
 	let newWorkoutName = $state('');
 	let newWorkoutNote = $state('');
-	let showNoteModal = $state(false);
+	let editingNote = $state(false);
 	let tempNote = $state('');
 	let newWorkoutExerciseId = $state('');
 	let newWorkoutSets = $state<
@@ -765,8 +765,7 @@
 							{#if hasDropSet}
 								<span
 									class="inline-flex items-center bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300"
-									>Drop Set</span
-								>
+								>Drop Set</span>
 							{/if}
 							{#if hasMyoRep}
 								<span
@@ -857,36 +856,7 @@
 					   <div>
 						   <!-- Button removed from here, will be placed with note display below -->
 					   </div>
-<!-- Note Edit Modal -->
-{#if showNoteModal}
-<div class="fixed top-0 left-0 right-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full overflow-y-auto overflow-x-hidden">
-	<div class="relative p-4 w-full max-w-md max-h-full">
-		<div class="relative bg-white rounded-lg shadow-xl dark:bg-gray-800 border-2 border-blue-700 dark:border-blue-600">
-			<div class="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">
-				<h3 class="text-lg font-semibold text-gray-900 dark:text-white">{newWorkoutNote ? 'Edit Note' : 'Add Note'}</h3>
-				<button type="button" class="text-red-500 bg-transparent hover:bg-red-100 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:text-red-400 dark:hover:bg-red-900" onclick={() => showNoteModal = false}>
-					<svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-					</svg>
-					<span class="sr-only">Close modal</span>
-				</button>
-			</div>
-			<div class="p-4">
-				<textarea
-					bind:value={tempNote}
-					rows="4"
-					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white mb-4"
-					placeholder="Add a note for your workout"
-				></textarea>
-				<div class="flex justify-end gap-2">
-					<button type="button" class="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600" onclick={() => showNoteModal = false}>Cancel</button>
-					<button type="button" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700" onclick={() => { newWorkoutNote = tempNote; showNoteModal = false; }}>Save</button>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-{/if}
+<!-- Note Edit Modal removed: now inline editable -->
 				</div>
 
 				<div class="mb-4">
@@ -933,7 +903,7 @@
 									   type="button"
 									   class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 ml-2"
 									   title="Add Note"
-									   onclick={() => { tempNote = newWorkoutNote; showNoteModal = true; }}
+									   onclick={() => { tempNote = newWorkoutNote; editingNote = true; }}
 								   >
 									   <EditSolid class="shrink-0 h-6 w-6" />
 									   <span class="sr-only">Add Note</span>
@@ -954,10 +924,22 @@
 					   <div class="flex flex-col gap-3">
 						   {#if newWorkoutNote}
 						   <div class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center gap-2">
-							   <button id="edit-note-btn" type="button" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" title="Edit Note" onclick={() => { tempNote = newWorkoutNote; showNoteModal = true; }}>
-								   <EditSolid class="shrink-0 h-6 w-6" />
-							   </button>
-							   <p class="text-sm text-gray-800 dark:text-white mb-0">{newWorkoutNote}</p>
+							   {#if editingNote}
+								   <textarea
+									   bind:value={tempNote}
+									   rows="3"
+									   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white mb-0"
+									   placeholder="Add a note for your workout"
+									   style="min-width: 0; flex: 1 1 0%"
+								   ></textarea>
+								   <button type="button" class="px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 text-xs" onclick={() => { newWorkoutNote = tempNote; editingNote = false; }}>Save</button>
+								   <button type="button" class="px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 text-xs" onclick={() => { editingNote = false; tempNote = newWorkoutNote; }}>Cancel</button>
+							   {:else}
+								   <button id="edit-note-btn" type="button" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" title="Edit Note" onclick={() => { tempNote = newWorkoutNote; editingNote = true; }}>
+									   <EditSolid class="shrink-0 h-6 w-6" />
+								   </button>
+								   <p class="text-sm text-gray-800 dark:text-white mb-0">{newWorkoutNote}</p>
+							   {/if}
 						   </div>
 						   {/if}
 						{#each groupedSets as group (group.exercise_id)}
