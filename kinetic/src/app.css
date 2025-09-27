@@ -1,6 +1,8 @@
+
 @import 'tailwindcss';
 @import 'flowbite/dist/flowbite.css';
 @import '@fontsource/jetbrains-mono';
+@import '@flowbite-svelte-plugins/chart/dist/chart.css';
 
 @layer base {
     body {
