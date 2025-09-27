@@ -28,18 +28,19 @@
 	} from '$lib/supabase';
 	import type { Workout, Exercise, WorkoutExercise, WorkoutLog, LoggedSet } from '$lib/supabase';
 	import {
-		PlusOutline,
-		DotsVerticalOutline,
-		TrashBinOutline,
-		EyeOutline,
-		PenOutline,
-		ArrowDownOutline,
-		CheckOutline,
-		CloseOutline,
-		PauseSolid,
-		HeartSolid,
-		PlaySolid
-	} from 'flowbite-svelte-icons';
+		   PlusOutline,
+		   DotsVerticalOutline,
+		   TrashBinOutline,
+		   EyeOutline,
+		   PenOutline,
+		   ArrowDownOutline,
+		   CheckOutline,
+		   CloseOutline,
+		   PauseSolid,
+		   HeartSolid,
+		   PlaySolid,
+		   EditSolid
+	   } from 'flowbite-svelte-icons';
 	import { user } from '$lib/stores';
 
 	let exercises: Exercise[] = $state([]);
@@ -854,11 +855,7 @@
 						/>
 					</div>
 					   <div>
-						   <div class="flex items-center gap-2">
-							   <button id="edit-note-btn" type="button" class="px-3 py-1 text-xs rounded bg-blue-600 text-white hover:bg-blue-700" onclick={() => { tempNote = newWorkoutNote; showNoteModal = true; }}>
-								   {newWorkoutNote ? 'Edit Note' : 'Add Note'}
-							   </button>
-						   </div>
+						   <!-- Button removed from here, will be placed with note display below -->
 					   </div>
 <!-- Note Edit Modal -->
 {#if showNoteModal}
@@ -942,12 +939,15 @@
 							{/if}
 						</div>
 					</div>
-					<div class="flex flex-col gap-3">
-						{#if newWorkoutNote}
-						<div class="p-3 rounded-lg border border-gray-200 dark:border-gray-700">
-							<p class="text-sm text-gray-800 dark:text-white">{newWorkoutNote}</p>
-						</div>
-						{/if}
+					   <div class="flex flex-col gap-3">
+						   {#if newWorkoutNote}
+						   <div class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center gap-2">
+							   <button id="edit-note-btn" type="button" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" title="Edit Note" onclick={() => { tempNote = newWorkoutNote; showNoteModal = true; }}>
+								   <EditSolid class="shrink-0 h-6 w-6" />
+							   </button>
+							   <p class="text-sm text-gray-800 dark:text-white mb-0">{newWorkoutNote}</p>
+						   </div>
+						   {/if}
 						{#each groupedSets as group (group.exercise_id)}
 							<div
 								class="flex flex-col gap-3 mt-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
