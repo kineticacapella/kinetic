@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
-	import { initFlowbite, Modal, Dropdown } from 'flowbite';
+	import { initFlowbite, Modal } from 'flowbite';
 	import {
 		workoutLogs,
 		workouts,
@@ -83,6 +83,7 @@
 
 	// Add workout state
 	let newWorkoutName = $state('');
+	let newWorkoutNote = $state('');
 	let newWorkoutExerciseId = $state('');
 	let newWorkoutSets = $state<
 		{
@@ -171,6 +172,7 @@
 					if (workoutMode !== 'play') {
 						editingWorkout = null;
 						newWorkoutName = '';
+						newWorkoutNote = '';
 						newWorkoutSets = [];
 						newWorkoutExerciseId = '';
 						workoutMode = 'edit';
@@ -248,6 +250,7 @@
 	function startAdd() {
 		editingWorkout = null;
 		newWorkoutName = '';
+		newWorkoutNote = '';
 		newWorkoutExerciseId = '';
 		newWorkoutSets = [];
 		workoutMode = 'edit';
@@ -441,7 +444,7 @@
 		try {
 			if (currentWorkout && currentWorkout.id) {
 				// Update existing workout
-				await updateWorkout(currentWorkout.id, { name: newWorkoutName });
+				await updateWorkout(currentWorkout.id, { name: newWorkoutName, note: newWorkoutNote });
 
 				// Simple update: delete all exercises and re-add them
 				for (const we of currentWorkout.workout_exercises || []) {
@@ -461,7 +464,7 @@
 				}
 			} else {
 				// Add new workout
-				const newWorkout = await addWorkout({ name: newWorkoutName }, $user);
+				const newWorkout = await addWorkout({ name: newWorkoutName, note: newWorkoutNote }, $user);
 				if (newWorkout && newWorkout.id) {
 					for (const set of newWorkoutSets) {
 						await addExerciseToWorkout({
@@ -530,6 +533,7 @@
 	async function startEdit(workout: Workout) {
 		editingWorkout = workout;
 		newWorkoutName = workout.name;
+		newWorkoutNote = workout.note || '';
 		newWorkoutSets = (workout.workout_exercises || []).map((we: WorkoutExercise) => ({
 			id: we.id || '',
 			exercise_id: we.exercise_id,
@@ -548,6 +552,7 @@
 	async function startWorkout(workout: Workout) {
 		editingWorkout = workout;
 		newWorkoutName = workout.name;
+		newWorkoutNote = workout.note || '';
 		newWorkoutSets = (workout.workout_exercises || []).map((we: WorkoutExercise) => ({
 			id: we.id || '',
 			exercise_id: we.exercise_id,
@@ -734,6 +739,10 @@
 							{/if}
 						</div>
 
+						{#if workout.note}
+						<p class="mb-3 text-sm text-gray-700 dark:text-gray-300">{workout.note}</p>
+						{/if}
+
 						<div class="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
 							<span>&bull; {numExercises} {numExercises === 1 ? 'exercise' : 'exercises'}</span>
 							<span class="mx-1">&bull;</span>
@@ -846,6 +855,20 @@
 							required
 						/>
 					</div>
+					<div>
+						<label
+							for="workout-note"
+							class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+							>Note</label
+						>
+						<textarea
+							id="workout-note"
+							bind:value={newWorkoutNote}
+							rows="2"
+							class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+							placeholder="Add a note for your workout"
+						></textarea>
+					</div>
 				</div>
 
 				<div class="mb-4">
@@ -899,6 +922,11 @@
 						</div>
 					</div>
 					<div class="flex flex-col gap-3">
+						{#if newWorkoutNote}
+						<div class="p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+							<p class="text-sm text-gray-800 dark:text-white">{newWorkoutNote}</p>
+						</div>
+						{/if}
 						{#each groupedSets as group (group.exercise_id)}
 							<div
 								class="flex flex-col gap-3 mt-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700"

@@ -138,6 +138,7 @@ export async function deleteExercise(id: string) {
 export interface Workout {
 	id?: string;
 	name: string;
+	note?: string;
 	user_id?: string;
 	workout_exercises?: WorkoutExercise[]; // This will be populated by a join
 }
