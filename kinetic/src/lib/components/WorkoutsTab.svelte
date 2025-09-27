@@ -931,7 +931,14 @@
 									   placeholder="Add a note for your workout"
 									   style="min-width: 0; flex: 1 1 0%"
 								   ></textarea>
-								   <button type="button" class="px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 text-xs" onclick={() => { newWorkoutNote = tempNote; editingNote = false; }}>Save</button>
+								   <button type="button" class="px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 text-xs" onclick={async () => {
+									   newWorkoutNote = tempNote;
+									   editingNote = false;
+									   if (editingWorkout && editingWorkout.id) {
+										   await updateWorkout(editingWorkout.id, { name: newWorkoutName, note: tempNote });
+										   await loadWorkouts();
+									   }
+								   }}>Save</button>
 								   <button type="button" class="px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 text-xs" onclick={() => { editingNote = false; tempNote = newWorkoutNote; }}>Cancel</button>
 							   {:else}
 								   <button id="edit-note-btn" type="button" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" title={newWorkoutNote ? 'Edit Note' : 'Add Note'} onclick={() => { tempNote = newWorkoutNote; editingNote = true; }}>
