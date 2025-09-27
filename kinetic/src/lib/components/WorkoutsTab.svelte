@@ -739,10 +739,6 @@
 							{/if}
 						</div>
 
-						{#if workout.note}
-						<p class="mb-3 text-sm text-gray-700 dark:text-gray-300">{workout.note}</p>
-						{/if}
-
 						<div class="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
 							<span>&bull; {numExercises} {numExercises === 1 ? 'exercise' : 'exercises'}</span>
 							<span class="mx-1">&bull;</span>
