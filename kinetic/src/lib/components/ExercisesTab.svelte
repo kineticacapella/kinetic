@@ -161,12 +161,15 @@ import '$lib/chart.css';
 
 			stats = { totalSets, totalReps, totalVolume, maxWeight };
 
+
 			const setsByDate = workoutLogs.reduce((acc, log) => {
-				const date = new Date(log.started_at).toLocaleDateString();
-				if (!acc[date]) {
-					acc[date] = [];
+				// Use ISO date string (yyyy-mm-dd) for chart x-axis
+				const date = new Date(log.started_at);
+				const isoDate = date.toISOString().split('T')[0];
+				if (!acc[isoDate]) {
+					acc[isoDate] = [];
 				}
-				acc[date].push(...log.sets.filter(set => set.exercise_id === exerciseId));
+				acc[isoDate].push(...log.sets.filter(set => set.exercise_id === exerciseId));
 				return acc;
 			}, {} as Record<string, LoggedSet[]>);
 
