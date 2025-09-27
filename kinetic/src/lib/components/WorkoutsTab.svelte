@@ -922,7 +922,6 @@
 						</div>
 					</div>
 					   <div class="flex flex-col gap-3">
-						   {#if newWorkoutNote}
 						   <div class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center gap-2">
 							   {#if editingNote}
 								   <textarea
@@ -935,13 +934,12 @@
 								   <button type="button" class="px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 text-xs" onclick={() => { newWorkoutNote = tempNote; editingNote = false; }}>Save</button>
 								   <button type="button" class="px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 text-xs" onclick={() => { editingNote = false; tempNote = newWorkoutNote; }}>Cancel</button>
 							   {:else}
-								   <button id="edit-note-btn" type="button" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" title="Edit Note" onclick={() => { tempNote = newWorkoutNote; editingNote = true; }}>
+								   <button id="edit-note-btn" type="button" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" title={newWorkoutNote ? 'Edit Note' : 'Add Note'} onclick={() => { tempNote = newWorkoutNote; editingNote = true; }}>
 									   <EditSolid class="shrink-0 h-6 w-6" />
 								   </button>
-								   <p class="text-sm text-gray-800 dark:text-white mb-0">{newWorkoutNote}</p>
+								   <p class="text-sm text-gray-800 dark:text-white mb-0">{newWorkoutNote || 'No note added.'}</p>
 							   {/if}
 						   </div>
-						   {/if}
 						{#each groupedSets as group (group.exercise_id)}
 							<div
 								class="flex flex-col gap-3 mt-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
