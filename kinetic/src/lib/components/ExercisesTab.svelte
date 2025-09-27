@@ -1,5 +1,5 @@
 <script lang="ts">
-import '@flowbite-svelte-plugins/chart/dist/chart.css';
+import '$lib/chart.css';
 	import { onMount } from 'svelte';
 	import { initFlowbite, Modal } from 'flowbite';
 	import { user } from '$lib/stores';
