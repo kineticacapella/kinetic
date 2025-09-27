@@ -919,14 +919,26 @@
 										>
 									</button>
 								</span>
-								<button
-									type="button"
-									onclick={addSetForLastSelected}
-									class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-								>
-									<PlusOutline class="w-6 h-6" />
-									<span class="sr-only">Add Set</span>
-								</button>
+								   <button
+									   type="button"
+									   onclick={addSetForLastSelected}
+									   class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+								   >
+									   <PlusOutline class="w-6 h-6" />
+									   <span class="sr-only">Add Set</span>
+								   </button>
+								   {#if !newWorkoutNote}
+								   <button
+									   id="edit-note-btn"
+									   type="button"
+									   class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 ml-2"
+									   title="Add Note"
+									   onclick={() => { tempNote = newWorkoutNote; showNoteModal = true; }}
+								   >
+									   <EditSolid class="shrink-0 h-6 w-6" />
+									   <span class="sr-only">Add Note</span>
+								   </button>
+								   {/if}
 							{:else}
 								<button
 									type="button"
