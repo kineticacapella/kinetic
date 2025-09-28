@@ -1319,22 +1319,30 @@
 						</button>
 					{/each}
 
-					<!-- Add Set row: appears below the grouped sets for this workout -->
+					<!-- Add Set row: full-width 56px tall button with left plus square and label + pill -->
 					<div class="mt-3">
 						<button
 							type="button"
 							onclick={addSetForLastSelected}
-							class="w-full flex items-center justify-center gap-3 text-sm text-gray-700 dark:text-gray-200 bg-white border border-dashed rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-700"
+							class="w-full h-14 box-border flex items-stretch overflow-hidden rounded-lg border border-dashed bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700"
 						>
-							<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-700 text-white">
-								<PlusOutline class="w-5 h-5" />
+							<!-- left square (56x56) -->
+							<span class="w-14 h-14 flex items-center justify-center bg-blue-700 text-white">
+								<PlusOutline class="w-6 h-6" />
 							</span>
-							<span>Add exercise</span>
-							{#if lastSelectedExercise}
-								<span class="inline-flex items-center gap-x-1.5 py-1 px-2 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-500">
-									{lastSelectedExercise.name}
-								</span>
-							{/if}
+							<!-- right content -->
+							<div class="flex-1 flex items-center justify-between px-4">
+								<div class="flex items-center gap-3">
+									<span class="text-sm text-gray-700 dark:text-gray-200">Add exercise</span>
+									{#if lastSelectedExercise}
+										<span class="inline-flex items-center gap-x-1.5 py-1 px-2 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-500">
+											{lastSelectedExercise.name}
+										</span>
+									{/if}
+								</div>
+								<!-- keep empty space at right for balance or future controls -->
+								<div></div>
+							</div>
 						</button>
 					</div>
 				</div>
