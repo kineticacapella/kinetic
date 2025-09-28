@@ -894,7 +894,7 @@
 						   </div>
 						{#each groupedSets as group (group.exercise_id)}
 							<div
-								class="flex flex-col gap-6 mt-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
+								class="flex flex-col gap-6 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
 							>
 								<h5 class="text-md font-semibold text-gray-800 dark:text-white">
 									{group.exercise_name}
@@ -1033,6 +1033,7 @@
 					<div class="mt-6">
 						<button
 							type="button"
+							aria-label={lastSelectedExercise && lastSelectedExercise.name ? `Add set to ${lastSelectedExercise.name}` : 'Select exercise to add set'}
 							onclick={() => {
 								if (lastSelectedExercise && lastSelectedExercise.id) {
 									addSetForLastSelected();
