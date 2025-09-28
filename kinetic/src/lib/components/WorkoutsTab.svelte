@@ -41,6 +41,7 @@
 		   PlaySolid,
 		   EditSolid
 	   } from 'flowbite-svelte-icons';
+	import { CirclePlusSolid } from 'flowbite-svelte-icons';
 	import { user } from '$lib/stores';
 
 	let exercises: Exercise[] = $state([]);
@@ -1048,7 +1049,10 @@
 									<!-- icon removed: spacer kept to preserve alignment -->
 								</div>
 								<div class="text-left flex flex-col justify-center">
-									<div class="text-sm font-medium text-gray-900 dark:text-white">Add set +</div>
+									<div class="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
+										<CirclePlusSolid class="shrink-0 h-6 w-6" />
+										<span>Add Set</span>
+									</div>
 									<div class="text-xs text-gray-500 dark:text-gray-400">Select exercise</div>
 								</div>
 							</div>
