@@ -886,29 +886,22 @@
 											stroke-linecap="round"
 											stroke-linejoin="round"
 											><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg
-										>
+									>
 									</button>
 								</span>
-								   <button
-									   type="button"
-									   onclick={addSetForLastSelected}
-									   class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-								   >
-									   <PlusOutline class="w-6 h-6" />
-									   <span class="sr-only">Add Set</span>
-								   </button>
-								   {#if !newWorkoutNote}
-								   <button
-									   id="edit-note-btn"
-									   type="button"
-									   class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 ml-2"
-									   title="Add Note"
-									   onclick={() => { tempNote = newWorkoutNote; editingNote = true; }}
-								   >
-									   <EditSolid class="shrink-0 h-6 w-6" />
-									   <span class="sr-only">Add Note</span>
-								   </button>
-								   {/if}
+								<!-- small hidden hook removed: full-width Add Set row is used instead -->
+								{#if !newWorkoutNote}
+								<button
+									id="edit-note-btn"
+									type="button"
+									class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 ml-2"
+									title="Add Note"
+									onclick={() => { tempNote = newWorkoutNote; editingNote = true; }}
+								>
+									<EditSolid class="shrink-0 h-6 w-6" />
+									<span class="sr-only">Add Note</span>
+								</button>
+								{/if}
 							{:else}
 								<button
 									type="button"
@@ -1082,6 +1075,34 @@
 								{/each}
 							</div>
 						{/each}
+					</div>
+
+					<!-- Full-width Add Set row -->
+					<div class="mt-4">
+						<button
+							type="button"
+							on:click={addSetForLastSelected}
+							class="w-full flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+							aria-disabled={!lastSelectedExercise}
+							disabled={!lastSelectedExercise}
+						>
+							<div class="flex items-center gap-3">
+								<div class="w-14 h-14 flex items-center justify-center bg-blue-700 text-white rounded-md">
+									<PlusOutline class="w-6 h-6" />
+								</div>
+								<div class="text-left">
+									<div class="text-sm font-medium text-gray-900 dark:text-white">Add Set</div>
+									<div class="text-xs text-gray-500 dark:text-gray-400">Add a new set to the last selected exercise</div>
+								</div>
+							</div>
+							<div>
+								{#if lastSelectedExercise}
+									<span class="inline-flex items-center gap-x-1.5 py-1 px-3 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-500">{lastSelectedExercise.name}</span>
+								{:else}
+									<span class="inline-flex items-center gap-x-1.5 py-1 px-3 rounded-full text-xs font-medium bg-gray-100 text-gray-400">No exercise selected</span>
+								{/if}
+							</div>
+						</button>
 					</div>
 				</div>
 
