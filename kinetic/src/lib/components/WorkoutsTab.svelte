@@ -718,7 +718,7 @@
 				{@const numExercises = new Set((workout.workout_exercises || []).map((e) => e.exercise_id)).size}
 				{@const numSets = (workout.workout_exercises || []).length}
 				<div
-					class="relative flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600 self-start w-96 h-64"
+					class="relative flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600 self-start"
 				>
 					<div class="p-6 flex-grow">
 						<div class="flex justify-between items-center mb-3">

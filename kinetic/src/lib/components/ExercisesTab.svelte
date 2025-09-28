@@ -307,7 +307,7 @@ import '$lib/chart.css';
 	{:else}
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-11">
 			{#each exercises as exercise (exercise.id)}
-                <div class="relative flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600 self-start w-96 h-64">
+				<div class="relative flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600 self-start">
                     <div class="p-6 flex-grow">
 						<div class="flex justify-between items-center mb-3">
 							<h5 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
