@@ -922,12 +922,12 @@
 						</div>
 					</div>
 					   <div class="flex flex-col gap-3">
-						   <div class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center gap-2 box-border h-14">
+						   <div class="p-2 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center gap-2 box-border h-14">
 							   {#if editingNote}
 								   <textarea
 									   bind:value={tempNote}
 									   rows="1"
-									   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2 h-8 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white mb-0 resize-none"
+									   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full box-border h-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white mb-0 resize-none"
 									   placeholder="Add a note for your workout"
 									   style="min-width: 0; flex: 1 1 0%"
 								   ></textarea>
