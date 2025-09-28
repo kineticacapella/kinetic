@@ -1318,6 +1318,25 @@
 							{exercise.name}
 						</button>
 					{/each}
+
+					<!-- Add Set row: appears below the grouped sets for this workout -->
+					<div class="mt-3">
+						<button
+							type="button"
+							onclick={addSetForLastSelected}
+							class="w-full flex items-center justify-center gap-3 text-sm text-gray-700 dark:text-gray-200 bg-white border border-dashed rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-700"
+						>
+							<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-700 text-white">
+								<PlusOutline class="w-5 h-5" />
+							</span>
+							<span>Add exercise</span>
+							{#if lastSelectedExercise}
+								<span class="inline-flex items-center gap-x-1.5 py-1 px-2 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-500">
+									{lastSelectedExercise.name}
+								</span>
+							{/if}
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
