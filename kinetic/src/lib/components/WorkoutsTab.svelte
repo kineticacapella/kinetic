@@ -1042,7 +1042,7 @@
 									addExerciseModal.show();
 								}
 							}}
-							class="w-full flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 box-border h-14 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 px-3"
+							class="w-full flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 box-border h-14 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 px-3.5"
 						>
 							<div class="flex items-center gap-3">
 								<CirclePlusSolid class="shrink-0 h-6 w-6 text-blue-600 dark:text-blue-500" />
