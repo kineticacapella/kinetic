@@ -922,7 +922,7 @@
 						</div>
 					</div>
 					   <div class="flex flex-col gap-3">
-						   <div class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center gap-2">
+						   <div class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center gap-2" class:box-border={!editingNote} class:h-14={!editingNote}>
 							   {#if editingNote}
 								   <textarea
 									   bind:value={tempNote}
@@ -944,7 +944,7 @@
 								   <button id="edit-note-btn" type="button" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" title={newWorkoutNote ? 'Edit Note' : 'Add Note'} onclick={() => { tempNote = newWorkoutNote; editingNote = true; }}>
 									   <EditSolid class="shrink-0 h-6 w-6" />
 								   </button>
-								   <p class="text-sm text-gray-800 dark:text-white mb-0 h-8 flex items-center">{newWorkoutNote || 'No note added.'}</p>
+								   <p class="text-sm text-gray-800 dark:text-white mb-0 flex items-center">{newWorkoutNote || 'No note added.'}</p>
 							   {/if}
 						   </div>
 						{#each groupedSets as group (group.exercise_id)}
