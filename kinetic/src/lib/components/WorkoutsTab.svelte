@@ -863,46 +863,7 @@
 					<div class="flex justify-end items-center mb-2">
 						
 						<div class="flex items-center gap-2">
-							{#if lastSelectedExercise}
-								<span
-									class="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-500"
-								>
-									{lastSelectedExercise.name}
-									<button
-										type="button"
-										aria-label="Remove exercise filter"
-										onclick={() => (lastSelectedExercise = null)}
-										class="flex-shrink-0 h-4 w-4 inline-flex items-center justify-center rounded-full text-blue-600 hover:bg-blue-200 hover:text-blue-800 focus:outline-none focus:bg-blue-200 focus:text-blue-800 dark:text-blue-500 dark:hover:bg-blue-900"
-									>
-										<svg
-											class="flex-shrink-0 h-3 w-3"
-											xmlns="http://www.w3.org/2000/svg"
-											width="24"
-											height="24"
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											stroke-width="2"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg
-									>
-									</button>
-								</span>
-								<!-- small hidden hook removed: full-width Add Set row is used instead -->
-								{#if !newWorkoutNote}
-								<button
-									id="edit-note-btn"
-									type="button"
-									class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 ml-2"
-									title="Add Note"
-									onclick={() => { tempNote = newWorkoutNote; editingNote = true; }}
-								>
-									<EditSolid class="shrink-0 h-6 w-6" />
-									<span class="sr-only">Add Note</span>
-								</button>
-								{/if}
-							{/if}
+							<!-- original last-selected pill and extra add-note button removed; note editing remains in the note area below -->
 						</div>
 					</div>
 					   <div class="flex flex-col gap-3">
@@ -1085,11 +1046,7 @@
 								</div>
 							</div>
 							<div>
-								{#if lastSelectedExercise}
-									<span class="inline-flex items-center gap-x-1.5 py-1 px-3 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-500">{lastSelectedExercise.name}</span>
-								{:else}
-									<span class="inline-flex items-center gap-x-1.5 py-1 px-3 rounded-full text-xs font-medium bg-gray-100 text-gray-400">No exercise selected</span>
-								{/if}
+								<!-- pill removed: no last-selected name shown here -->
 							</div>
 						</button>
 					</div>
