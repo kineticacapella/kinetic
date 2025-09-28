@@ -868,7 +868,7 @@
 						</div>
 					</div>
 					   <div class="flex flex-col gap-6">
-						   <div class="p-2 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center gap-2 box-border h-14">
+						   <div class="px-3.5 py-2 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center gap-2 box-border h-14">
 							   {#if editingNote}
 								   <textarea
 									   bind:value={tempNote}
