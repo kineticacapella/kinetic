@@ -927,7 +927,7 @@
 								   <textarea
 									   bind:value={tempNote}
 									   rows="1"
-									   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 h-14 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white mb-0 resize-none"
+									   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 min-h-[32px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white mb-0 resize-none"
 									   placeholder="Add a note for your workout"
 									   style="min-width: 0; flex: 1 1 0%"
 								   ></textarea>
@@ -944,7 +944,7 @@
 								   <button id="edit-note-btn" type="button" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300" title={newWorkoutNote ? 'Edit Note' : 'Add Note'} onclick={() => { tempNote = newWorkoutNote; editingNote = true; }}>
 									   <EditSolid class="shrink-0 h-6 w-6" />
 								   </button>
-								   <p class="text-sm text-gray-800 dark:text-white mb-0">{newWorkoutNote || 'No note added.'}</p>
+								   <p class="text-sm text-gray-800 dark:text-white mb-0 h-14 flex items-center">{newWorkoutNote || 'No note added.'}</p>
 							   {/if}
 						   </div>
 						{#each groupedSets as group (group.exercise_id)}
