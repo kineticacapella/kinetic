@@ -707,7 +707,7 @@
 			<p class="text-gray-500 dark:text-gray-400 mt-2">Click "Add Workout" to get started.</p>
 		</div>
 	{:else}
-		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-11">
+	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 			{#each $workouts as workout (workout.id)}
 				{@const hasDropSet = (workout.workout_exercises || []).some((ex: WorkoutExercise) => ex.is_drop_set)}
 				{@const hasMyoRep = (workout.workout_exercises || []).some((ex: WorkoutExercise) => ex.myo_rep)}

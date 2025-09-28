@@ -305,7 +305,7 @@ import '$lib/chart.css';
 			<p class="text-gray-500 dark:text-gray-400 mt-2">Click "Add Exercise" to get started.</p>
 		</div>
 	{:else}
-		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-11">
+	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 			{#each exercises as exercise (exercise.id)}
 				<div class="relative flex flex-col bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-lg border-2 border-blue-700 dark:border-blue-600 self-start">
                     <div class="p-6 flex-grow">
