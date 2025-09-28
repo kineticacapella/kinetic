@@ -1043,8 +1043,8 @@
 							class="w-full flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 box-border h-14 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 px-3"
 						>
 							<div class="flex items-center gap-3 h-full">
-								<div class="w-14 h-14 flex items-center justify-center bg-blue-700 text-white rounded-md">
-									<PlusOutline class="w-6 h-6" />
+								<div class="w-14 h-14 flex items-center justify-center rounded-md">
+									<!-- icon removed: spacer kept to preserve alignment -->
 								</div>
 								<div class="text-left flex flex-col justify-center">
 									<div class="text-sm font-medium text-gray-900 dark:text-white">Add Set</div>
