@@ -1044,17 +1044,9 @@
 							}}
 							class="w-full flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 box-border h-14 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 px-3"
 						>
-							<div class="flex items-center gap-3 h-full">
-								<div class="w-14 h-14 flex items-center justify-center rounded-md">
-									<!-- icon removed: spacer kept to preserve alignment -->
-								</div>
-								<div class="text-left flex flex-col justify-center">
-									<div class="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
-										<CirclePlusSolid class="shrink-0 h-6 w-6" />
-										<span>Add Set</span>
-									</div>
-									<div class="text-xs text-gray-500 dark:text-gray-400">Select exercise</div>
-								</div>
+							<div class="flex items-center gap-3">
+								<CirclePlusSolid class="shrink-0 h-6 w-6 text-blue-600 dark:text-blue-500" />
+								<span class="text-sm font-medium text-gray-900 dark:text-white">Add set</span>
 							</div>
 							<div>
 								{#if lastSelectedExercise}
