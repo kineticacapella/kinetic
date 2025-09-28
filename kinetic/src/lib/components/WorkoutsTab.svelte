@@ -866,7 +866,7 @@
 							<!-- original last-selected pill and extra add-note button removed; note editing remains in the note area below -->
 						</div>
 					</div>
-					   <div class="flex flex-col gap-3">
+					   <div class="flex flex-col gap-6">
 						   <div class="p-2 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center gap-2 box-border h-14">
 							   {#if editingNote}
 								   <textarea
@@ -894,14 +894,14 @@
 						   </div>
 						{#each groupedSets as group (group.exercise_id)}
 							<div
-								class="flex flex-col gap-3 mt-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
+								class="flex flex-col gap-6 mt-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
 							>
 								<h5 class="text-md font-semibold text-gray-800 dark:text-white">
 									{group.exercise_name}
 								</h5>
 								{#if group.sets.length > 0}
 									<div
-										class="grid grid-cols-5 gap-3 items-center font-medium text-gray-500 dark:text-gray-400"
+										class="grid grid-cols-5 gap-6 items-center font-medium text-gray-500 dark:text-gray-400"
 									>
 										<div class="text-left"></div>
 										<div class="text-sm text-left">Set</div>
@@ -912,7 +912,7 @@
 								{/if}
 								{#each group.sets as set, i (set.id)}
 									<div
-										class="grid grid-cols-5 gap-3 items-center border border-gray-200 dark:border-gray-700 rounded-lg p-2"
+										class="grid grid-cols-5 gap-6 items-center border border-gray-200 dark:border-gray-700 rounded-lg p-2"
 									>
 										<div class="flex justify-start items-center">
 											<button
@@ -1030,7 +1030,7 @@
 					</div>
 
 					<!-- Full-width Add Set row -->
-					<div class="mt-4">
+					<div class="mt-6">
 						<button
 							type="button"
 							onclick={() => {
@@ -1047,7 +1047,7 @@
 									<!-- icon removed: spacer kept to preserve alignment -->
 								</div>
 								<div class="text-left flex flex-col justify-center">
-									<div class="text-sm font-medium text-gray-900 dark:text-white">Add Set</div>
+									<div class="text-sm font-medium text-gray-900 dark:text-white">Add set +</div>
 									<div class="text-xs text-gray-500 dark:text-gray-400">Select exercise</div>
 								</div>
 							</div>
