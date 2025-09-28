@@ -902,15 +902,6 @@
 									<span class="sr-only">Add Note</span>
 								</button>
 								{/if}
-							{:else}
-								<button
-									type="button"
-									onclick={() => addExerciseModal.show()}
-									class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm text-center inline-flex items-center justify-center w-[42px] h-[42px] dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-								>
-									<PlusOutline class="w-6 h-6" />
-									<span class="sr-only">Add Exercise</span>
-								</button>
 							{/if}
 						</div>
 					</div>
@@ -1083,8 +1074,6 @@
 							type="button"
 							onclick={() => addExerciseModal.show()}
 							class="w-full flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
-							aria-disabled={!lastSelectedExercise}
-							disabled={!lastSelectedExercise}
 						>
 							<div class="flex items-center gap-3">
 								<div class="w-14 h-14 flex items-center justify-center bg-blue-700 text-white rounded-md">
