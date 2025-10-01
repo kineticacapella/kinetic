@@ -902,7 +902,7 @@
 								</h5>
 								{#if group.sets.length > 0}
 									<div
-										class="grid grid-cols-5 gap-6 items-center font-medium text-gray-500 dark:text-gray-400"
+										class="grid grid-cols-5 gap-2 sm:gap-6 items-center font-medium text-gray-500 dark:text-gray-400"
 									>
 										<div class="text-left"></div>
 										<div class="text-sm text-left">Set</div>
@@ -980,7 +980,7 @@
 												type="number"
 												id="weight-{set.id}"
 												bind:value={set.weight}
-												class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-20 p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white {workoutMode === 'play' ? 'opacity-50' : ''}"
+												class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-14 sm:w-20 p-1 sm:p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white {workoutMode === 'play' ? 'opacity-50' : ''}"
 											/>
 										</div>
 										<div class="flex justify-start">
@@ -989,7 +989,7 @@
 												type="number"
 												id="reps-{set.id}"
 												bind:value={set.reps}
-												class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-20 p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white {workoutMode === 'play' ? 'opacity-50' : ''}"
+												class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-14 sm:w-20 p-1 sm:p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white {workoutMode === 'play' ? 'opacity-50' : ''}"
 											/>
 										</div>
 										<div class="flex justify-center">
