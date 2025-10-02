@@ -913,7 +913,7 @@
 								{/if}
 								{#each group.sets as set, i (set.id)}
 									<div
-										class="grid grid-cols-5 gap-2 sm:gap-6 items-center border border-gray-200 dark:border-gray-700 rounded-lg p-1 sm:p-2"
+										class="grid grid-cols-5 gap-2 sm:gap-6 items-center border border-gray-200 dark:border-gray-700 rounded-lg px-1 sm:px-2 box-border h-14"
 									>
 										<div class="flex justify-start items-center">
 											<button
