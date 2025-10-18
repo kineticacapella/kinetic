@@ -285,6 +285,18 @@ import '$lib/chart.css';
 	}
 </script>
 
+<style>
+/* Make selected tab buttons in the stats modal match the app blue color */
+:global(#stats-modal [role="tab"][aria-selected="true"]) {
+	color: #2563eb !important; /* blue-600 */
+}
+
+/* Flowbite underlined tabs use a bottom border; ensure it's blue when selected */
+:global(#stats-modal .underline .tab-item[aria-selected="true"]) {
+	border-bottom-color: #2563eb !important;
+}
+</style>
+
 <div class="container mx-auto p-4 md:p-8">
     <div class="flex justify-between items-center mb-8">
         <div>
