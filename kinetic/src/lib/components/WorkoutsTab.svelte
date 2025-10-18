@@ -1052,14 +1052,16 @@
 								{#if lastSelectedExercise}
 									<span class="inline-flex items-center gap-x-2 py-1 px-3 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-500">
 										<span>{lastSelectedExercise.name}</span>
-										<button
-											type="button"
-											class="ms-2 text-blue-600 hover:text-blue-800 dark:text-blue-400"
+										<span
+											role="button"
+											tabindex="0"
+											class="ms-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 cursor-pointer"
 											onclick={(e) => { e.stopPropagation(); lastSelectedExercise = null; }}
+											onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); lastSelectedExercise = null; } }}
 											aria-label="Clear selected exercise"
 										>
 											&times;
-										</button>
+										</span>
 									</span>
 								{/if}
 							</div>
