@@ -873,8 +873,8 @@
 								   <textarea
 									   bind:value={tempNote}
 									   rows="1"
-									   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full box-border h-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white mb-0 resize-none"
-									   placeholder="Add a note to workout"
+									   class="bg-transparent border-0 text-gray-900 text-sm focus:outline-none block w-full box-border h-full p-0 dark:text-white placeholder-gray-500 mb-0 resize-none"
+									   placeholder="Add a note"
 									   style="min-width: 0; flex: 1 1 0%"
 								   ></textarea>
 								   <button type="button" class="px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700 text-xs" onclick={async () => {
