@@ -610,9 +610,18 @@ import '$lib/chart.css';
 													},
 												},
 												tooltip: {
+													theme: 'dark',
 													x: {
 														show: true,
-														formatter: function(val) { return String(val); },
+														formatter: function(val) {
+															try {
+																const ts = typeof val === 'number' ? val : Number(val);
+																const d = new Date(ts);
+																return d.toLocaleDateString();
+															} catch (e) {
+																return String(val);
+															}
+														},
 													},
 												},
 												grid: {
