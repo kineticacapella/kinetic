@@ -174,21 +174,20 @@ import '$lib/chart.css';
 			}, {} as Record<string, LoggedSet[]>);
 
 			const dates = Object.keys(setsByDate).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+			// Only include dates that are true PRs (strictly greater than any previous max)
 			let currentPr = 0;
-			const prData = dates.map(date => {
+			const prPairs: { date: string; pr: number }[] = [];
+			for (const date of dates) {
 				const sets = setsByDate[date];
 				const maxWeightForDay = sets.reduce((max, set) => Math.max(max, set.weight), 0);
 				if (maxWeightForDay > currentPr) {
 					currentPr = maxWeightForDay;
+					prPairs.push({ date, pr: currentPr });
 				}
-				return currentPr;
-			});
+			}
 
-			// Remove entries where the progressive PR is 0 so the chart doesn't show empty/zero points
-			const paired = dates.map((d, i) => ({ date: d, pr: prData[i] }));
-			const filtered = paired.filter(p => p.pr > 0);
-			chartLabels = filtered.map(p => p.date);
-			chartData = filtered.map(p => p.pr);
+			chartLabels = prPairs.map(p => p.date);
+			chartData = prPairs.map(p => p.pr);
 
 		} catch (error) {
 			console.error('Error fetching exercise stats:', error);
