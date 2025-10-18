@@ -184,8 +184,11 @@ import '$lib/chart.css';
 				return currentPr;
 			});
 
-			chartLabels = dates;
-			chartData = prData;
+			// Remove entries where the progressive PR is 0 so the chart doesn't show empty/zero points
+			const paired = dates.map((d, i) => ({ date: d, pr: prData[i] }));
+			const filtered = paired.filter(p => p.pr > 0);
+			chartLabels = filtered.map(p => p.date);
+			chartData = filtered.map(p => p.pr);
 
 		} catch (error) {
 			console.error('Error fetching exercise stats:', error);
