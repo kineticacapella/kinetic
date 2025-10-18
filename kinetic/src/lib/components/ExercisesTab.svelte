@@ -586,48 +586,38 @@ import '$lib/chart.css';
 													type: 'area',
 													zoom: { enabled: false },
 													toolbar: { show: false },
+													background: 'transparent',
 												},
-												dataLabels: {
-													enabled: false,
+												dataLabels: { enabled: false },
+												colors: ['#2563eb'],
+												fill: {
+													type: 'gradient',
+													gradient: {
+														shade: 'light',
+														type: 'vertical',
+														shadeIntensity: 0.2,
+														gradientToColors: ['#93c5fd'],
+														inverseColors: false,
+														opacityFrom: 0.65,
+														opacityTo: 0.08
+													}
 												},
-												stroke: {
-													curve: 'smooth',
-												},
+												stroke: { curve: 'smooth', width: 4 },
+												markers: { size: 4, colors: ['#ffffff'], strokeColors: '#2563eb', strokeWidth: 2, hover: { size: 6 } },
+												legend: { show: false },
 												xaxis: {
 													type: 'datetime',
 													categories: chartLabels,
 													labels: {
 														style: {
-															colors: '#ffffff',
+															colors: '#6b7280', /* tailwind gray-500 for balance */
+															fontSize: '12px'
 														},
 													},
 												},
-												yaxis: {
-													labels: {
-														style: {
-															colors: '#ffffff',
-															fontSize: '12px',
-														},
-													},
-												},
-												tooltip: {
-													theme: 'dark',
-													x: {
-														show: true,
-														formatter: function(val) {
-															try {
-																const ts = typeof val === 'number' ? val : Number(val);
-																const d = new Date(ts);
-																return d.toLocaleDateString();
-															} catch (e) {
-																return String(val);
-															}
-														},
-													},
-												},
-												grid: {
-													padding: { left: 10, right: 10 },
-												},
+												yaxis: { labels: { style: { colors: '#6b7280', fontSize: '12px' } } },
+												tooltip: { theme: 'dark', x: { show: true, formatter: function(val) { try { const ts = typeof val === 'number' ? val : Number(val); const d = new Date(ts); return d.toLocaleDateString(); } catch (e) { return String(val); } } } },
+												grid: { show: false, padding: { left: 6, right: 6 } },
 												responsive: [
 													{
 														breakpoint: 600,
