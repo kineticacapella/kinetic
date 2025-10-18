@@ -582,6 +582,7 @@ import '$lib/chart.css';
 												],
 												chart: {
 													height: 350,
+													fontFamily: 'JetBrains Mono, monospace',
 													type: 'area',
 													zoom: { enabled: false },
 													toolbar: { show: false },
