@@ -156,10 +156,10 @@
   }
 </style>
 
-<div class="mb-6">
+<div class="mb-6 border-2 border-gray-300 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
   <div class="flex items-center justify-between mb-2">
     <div class="flex items-center gap-3">
-      <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Activity</h3>
+    <h3 class="text-2xl font-bold text-gray-800 dark:text-white">Activity</h3>
       <button class="text-sm px-2 py-1 rounded border bg-gray-50 dark:bg-gray-700" on:click={toggleView} aria-pressed={viewMode === 'weeks52'} aria-label="Toggle month / 52-week view">{viewMode === 'month' ? 'Month' : '52w'}</button>
     </div>
 
@@ -173,7 +173,7 @@
     {/if}
   </div>
 
-  <div class="grid-scroll border rounded-lg p-3 bg-white dark:bg-gray-800">
+  <div class="grid-scroll">
     <div class="flex gap-2" style="padding-bottom: 6px;">
       {#each columns as col, colIndex}
         <div class="column" style="gap: {gap}px;">
