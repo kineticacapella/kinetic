@@ -1,8 +1,8 @@
 <script lang="ts">
   import type { WorkoutLog } from '$lib/supabase';
   export let logs: WorkoutLog[] = [];
-  export let squareSize = 12; // px
-  export let gap = 4; // px
+  export let squareSize = 14; // px
+  export let gap = 6; // px
 
   // allow switching back to the previous 52-week view
   export let weeks = 52;
@@ -130,7 +130,8 @@
     return 3;
   }
 
-  const colorClasses = ['bg-gray-200 dark:bg-gray-700', 'bg-green-200 dark:bg-green-700', 'bg-green-500 dark:bg-green-500', 'bg-green-800 dark:bg-green-400'];
+  // Use blue palette consistent with the rest of the UI (matches other blue accents)
+  const colorClasses = ['bg-gray-200 dark:bg-gray-700', 'bg-blue-200 dark:bg-blue-700', 'bg-blue-500 dark:bg-blue-500', 'bg-blue-800 dark:bg-blue-400'];
 
   function infoFor(day: Date) {
     const key = dateKey(day);
