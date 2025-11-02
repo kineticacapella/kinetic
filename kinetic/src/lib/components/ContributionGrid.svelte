@@ -130,8 +130,14 @@
     return 3;
   }
 
-  // Use blue palette consistent with the rest of the UI (matches other blue accents)
-  const colorClasses = ['bg-gray-200 dark:bg-gray-700', 'bg-blue-200 dark:bg-blue-700', 'bg-blue-500 dark:bg-blue-500', 'bg-blue-800 dark:bg-blue-400'];
+  // Blue palette: increase intensity left-to-right (less -> more)
+  // Keep gray for zero activity, then ascending blues for intensity.
+  const colorClasses = [
+    'bg-gray-200 dark:bg-gray-700',
+    'bg-blue-100 dark:bg-blue-900',
+    'bg-blue-400 dark:bg-blue-600',
+    'bg-blue-700 dark:bg-blue-400'
+  ];
 
   function infoFor(day: Date) {
     const key = dateKey(day);
