@@ -11,9 +11,52 @@
     viewMode = viewMode === 'month' ? 'weeks52' : 'month';
   }
 
+  import { onMount, onDestroy } from 'svelte';
+
   // Selected month (view). Default to current month.
   let selectedMonth = new Date();
   selectedMonth.setDate(1);
+
+  // Custom month picker state
+  let showMonthPicker = false;
+  let pickerRef: HTMLElement | null = null;
+  const monthNames = [
+    'January','February','March','April','May','June','July','August','September','October','November','December'
+  ];
+
+  // choose a reasonable year window around the current year
+  $: {
+    const y = selectedMonth.getFullYear();
+    const range = 5; // years before and after
+    years = [] as number[];
+    for (let i = y - range; i <= y + range; i++) years.push(i);
+  }
+  let years: number[] = [];
+  let selectedYear = selectedMonth.getFullYear();
+  const yearSelectId = `contrib-year-select-${Math.random().toString(36).slice(2,8)}`;
+
+  function setMonthYear(monthIndex: number, year: number) {
+    selectedMonth = new Date(year, monthIndex, 1);
+    showMonthPicker = false;
+  }
+
+  function togglePicker() {
+    showMonthPicker = !showMonthPicker;
+  }
+
+  function outsideClick(e: MouseEvent) {
+    if (!pickerRef) return;
+    const path = e.composedPath ? e.composedPath() : (e as any).path || [];
+    if (path && path.indexOf(pickerRef) === -1) {
+      showMonthPicker = false;
+    } else if (!path) {
+      // fallback
+      if (!pickerRef.contains(e.target as Node)) showMonthPicker = false;
+    }
+  }
+
+  onMount(() => document.addEventListener('click', outsideClick));
+  onDestroy(() => document.removeEventListener('click', outsideClick));
 
   function monthLabel(d: Date) {
     return d.toLocaleString(undefined, { month: 'long', year: 'numeric' });
@@ -175,7 +218,38 @@
         <button class="px-2 py-1 rounded border bg-gray-100 dark:bg-gray-700" on:click={prevMonth} aria-label="Previous month">◀</button>
         <div class="text-sm text-gray-700 dark:text-gray-200 font-medium">{monthLabel(selectedMonth)}</div>
         <button class="px-2 py-1 rounded border bg-gray-100 dark:bg-gray-700" on:click={nextMonth} aria-label="Next month">▶</button>
-        <input type="month" class="ml-2 text-sm bg-transparent text-gray-700 dark:text-gray-200" bind:value={monthValue} on:change={onMonthInput} aria-label="Select month" />
+        <!-- Custom month picker (styled) -->
+        <div class="ml-2 relative" bind:this={pickerRef}>
+          <button class="text-sm flex items-center gap-2 px-3 py-1 border rounded bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200" on:click={togglePicker} aria-haspopup="dialog" aria-expanded={showMonthPicker}>
+            <span>{monthLabel(selectedMonth)}</span>
+            <svg class="w-3 h-3" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+          </button>
+
+          {#if showMonthPicker}
+            <div class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-700 border rounded shadow-lg z-10 p-2">
+              <div class="grid grid-cols-3 gap-1">
+                {#each monthNames as m, idx}
+                  <button class="text-sm text-left px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-600 {selectedMonth.getMonth() === idx ? 'font-semibold underline' : ''}"
+                    on:click={() => setMonthYear(idx, selectedMonth.getFullYear())}>
+                    {m}
+                  </button>
+                {/each}
+              </div>
+              <div class="mt-2">
+                <label class="sr-only" for={yearSelectId}>Year</label>
+                <div class="flex gap-1 items-center">
+                  <button class="px-2 py-1 border rounded bg-gray-50 dark:bg-gray-800" on:click={() => setMonthYear(selectedMonth.getMonth(), selectedMonth.getFullYear() - 1)} aria-label="Previous year">«</button>
+                  <select id={yearSelectId} class="flex-1 px-2 py-1 border rounded bg-white dark:bg-gray-700 text-sm" bind:value={selectedYear} on:change={() => setMonthYear(selectedMonth.getMonth(), +selectedYear)}>
+                    {#each years as y}
+                      <option value={y} selected={y === selectedMonth.getFullYear()}>{y}</option>
+                    {/each}
+                  </select>
+                  <button class="px-2 py-1 border rounded bg-gray-50 dark:bg-gray-800" on:click={() => setMonthYear(selectedMonth.getMonth(), selectedMonth.getFullYear() + 1)} aria-label="Next year">»</button>
+                </div>
+              </div>
+            </div>
+          {/if}
+        </div>
       </div>
     {:else}
       <div class="text-sm text-gray-500 dark:text-gray-300">Last {weeks} weeks</div>
