@@ -134,9 +134,9 @@
   // Keep gray for zero activity, then ascending blues for intensity.
   const colorClasses = [
     'bg-gray-200 dark:bg-gray-700',
-    'bg-blue-100 dark:bg-blue-900',
+    'bg-blue-100 dark:bg-blue-400',
     'bg-blue-400 dark:bg-blue-600',
-    'bg-blue-700 dark:bg-blue-400'
+    'bg-blue-700 dark:bg-blue-900'
   ];
 
   function infoFor(day: Date) {
