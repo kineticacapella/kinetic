@@ -82,6 +82,11 @@
             <p class="text-gray-500 dark:text-gray-400 mt-2">Complete a workout to see it here.</p>
         </div>
     {:else}
+        <!-- Contribution / activity calendar -->
+        <div class="mb-6">
+            <ContributionGrid logs={history} />
+        </div>
+
         <div
             role="button"
             tabindex="0"
@@ -94,11 +99,6 @@
                 <span class="ml-4 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-sm font-semibold px-2.5 py-0.5 rounded-full">{history.length}</span>
             </div>
             <svg class="w-6 h-6 text-gray-500 dark:text-gray-400 transform transition-transform {logsVisible ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </div>
-
-        <!-- Contribution / activity calendar -->
-        <div class="mb-6">
-            <ContributionGrid logs={history} />
         </div>
 
         
