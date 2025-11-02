@@ -23,13 +23,7 @@
     selectedMonth = new Date(pickerDate.getFullYear(), pickerDate.getMonth(), 1);
   }
 
-  function monthLabel(d: Date) {
-    return d.toLocaleString(undefined, { month: 'long', year: 'numeric' });
-  }
-
-  function prevMonth() {
-    selectedMonth = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() - 1, 1);
-  }
+  // month label helper removed — Datepicker used for selection
   function nextMonth() {
     selectedMonth = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 1);
   }
@@ -171,12 +165,9 @@
 
     {#if viewMode === 'month'}
       <div class="flex items-center gap-2">
-        <button class="px-2 py-1 rounded border bg-gray-100 dark:bg-gray-700" on:click={prevMonth} aria-label="Previous month">◀</button>
-        <div class="text-sm text-gray-700 dark:text-gray-200 font-medium">{monthLabel(selectedMonth)}</div>
-        <button class="px-2 py-1 rounded border bg-gray-100 dark:bg-gray-700" on:click={nextMonth} aria-label="Next month">▶</button>
-        <!-- Flowbite Datepicker -->
-        <Datepicker bind:value={pickerDate} class="ml-2" />
-      </div>
+          <!-- Flowbite Datepicker only -->
+          <Datepicker bind:value={pickerDate} class="ml-2" />
+        </div>
     {:else}
       <div class="text-sm text-gray-500 dark:text-gray-300">Last {weeks} weeks</div>
     {/if}
