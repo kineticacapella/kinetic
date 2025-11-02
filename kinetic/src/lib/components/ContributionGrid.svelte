@@ -156,48 +156,52 @@
   }
 </style>
 
-<div class="mb-6 border-2 border-gray-300 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
+<div class="mb-6">
+  <!-- Header: Activity title + controls (outside the card) -->
   <div class="flex items-center justify-between mb-2">
     <div class="flex items-center gap-3">
-    <h3 class="text-2xl font-bold text-gray-800 dark:text-white">Activity</h3>
+      <h3 class="text-2xl font-bold text-gray-800 dark:text-white">Activity</h3>
       <button class="text-sm px-2 py-1 rounded border bg-gray-50 dark:bg-gray-700" on:click={toggleView} aria-pressed={viewMode === 'weeks52'} aria-label="Toggle month / 52-week view">{viewMode === 'month' ? 'Month' : '52w'}</button>
     </div>
 
     {#if viewMode === 'month'}
       <div class="flex items-center gap-2">
-          <!-- Flowbite Datepicker only -->
-          <Datepicker bind:value={pickerDate} class="ml-2" />
-        </div>
+        <!-- Flowbite Datepicker only -->
+        <Datepicker bind:value={pickerDate} class="ml-2" />
+      </div>
     {:else}
       <div class="text-sm text-gray-500 dark:text-gray-300">Last {weeks} weeks</div>
     {/if}
   </div>
 
-  <div class="grid-scroll">
-    <div class="flex gap-2" style="padding-bottom: 6px;">
-      {#each columns as col, colIndex}
-        <div class="column" style="gap: {gap}px;">
-          {#each col as day}
-            {#key day.toISOString()}
-              <div
-                class="square {colorClasses[intensityFor(volumeMap.get(dateKey(day)) || 0)]} { (day < monthStart || day > monthEnd) ? 'opacity-40' : '' }"
-                title="{day.toDateString()}: {volumeMap.get(dateKey(day)) || 0} volume"
-                aria-label="{day.toDateString()}: {volumeMap.get(dateKey(day)) || 0} volume"
-                style="width: {squareSize}px; height: {squareSize}px;"
-              ></div>
-            {/key}
-          {/each}
-        </div>
-      {/each}
-    </div>
+  <!-- Card containing the grid -->
+  <div class="border-2 border-gray-300 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
+    <div class="grid-scroll">
+      <div class="flex gap-2" style="padding-bottom: 6px;">
+        {#each columns as col, colIndex}
+          <div class="column" style="gap: {gap}px;">
+            {#each col as day}
+              {#key day.toISOString()}
+                <div
+                  class="square {colorClasses[intensityFor(volumeMap.get(dateKey(day)) || 0)]} { (day < monthStart || day > monthEnd) ? 'opacity-40' : '' }"
+                  title="{day.toDateString()}: {volumeMap.get(dateKey(day)) || 0} volume"
+                  aria-label="{day.toDateString()}: {volumeMap.get(dateKey(day)) || 0} volume"
+                  style="width: {squareSize}px; height: {squareSize}px;"
+                ></div>
+              {/key}
+            {/each}
+          </div>
+        {/each}
+      </div>
 
-    <!-- Legend -->
-    <div class="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-      <span class="mr-2">Less</span>
-      {#each colorClasses as c, i}
-        <div class="{c}" style="width: 14px; height: 14px; border-radius: 3px;"></div>
-      {/each}
-      <span class="ml-2">More</span>
+      <!-- Legend -->
+      <div class="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+        <span class="mr-2">Less</span>
+        {#each colorClasses as c, i}
+          <div class="{c}" style="width: 14px; height: 14px; border-radius: 3px;"></div>
+        {/each}
+        <span class="ml-2">More</span>
+      </div>
     </div>
   </div>
 </div>
