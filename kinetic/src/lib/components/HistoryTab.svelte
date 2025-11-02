@@ -3,6 +3,7 @@
     import { onMount } from 'svelte';
     import { workoutLogs } from '$lib/stores';
     import type { WorkoutLog } from '$lib/supabase';
+    import ContributionGrid from './ContributionGrid.svelte';
     import { sineIn } from 'svelte/easing';
 
     let history: WorkoutLog[] = [];
@@ -95,6 +96,12 @@
             <svg class="w-6 h-6 text-gray-500 dark:text-gray-400 transform transition-transform {logsVisible ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
         </div>
 
+        <!-- Contribution / activity calendar -->
+        <div class="mb-6">
+            <ContributionGrid logs={history} />
+        </div>
+
+        
         {#if logsVisible}
             <div class="space-y-4">
                 {#each history as log (log.id)}
