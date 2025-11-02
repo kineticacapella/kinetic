@@ -1,9 +1,34 @@
 <script lang="ts">
   import type { WorkoutLog } from '$lib/supabase';
   export let logs: WorkoutLog[] = [];
-  export let weeks = 52;
   export let squareSize = 12; // px
   export let gap = 4; // px
+
+  // Selected month (view). Default to current month.
+  let selectedMonth = new Date();
+  selectedMonth.setDate(1);
+
+  function monthLabel(d: Date) {
+    return d.toLocaleString(undefined, { month: 'long', year: 'numeric' });
+  }
+
+  function prevMonth() {
+    selectedMonth = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() - 1, 1);
+  }
+
+  function nextMonth() {
+    selectedMonth = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 1);
+  }
+
+  // helper for <input type="month"> value and change
+  $: monthValue = `${selectedMonth.getFullYear()}-${String(selectedMonth.getMonth() + 1).padStart(2, '0')}`;
+  function onMonthInput(e: Event) {
+    const v = (e.target as HTMLInputElement).value;
+    const [y, m] = v.split('-').map(Number);
+    if (!Number.isNaN(y) && !Number.isNaN(m)) {
+      selectedMonth = new Date(y, m - 1, 1);
+    }
+  }
 
   // Helper: YYYY-MM-DD key
   function dateKey(d: Date) {
@@ -34,31 +59,41 @@
     }
   }
 
-  // Build days array from earliest to today (weeks * 7 days)
-  function buildDays() {
-    const days: Date[] = [];
-    const today = new Date();
-    const end = new Date(today);
-    end.setHours(0, 0, 0, 0);
-    const totalDays = weeks * 7;
-    const start = new Date(end);
-    start.setDate(end.getDate() - (totalDays - 1));
-
-    for (let i = 0; i < totalDays; i++) {
-      const d = new Date(start);
-      d.setDate(start.getDate() + i);
-      days.push(d);
-    }
-    return days;
+  // Build days array for the selected month. We'll display the full weeks that cover the month
+  function startOfWeek(d: Date) {
+    const nd = new Date(d);
+    nd.setHours(0, 0, 0, 0);
+    nd.setDate(nd.getDate() - nd.getDay()); // Sunday as week start
+    return nd;
   }
 
-  $: days = buildDays();
+  function endOfWeek(d: Date) {
+    const nd = new Date(d);
+    nd.setHours(0, 0, 0, 0);
+    nd.setDate(nd.getDate() + (6 - nd.getDay()));
+    return nd;
+  }
 
-  // Group into weeks (columns)
+  $: monthStart = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), 1);
+  $: monthEnd = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0);
+
+  $: calendarStart = startOfWeek(monthStart);
+  $: calendarEnd = endOfWeek(monthEnd);
+
+  $: days = (() => {
+    const arr: Date[] = [];
+    for (let d = new Date(calendarStart); d <= calendarEnd; d.setDate(d.getDate() + 1)) {
+      arr.push(new Date(d));
+    }
+    return arr;
+  })();
+
+  // Group into week-columns of 7 days
   $: columns = [] as Date[][];
   $: {
     columns = [];
-    for (let i = 0; i < weeks; i++) {
+    const totalWeeks = Math.ceil(days.length / 7);
+    for (let i = 0; i < totalWeeks; i++) {
       const start = i * 7;
       columns.push(days.slice(start, start + 7));
     }
@@ -104,7 +139,12 @@
 <div class="mb-6">
   <div class="flex items-center justify-between mb-2">
     <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Activity</h3>
-    <div class="text-sm text-gray-500 dark:text-gray-300">Last {weeks} weeks</div>
+    <div class="flex items-center gap-2">
+      <button class="px-2 py-1 rounded border bg-gray-100 dark:bg-gray-700" on:click={prevMonth} aria-label="Previous month">◀</button>
+      <div class="text-sm text-gray-700 dark:text-gray-200 font-medium">{monthLabel(selectedMonth)}</div>
+      <button class="px-2 py-1 rounded border bg-gray-100 dark:bg-gray-700" on:click={nextMonth} aria-label="Next month">▶</button>
+      <input type="month" class="ml-2 text-sm bg-transparent text-gray-700 dark:text-gray-200" bind:value={monthValue} on:change={onMonthInput} aria-label="Select month" />
+    </div>
   </div>
 
   <div class="grid-scroll border rounded-lg p-3 bg-white dark:bg-gray-800">
@@ -114,7 +154,7 @@
           {#each col as day}
             {#key day.toISOString()}
               <div
-                class="square {colorClasses[intensityFor(volumeMap.get(dateKey(day)) || 0)]}"
+                class="square {colorClasses[intensityFor(volumeMap.get(dateKey(day)) || 0)]} { (day < monthStart || day > monthEnd) ? 'opacity-40' : '' }"
                 title="{day.toDateString()}: {volumeMap.get(dateKey(day)) || 0} volume"
                 aria-label="{day.toDateString()}: {volumeMap.get(dateKey(day)) || 0} volume"
                 style="width: {squareSize}px; height: {squareSize}px;"
