@@ -4,6 +4,13 @@
   export let squareSize = 12; // px
   export let gap = 4; // px
 
+  // allow switching back to the previous 52-week view
+  export let weeks = 52;
+  let viewMode: 'month' | 'weeks52' = 'month';
+  function toggleView() {
+    viewMode = viewMode === 'month' ? 'weeks52' : 'month';
+  }
+
   // Selected month (view). Default to current month.
   let selectedMonth = new Date();
   selectedMonth.setDate(1);
@@ -80,13 +87,33 @@
   $: calendarStart = startOfWeek(monthStart);
   $: calendarEnd = endOfWeek(monthEnd);
 
-  $: days = (() => {
-    const arr: Date[] = [];
-    for (let d = new Date(calendarStart); d <= calendarEnd; d.setDate(d.getDate() + 1)) {
-      arr.push(new Date(d));
+  // Build days for either mode: month (full weeks covering the month) or last N weeks ending today
+  function buildDaysWeeks() {
+    const daysArr: Date[] = [];
+    const today = new Date();
+    const end = new Date(today);
+    end.setHours(0, 0, 0, 0);
+    const totalDays = weeks * 7;
+    const start = new Date(end);
+    start.setDate(end.getDate() - (totalDays - 1));
+
+    for (let i = 0; i < totalDays; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      daysArr.push(d);
     }
-    return arr;
-  })();
+    return daysArr;
+  }
+
+  $: days = (viewMode === 'month')
+    ? (() => {
+        const arr: Date[] = [];
+        for (let d = new Date(calendarStart); d <= calendarEnd; d.setDate(d.getDate() + 1)) {
+          arr.push(new Date(d));
+        }
+        return arr;
+      })()
+    : buildDaysWeeks();
 
   // Group into week-columns of 7 days
   $: columns = [] as Date[][];
@@ -138,13 +165,21 @@
 
 <div class="mb-6">
   <div class="flex items-center justify-between mb-2">
-    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Activity</h3>
-    <div class="flex items-center gap-2">
-      <button class="px-2 py-1 rounded border bg-gray-100 dark:bg-gray-700" on:click={prevMonth} aria-label="Previous month">◀</button>
-      <div class="text-sm text-gray-700 dark:text-gray-200 font-medium">{monthLabel(selectedMonth)}</div>
-      <button class="px-2 py-1 rounded border bg-gray-100 dark:bg-gray-700" on:click={nextMonth} aria-label="Next month">▶</button>
-      <input type="month" class="ml-2 text-sm bg-transparent text-gray-700 dark:text-gray-200" bind:value={monthValue} on:change={onMonthInput} aria-label="Select month" />
+    <div class="flex items-center gap-3">
+      <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Activity</h3>
+      <button class="text-sm px-2 py-1 rounded border bg-gray-50 dark:bg-gray-700" on:click={toggleView} aria-pressed={viewMode === 'weeks52'} aria-label="Toggle month / 52-week view">{viewMode === 'month' ? 'Month' : '52w'}</button>
     </div>
+
+    {#if viewMode === 'month'}
+      <div class="flex items-center gap-2">
+        <button class="px-2 py-1 rounded border bg-gray-100 dark:bg-gray-700" on:click={prevMonth} aria-label="Previous month">◀</button>
+        <div class="text-sm text-gray-700 dark:text-gray-200 font-medium">{monthLabel(selectedMonth)}</div>
+        <button class="px-2 py-1 rounded border bg-gray-100 dark:bg-gray-700" on:click={nextMonth} aria-label="Next month">▶</button>
+        <input type="month" class="ml-2 text-sm bg-transparent text-gray-700 dark:text-gray-200" bind:value={monthValue} on:change={onMonthInput} aria-label="Select month" />
+      </div>
+    {:else}
+      <div class="text-sm text-gray-500 dark:text-gray-300">Last {weeks} weeks</div>
+    {/if}
   </div>
 
   <div class="grid-scroll border rounded-lg p-3 bg-white dark:bg-gray-800">
