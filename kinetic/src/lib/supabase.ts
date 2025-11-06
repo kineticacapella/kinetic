@@ -141,7 +141,7 @@ export interface Workout {
 	id?: string;
 	name: string;
 	note?: string;
-	workout_types?: string;
+	type?: string;
 	user_id?: string;
 	workout_exercises?: WorkoutExercise[]; // This will be populated by a join
 }
