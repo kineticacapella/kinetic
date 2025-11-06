@@ -760,11 +760,7 @@
 								</button>
 							{/if}
 						</div>
-						{#if (workout as any).type}
-							<div class="mb-3">
-								<span class="inline-flex items-center bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-800/30 dark:text-blue-400">{(workout as any).type}</span>
-							</div>
-						{/if}
+
 
 						<div class="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
 							<span>&bull; {numExercises} {numExercises === 1 ? 'exercise' : 'exercises'}</span>
@@ -785,6 +781,9 @@
 								>
 									{totalVolume.toLocaleString()} kg
 								</span>
+							{/if}
+							{#if (workout as any).type}
+								<span class="inline-flex items-center bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-800/30 dark:text-blue-400">{(workout as any).type}</span>
 							{/if}
 							{#if hasDropSet}
 								<span
