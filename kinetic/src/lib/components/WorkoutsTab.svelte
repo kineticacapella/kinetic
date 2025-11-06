@@ -464,7 +464,7 @@
 		try {
 			if (currentWorkout && currentWorkout.id) {
 				// Update existing workout
-				await updateWorkout(currentWorkout.id, { name: newWorkoutName, note: newWorkoutNote, type: selectedWorkoutType });
+				await updateWorkout(currentWorkout.id, { name: newWorkoutName, note: newWorkoutNote, workout_types: selectedWorkoutType });
 
 				// Simple update: delete all exercises and re-add them
 				for (const we of currentWorkout.workout_exercises || []) {
@@ -484,7 +484,7 @@
 				}
 			} else {
 				// Add new workout
-				const newWorkout = await addWorkout({ name: newWorkoutName, note: newWorkoutNote, type: selectedWorkoutType }, $user);
+				const newWorkout = await addWorkout({ name: newWorkoutName, note: newWorkoutNote, workout_types: selectedWorkoutType }, $user);
 				if (newWorkout && newWorkout.id) {
 					for (const set of newWorkoutSets) {
 						await addExerciseToWorkout({
@@ -554,7 +554,7 @@
 		editingWorkout = workout;
 		newWorkoutName = workout.name;
 		newWorkoutNote = workout.note || '';
-		selectedWorkoutType = (workout as any).type || '';
+		selectedWorkoutType = (workout as any).workout_types || '';
 		newWorkoutSets = (workout.workout_exercises || []).map((we: WorkoutExercise) => ({
 			id: we.id || '',
 			exercise_id: we.exercise_id,
@@ -574,7 +574,7 @@
 		editingWorkout = workout;
 		newWorkoutName = workout.name;
 		newWorkoutNote = workout.note || '';
-		selectedWorkoutType = (workout as any).type || '';
+		selectedWorkoutType = (workout as any).workout_types || '';
 		newWorkoutSets = (workout.workout_exercises || []).map((we: WorkoutExercise) => ({
 			id: we.id || '',
 			exercise_id: we.exercise_id,
@@ -760,9 +760,9 @@
 								</button>
 							{/if}
 						</div>
-						{#if (workout as any).type}
+						{#if (workout as any).workout_types}
 							<div class="mb-3">
-								<span class="inline-flex items-center bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-800/30 dark:text-blue-400">{(workout as any).type}</span>
+								<span class="inline-flex items-center bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-800/30 dark:text-blue-400">{(workout as any).workout_types}</span>
 							</div>
 						{/if}
 
