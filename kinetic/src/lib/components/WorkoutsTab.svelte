@@ -775,15 +775,15 @@
 						</div>
 
 						<div class="pt-2 min-h-[34px]">
+							{#if (workout as any).type}
+								<span class="inline-flex items-center bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-900 dark:text-blue-300">{(workout as any).type}</span>
+							{/if}
 							{#if totalVolume > 0}
 								<span
 									class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-green-900 dark:text-green-300"
 								>
 									{totalVolume.toLocaleString()} kg
 								</span>
-							{/if}
-							{#if (workout as any).type}
-								<span class="inline-flex items-center bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-blue-800/30 dark:text-blue-400">{(workout as any).type}</span>
 							{/if}
 							{#if hasDropSet}
 								<span
