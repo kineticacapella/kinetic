@@ -17,6 +17,7 @@ export interface UserSettings {
 	user_id: string;
 	exercise_types: string[];
 	equipment_types: string[];
+	workout_types?: string[];
 }
 
 export async function getUserSettings(user: User): Promise<UserSettings | null> {
@@ -34,14 +35,15 @@ export async function getUserSettings(user: User): Promise<UserSettings | null> 
 	});
 }
 
-export async function upsertUserSettings(user: User, exercise_types: string[], equipment_types: string[]) {
+export async function upsertUserSettings(user: User, exercise_types: string[], equipment_types: string[], workout_types?: string[]) {
 	return withStatus('syncing', async () => {
 		const { error } = await supabase
 			.from('user_settings')
 			.upsert({
 				user_id: user.id,
 				exercise_types,
-				equipment_types
+				equipment_types,
+				workout_types
 			});
 		if (error) throw error;
 	});
@@ -139,6 +141,7 @@ export interface Workout {
 	id?: string;
 	name: string;
 	note?: string;
+	type?: string;
 	user_id?: string;
 	workout_exercises?: WorkoutExercise[]; // This will be populated by a join
 }

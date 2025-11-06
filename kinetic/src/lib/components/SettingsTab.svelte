@@ -6,11 +6,15 @@
 
 	let newExerciseType = $state('');
 	let newEquipmentType = $state('');
+	let newWorkoutType = $state('');
 	let exerciseTypes: string[] = $state([
 		'Strength', 'Cardio', 'Stretching', 'Plyometrics', 'Powerlifting', 'Strongman', 'Olympic Weightlifting'
 	]);
 	let equipmentTypes: string[] = $state([
 		'Barbell', 'Dumbbell', 'Kettlebell', 'Machine', 'Cable', 'Bodyweight', 'Bands', 'Medicine Ball', 'Other'
+	]);
+	let workoutTypes: string[] = $state([
+		'Full Body', 'Upper Body', 'Lower Body', 'Push', 'Pull', 'Legs', 'Cardio'
 	]);
 	let settingsError = $state('');
 	let email = $state('');
@@ -27,6 +31,7 @@
 				if (settings) {
 					exerciseTypes = settings.exercise_types;
 					equipmentTypes = settings.equipment_types;
+					workoutTypes = settings.workout_types ?? workoutTypes;
 				}
 			} catch (err) {
 				settingsError = 'Could not load settings.';
@@ -57,7 +62,7 @@
 		exerciseTypes = [...exerciseTypes, newExerciseType.trim()];
 		newExerciseType = '';
 		try {
-			await upsertUserSettings($user, exerciseTypes, equipmentTypes);
+			await upsertUserSettings($user, exerciseTypes, equipmentTypes, workoutTypes);
 			await loadUserSettings();
 		} catch (err) {
 			settingsError = 'Could not save exercise types.';
@@ -68,7 +73,7 @@
 		exerciseTypes = exerciseTypes.filter((t: string) => t !== typeToRemove);
 		if ($user) {
 			try {
-				await upsertUserSettings($user, exerciseTypes, equipmentTypes);
+				await upsertUserSettings($user, exerciseTypes, equipmentTypes, workoutTypes);
 				await loadUserSettings();
 			} catch (err) {
 				settingsError = 'Could not save exercise types.';
@@ -82,7 +87,7 @@
 		equipmentTypes = [...equipmentTypes, newEquipmentType.trim()];
 		newEquipmentType = '';
 		try {
-			await upsertUserSettings($user, exerciseTypes, equipmentTypes);
+			await upsertUserSettings($user, exerciseTypes, equipmentTypes, workoutTypes);
 			await loadUserSettings();
 		} catch (err) {
 			settingsError = 'Could not save equipment types.';
@@ -93,10 +98,35 @@
 		equipmentTypes = equipmentTypes.filter((t: string) => t !== typeToRemove);
 		if ($user) {
 			try {
-				await upsertUserSettings($user, exerciseTypes, equipmentTypes);
+				await upsertUserSettings($user, exerciseTypes, equipmentTypes, workoutTypes);
 				await loadUserSettings();
 			} catch (err) {
 				settingsError = 'Could not save equipment types.';
+			}
+		}
+	}
+
+	async function addWorkoutType(event?: Event) {
+		event?.preventDefault();
+		if (!newWorkoutType.trim() || !$user) return;
+		workoutTypes = [...workoutTypes, newWorkoutType.trim()];
+		newWorkoutType = '';
+		try {
+			await upsertUserSettings($user, exerciseTypes, equipmentTypes, workoutTypes);
+			await loadUserSettings();
+		} catch (err) {
+			settingsError = 'Could not save workout types.';
+		}
+	}
+
+	async function removeWorkoutType(typeToRemove: string) {
+		workoutTypes = workoutTypes.filter((t: string) => t !== typeToRemove);
+		if ($user) {
+			try {
+				await upsertUserSettings($user, exerciseTypes, equipmentTypes, workoutTypes);
+				await loadUserSettings();
+			} catch (err) {
+				settingsError = 'Could not save workout types.';
 			}
 		}
 	}
@@ -313,6 +343,36 @@
 					bind:value={newEquipmentType}
 					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 					placeholder="New equipment type"
+				/>
+				<button
+					type="submit"
+					class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800 transition-colors"
+					>Add</button
+				>
+			</form>
+		</div>
+
+		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-2 border-blue-700 dark:border-blue-600">
+			<h2 class="text-2xl font-semibold mb-6 text-gray-700 dark:text-gray-300">Workout Types</h2>
+			<ul class="space-y-3 mb-4">
+				{#each workoutTypes as type}
+					<li
+						class="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-3 rounded-lg"
+					>
+						<span class="text-gray-800 dark:text-gray-200">{type}</span>
+						<button
+							onclick={() => removeWorkoutType(type)}
+							class="text-sm font-medium text-red-600 dark:text-red-400 hover:underline"
+							>Remove</button
+						>
+					</li>
+				{/each}
+			</ul>
+			<form onsubmit={addWorkoutType} class="flex items-center gap-3">
+				<input
+					bind:value={newWorkoutType}
+					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+					placeholder="New workout type"
 				/>
 				<button
 					type="submit"

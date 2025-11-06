@@ -19,6 +19,7 @@
 		getExercises,
 		getWorkouts,
 		getWorkout,
+		getUserSettings,
 		addWorkout,
 		updateWorkout,
 		deleteWorkout,
@@ -45,6 +46,7 @@
 	import { user } from '$lib/stores';
 
 	let exercises: Exercise[] = $state([]);
+	let workoutTypes: string[] = $state([]);
 	let editingWorkout: Workout | null = $state(null);
 	let workoutError = $state('');
 	let workoutSuccess = $state('');
@@ -86,6 +88,7 @@
 	// Add workout state
 	let newWorkoutName = $state('');
 	let newWorkoutNote = $state('');
+	let selectedWorkoutType = $state('');
 	let editingNote = $state(false);
 	let tempNote = $state('');
 	let newWorkoutExerciseId = $state('');
@@ -146,6 +149,17 @@
 			} else {
 				console.error('Unknown error fetching exercises:', error);
 			}
+		}
+	}
+
+	async function loadUserSettings() {
+		if (!$user) return;
+		try {
+			const settings = await getUserSettings($user);
+			workoutTypes = settings?.workout_types ?? [];
+		} catch (err) {
+			console.error('Error loading user settings for workout types', err);
+			workoutTypes = [];
 		}
 	}
 
@@ -210,6 +224,7 @@
 		if ($user) {
 			void loadExercises();
 			void loadWorkouts();
+			void loadUserSettings();
 		}
 	});
 
@@ -257,6 +272,7 @@
 		newWorkoutNote = '';
 		newWorkoutExerciseId = '';
 		newWorkoutSets = [];
+		selectedWorkoutType = '';
 		workoutMode = 'edit';
 		addWorkoutModal.show();
 	}
@@ -448,7 +464,7 @@
 		try {
 			if (currentWorkout && currentWorkout.id) {
 				// Update existing workout
-				await updateWorkout(currentWorkout.id, { name: newWorkoutName, note: newWorkoutNote });
+				await updateWorkout(currentWorkout.id, { name: newWorkoutName, note: newWorkoutNote, type: selectedWorkoutType });
 
 				// Simple update: delete all exercises and re-add them
 				for (const we of currentWorkout.workout_exercises || []) {
@@ -468,7 +484,7 @@
 				}
 			} else {
 				// Add new workout
-				const newWorkout = await addWorkout({ name: newWorkoutName, note: newWorkoutNote }, $user);
+				const newWorkout = await addWorkout({ name: newWorkoutName, note: newWorkoutNote, type: selectedWorkoutType }, $user);
 				if (newWorkout && newWorkout.id) {
 					for (const set of newWorkoutSets) {
 						await addExerciseToWorkout({
@@ -538,6 +554,7 @@
 		editingWorkout = workout;
 		newWorkoutName = workout.name;
 		newWorkoutNote = workout.note || '';
+		selectedWorkoutType = (workout as any).type || '';
 		newWorkoutSets = (workout.workout_exercises || []).map((we: WorkoutExercise) => ({
 			id: we.id || '',
 			exercise_id: we.exercise_id,
@@ -557,6 +574,7 @@
 		editingWorkout = workout;
 		newWorkoutName = workout.name;
 		newWorkoutNote = workout.note || '';
+		selectedWorkoutType = (workout as any).type || '';
 		newWorkoutSets = (workout.workout_exercises || []).map((we: WorkoutExercise) => ({
 			id: we.id || '',
 			exercise_id: we.exercise_id,
@@ -854,6 +872,15 @@
 							required
 						/>
 					</div>
+		                    <div>
+		                        <label for="workout-type" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Workout Type</label>
+		                        <select id="workout-type" bind:value={selectedWorkoutType} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+		                            <option value="">(None)</option>
+		                            {#each workoutTypes as wt}
+		                                <option value={wt}>{wt}</option>
+		                            {/each}
+		                        </select>
+		                    </div>
 					   <div>
 						   <!-- Button removed from here, will be placed with note display below -->
 					   </div>
