@@ -1,7 +1,7 @@
 import { writable, get } from 'svelte/store';
 import type { Session, User } from '@supabase/supabase-js';
 import type { Workout, WorkoutLog } from './supabase';
-import { addWorkoutLog as dbAddWorkoutLog, getWorkoutLogs, updateWorkoutLog as dbUpdateWorkoutLog } from './supabase';
+import { addWorkoutLog as dbAddWorkoutLog, getWorkoutLogs, updateWorkoutLog as dbUpdateWorkoutLog, deleteWorkoutLog as dbDeleteWorkoutLog } from './supabase';
 
 export const workouts = writable<Workout[]>([]);
 
@@ -84,6 +84,14 @@ export async function updateWorkoutLog(id: string, log: Partial<WorkoutLog>) {
     const updatedLog = await dbUpdateWorkoutLog(id, log);
     workoutLogs.update(logs => logs.map(l => l.id === id ? updatedLog : l));
     return updatedLog;
+}
+
+export async function deleteWorkoutLog(id: string) {
+    if (!id) return;
+    // call DB delete
+    await dbDeleteWorkoutLog(id);
+    // remove from local store
+    workoutLogs.update(logs => logs.filter(l => l.id !== id));
 }
 
 

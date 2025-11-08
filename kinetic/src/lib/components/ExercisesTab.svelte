@@ -2,7 +2,7 @@
 import '$lib/chart.css';
 	import { onMount } from 'svelte';
 	import { initFlowbite, Modal } from 'flowbite';
-	import { user } from '$lib/stores';
+	import { user, workoutLogs } from '$lib/stores';
 	import { getExercises, addExercise, updateExercise, deleteExercise, getWorkoutLogs, type WorkoutLog, type LoggedSet } from '$lib/supabase';
 	import { PlusOutline, CheckOutline, CloseOutline, FileChartBarSolid } from 'flowbite-svelte-icons';
 	import { Chart } from '@flowbite-svelte-plugins/chart';
@@ -202,7 +202,11 @@ import '$lib/chart.css';
 	}
 
 	$effect(() => {
+		// Recompute stats when selected exercise or timeframe changes,
+		// and also when workoutLogs (the source of truth for sets) updates so the PR chart refreshes immediately after deletions.
 		if (selectedExercise) {
+			// reference $workoutLogs here so this effect re-runs when the store updates
+			const _logs = $workoutLogs;
 			void getExerciseStats(selectedExercise.id, selectedTimeframe);
 		}
 	});

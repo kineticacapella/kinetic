@@ -292,6 +292,16 @@ export async function updateWorkoutLog(id: string, log: Partial<WorkoutLog>) {
 	});
 }
 
+export async function deleteWorkoutLog(id: string) {
+	return withStatus('syncing', async () => {
+		const { error } = await supabase
+			.from('workout_logs')
+			.delete()
+			.eq('id', id);
+		if (error) throw error;
+	});
+}
+
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;

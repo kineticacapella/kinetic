@@ -1,7 +1,7 @@
 
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { workoutLogs } from '$lib/stores';
+    import { workoutLogs, deleteWorkoutLog } from '$lib/stores';
     import type { WorkoutLog } from '$lib/supabase';
     import ContributionGrid from './ContributionGrid.svelte';
     import { sineIn } from 'svelte/easing';
@@ -115,6 +115,16 @@
                                     </p>
                                 </div>
                                 <div class="flex items-center">
+                                    <button
+                                        class="text-sm text-red-600 dark:text-red-400 me-4 hover:underline"
+                                        on:click|stopPropagation={() => {
+                                            if (confirm('Delete this log? This cannot be undone.')) {
+                                                void deleteWorkoutLog(log.id);
+                                            }
+                                        }}
+                                    >
+                                        Delete
+                                    </button>
                                     {#if !log.ended_at}
                                         <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-1 rounded-full dark:bg-green-900 dark:text-green-300">Ongoing</span>
                                     {:else}
