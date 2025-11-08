@@ -5,10 +5,13 @@
     import type { WorkoutLog } from '$lib/supabase';
     import ContributionGrid from './ContributionGrid.svelte';
     import { sineIn } from 'svelte/easing';
+    import { initFlowbite, Modal } from 'flowbite';
 
     let history: WorkoutLog[] = [];
     let expandedLogs = new Set<string>();
     let logsVisible = true;
+    let confirmDeleteModal: Modal;
+    let logToDeleteId: string | null = null;
 
     function toggleLog(logId: string) {
         if (expandedLogs.has(logId)) {
@@ -36,6 +39,12 @@
     }
 
     onMount(() => {
+        initFlowbite();
+        const confirmDeleteModalEl = document.getElementById('confirm-delete-log-modal');
+        if (confirmDeleteModalEl) {
+            confirmDeleteModal = new Modal(confirmDeleteModalEl);
+        }
+
         const unsubscribe = workoutLogs.subscribe(logs => {
             const ongoing = logs.filter(log => !log.ended_at);
             const completed = logs.filter(log => log.ended_at && log.sets && log.sets.length > 0);
@@ -51,6 +60,22 @@
 
         return () => unsubscribe();
     });
+
+    function handleDeleteClick(id: string) {
+        logToDeleteId = id;
+        if (confirmDeleteModal) confirmDeleteModal.show();
+    }
+
+    async function confirmDeleteLog() {
+        if (!logToDeleteId) return;
+        try {
+            await deleteWorkoutLog(logToDeleteId);
+        } catch (err) {
+            console.error('Error deleting workout log:', err);
+        }
+        logToDeleteId = null;
+        if (confirmDeleteModal) confirmDeleteModal.hide();
+    }
 
     function formatDateTime(isoString: string): string {
         const date = new Date(isoString);
@@ -70,9 +95,39 @@
     <div class="flex justify-between items-center mb-8">
         <div>
             <h1 class="text-3xl font-bold text-gray-800 dark:text-white">History</h1>
-            <p class="text-gray-500 dark:text-gray-400 mt-1">
-                A log of your completed workout sessions.
-            </p>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">A log of your completed workout sessions.</p>
+
+        <!-- Confirm Delete Log Modal -->
+        <div
+            id="confirm-delete-log-modal"
+            tabindex="-1"
+            aria-hidden="true"
+            class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+        >
+            <div class="relative p-4 w-full max-w-sm max-h-full">
+                <div class="relative bg-white rounded-lg shadow-xl dark:bg-gray-800 border-2 border-red-700 dark:border-red-600">
+                    <div class="flex items-center justify-between p-4 rounded-t dark:border-gray-600">
+                        <h3 class="text-base font-semibold text-gray-900 dark:text-white">Delete log?</h3>
+                        <div class="flex items-center gap-2">
+                            <button
+                                on:click={confirmDeleteLog}
+                                type="button"
+                                class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm p-2 text-center inline-flex items-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+                            >
+                                Delete
+                            </button>
+                            <button
+                                data-modal-hide="confirm-delete-log-modal"
+                                type="button"
+                                class="text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 p-2"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         </div>
     </div>
 
@@ -117,11 +172,7 @@
                                 <div class="flex items-center">
                                     <button
                                         class="text-sm text-red-600 dark:text-red-400 me-4 hover:underline"
-                                        on:click|stopPropagation={() => {
-                                            if (confirm('Delete this log? This cannot be undone.')) {
-                                                void deleteWorkoutLog(log.id);
-                                            }
-                                        }}
+                                        on:click|stopPropagation={() => handleDeleteClick(log.id)}
                                     >
                                         Delete
                                     </button>
